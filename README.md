@@ -103,11 +103,12 @@ affiliated with, approved, sponsored or endorsed by the BookOrbit project.
 - **Google Play** (testing): [Google Play testing link]
 - **GitHub releases**: signed APKs are attached to each release at
   <https://github.com/redmundmcmund/ottershelf/releases>. The release signing certificate's
-  SHA-256 fingerprint is `[signing certificate SHA-256]`.
+  SHA-256 fingerprint is
+  `99:3B:5B:6A:81:9E:7E:22:A3:60:C9:96:CD:1F:D8:BA:93:9E:5C:BF:63:EA:A9:B6:F4:EF:9A:8F:0F:68:54:D6`.
 
-The Play and GitHub builds use the same package ID (`io.github.ottershelf`).
-[Confirm whether Play App Signing is used; if it is, the two builds are signed with different keys
-and cannot be installed over each other.]
+The Play and GitHub builds use the same package ID (`io.github.ottershelf`) and the same signing
+key: the project's own key is also the app signing key on Google Play (Play App Signing with an
+uploaded key), so either build can update the other without reinstalling.
 
 ## Building from source
 
