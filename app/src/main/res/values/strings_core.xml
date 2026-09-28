@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Data layer (core.*): notification texts, also used by the shell's download snackbars. -->
+<resources>
+    <string name="core_download_channel">Downloads</string>
+    <string name="core_download_channel_description">Books being downloaded for offline reading</string>
+    <string name="core_download_progress">Downloading %1$s</string>
+    <string name="core_download_cancel">Cancel</string>
+    <string name="core_download_done">Downloaded %1$s</string>
+    <string name="core_download_failed">Couldn\'t download %1$s: %2$s</string>
+    <!-- Stands in for a book with no title in the texts above. -->
+    <string name="core_download_untitled">book</string>
+
+    <!-- The reading timer (core.tracking.TimerNotifications) -->
+    <string name="core_timer_channel">Reading timer</string>
+    <string name="core_timer_channel_description">The timer while you read, with pause and stop</string>
+    <string name="core_timer_alert_channel">Timer alerts</string>
+    <string name="core_timer_alert_channel_description">When a countdown reaches its goal</string>
+    <!-- The running timer's title on the lock screen, in place of the book's -->
+    <string name="core_timer_public_title">Reading timer</string>
+    <string name="core_timer_reading">Reading</string>
+    <!-- %1$s: the active time so far, e.g. 12:34 -->
+    <string name="core_timer_paused">Paused at %1$s</string>
+    <!-- %1$d: the countdown's length in minutes -->
+    <string name="core_timer_countdown">%1$d min goal</string>
+    <string name="core_timer_overtime">Past your goal</string>
+    <string name="core_timer_pause">Pause</string>
+    <string name="core_timer_resume">Resume</string>
+    <string name="core_timer_stop">Stop</string>
+    <!-- %1$s: the reading time, e.g. 25:10; %2$s: the book's title -->
+    <string name="core_timer_finished_title">%1$s of %2$s</string>
+    <string name="core_timer_finished_text">Tap to save your session and the page you reached.</string>
+    <string name="core_timer_times_up_title">Time\'s up</string>
+    <!-- %1$s: the book's title -->
+    <string name="core_timer_times_up_text">You reached your reading goal for %1$s.</string>
+    <string name="core_timer_untitled">Your book</string>
+</resources>

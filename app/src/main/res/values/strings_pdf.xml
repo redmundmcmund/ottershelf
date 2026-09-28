@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- feature.pdf: the PDF reader. -->
+
+    <string name="pdf_contents">Contents</string>
+    <string name="pdf_outline">Outline</string>
+    <string name="pdf_pages">Pages</string>
+    <string name="pdf_search">Search</string>
+    <string name="pdf_settings">PDF settings</string>
+    <string name="pdf_position_page">Page %1$d of %2$d</string>
+    <string name="pdf_page_number">Page %1$d</string>
+
+    <string name="pdf_loading">Getting the PDF…</string>
+    <string name="pdf_downloading_percent">Downloading… %1$d%%</string>
+    <string name="pdf_opening">Opening…</string>
+    <string name="pdf_offline_not_downloaded">No connection, and this PDF isn\'t on the phone. Download it from its page to read it offline.</string>
+    <string name="pdf_open_failed">Couldn\'t open the PDF.</string>
+    <string name="pdf_fresh_start">Marked %1$s, so starting from the beginning</string>
+    <string name="pdf_link_failed">Couldn\'t open that link</string>
+
+    <string name="pdf_search_hint">Search in this PDF</string>
+    <string name="pdf_search_searching">Searching… page %1$d of %2$d</string>
+    <string name="pdf_search_searching_short">Searching…</string>
+    <string name="pdf_search_none">No matches</string>
+    <string name="pdf_search_capped">Showing the first %1$d matches</string>
+    <plurals name="pdf_search_results">
+        <item quantity="one">%1$d match</item>
+        <item quantity="other">%1$d matches</item>
+    </plurals>
+    <string name="pdf_search_position">%1$d of %2$d</string>
+    <string name="pdf_search_previous">Previous match</string>
+    <string name="pdf_search_next">Next match</string>
+    <string name="pdf_search_clear">Clear search</string>
+
+    <string name="pdf_layout">Layout</string>
+    <string name="pdf_layout_continuous">Continuous</string>
+    <string name="pdf_layout_single">Single page</string>
+    <string name="pdf_zoom">Zoom</string>
+    <string name="pdf_fit_width">Fit width</string>
+    <string name="pdf_fit_page">Fit page</string>
+    <string name="pdf_night">Night mode</string>
+    <string name="pdf_night_detail">Invert the page colours</string>
+    <string name="pdf_settings_default">Layout and zoom follow your default for PDFs.</string>
+    <string name="pdf_settings_customized">Layout and zoom are set for this book.</string>
+    <string name="pdf_settings_reset">Reset</string>
+    <string name="pdf_settings_use_for_all">Use for all PDFs</string>
+
+    <string name="pdf_password_title">Password required</string>
+    <string name="pdf_password_message">This PDF is protected. Enter its password to open it.</string>
+    <string name="pdf_password_label">Password</string>
+    <string name="pdf_password_wrong">That password didn\'t open it</string>
+    <string name="pdf_password_open">Open</string>
+    <string name="pdf_cancel">Cancel</string>
+</resources>

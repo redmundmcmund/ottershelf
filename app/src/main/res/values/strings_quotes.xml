@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- feature.quotes: typed or photographed quotes, saved as BookOrbit annotations. -->
+<resources>
+    <string name="quotes_title">Add quote</string>
+    <string name="quotes_add">Add quote</string>
+    <string name="quotes_scan">Scan a page</string>
+    <string name="quotes_choose_photo">Choose a photo</string>
+
+    <!-- Form -->
+    <string name="quotes_book">Book</string>
+    <string name="quotes_choose_book">Choose a book</string>
+    <string name="quotes_change_book">Change</string>
+    <string name="quotes_book_failed">Couldn\'t load the book. It is still saved to it.</string>
+    <string name="quotes_quote">Quote</string>
+    <string name="quotes_quote_hint">Type the passage, or scan the page</string>
+    <string name="quotes_page">Page</string>
+    <string name="quotes_page_from">From</string>
+    <string name="quotes_page_to">To</string>
+    <string name="quotes_page_saved">Saved as %1$s</string>
+    <string name="quotes_thought">Your thought</string>
+    <string name="quotes_thought_hint">What it made you think (optional)</string>
+    <string name="quotes_colour">Colour</string>
+    <string name="quotes_keep_photo">Keep the photo on this phone</string>
+    <string name="quotes_keep_photo_detail">It isn\'t uploaded. Off: it is deleted once the quote is saved.</string>
+    <string name="quotes_save">Save quote</string>
+    <string name="quotes_saving">Saving…</string>
+    <string name="quotes_save_failed">Couldn\'t save: %1$s</string>
+    <string name="quotes_where">Saved to BookOrbit as a highlight with no place in the book: it shows in Notes, on the book page and on the web, but the reader can\'t open it.</string>
+
+    <!-- Book picker -->
+    <string name="quotes_search_books">Search your library</string>
+    <string name="quotes_reading_now">Reading now</string>
+    <string name="quotes_results">Books</string>
+    <string name="quotes_no_books">No books found.</string>
+    <string name="quotes_books_failed">Couldn\'t load books.</string>
+
+    <!-- Camera permission -->
+    <string name="quotes_camera_title">Photograph a page</string>
+    <string name="quotes_camera_rationale">The camera is used only while you photograph a page, so its text can be read here on the phone. The photo and its text never leave the phone, and you decide whether the photo is kept.</string>
+    <string name="quotes_camera_continue">Continue</string>
+    <string name="quotes_camera_denied_title">Camera not allowed</string>
+    <string name="quotes_camera_denied">You can still choose a photo of the page from your gallery, or allow the camera in Settings.</string>
+    <string name="quotes_open_settings">Settings</string>
+    <string name="quotes_cancel">Cancel</string>
+
+    <!-- Scan -->
+    <string name="quotes_camera_hint">Fill the frame with the page and hold steady</string>
+    <string name="quotes_take_photo">Take photo</string>
+    <string name="quotes_close">Close</string>
+    <string name="quotes_camera_failed">The camera couldn\'t start.</string>
+    <string name="quotes_reading_page">Reading the page…</string>
+    <string name="quotes_pick_lines">Pick the lines</string>
+    <string name="quotes_pick_hint">Tap or drag over the lines to keep</string>
+    <string name="quotes_select_all">All</string>
+    <string name="quotes_select_none">None</string>
+    <string name="quotes_retake">Retake</string>
+    <plurals name="quotes_use_lines">
+        <item quantity="one">Use %1$d line</item>
+        <item quantity="other">Use %1$d lines</item>
+    </plurals>
+    <string name="quotes_no_text">No text found. Try again with more light, closer to the page.</string>
+    <string name="quotes_scan_failed">Couldn\'t read the photo.</string>
+    <string name="quotes_photo">The photographed page</string>
+    <string name="quotes_photo_remove">Remove photo</string>
+    <string name="quotes_photo_remove_title">Remove this photo?</string>
+    <string name="quotes_photo_remove_text">It is deleted from this phone. The quote stays.</string>
+</resources>

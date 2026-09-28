@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.home (the Dashboard). -->
+<resources>
+    <string name="home_currently_reading">Currently Reading</string>
+    <string name="home_currently_reading_empty">No books in progress. Start reading one to see it here.</string>
+    <string name="home_continue_reading">Continue reading</string>
+    <string name="home_reading_streak">Reading Streak</string>
+    <string name="home_reading_streak_empty">Read today to start your streak</string>
+    <string name="home_day_streak">day streak</string>
+    <plurals name="home_best_streak">
+        <item quantity="one">Best: %d day</item>
+        <item quantity="other">Best: %d days</item>
+    </plurals>
+    <string name="home_last_seven_days">Last 7 days</string>
+    <string name="home_recently_added">Recently Added</string>
+    <string name="home_recently_added_empty">No books in your library yet.</string>
+    <string name="home_failed">Couldn\'t load.</string>
+
+    <!-- Widgets (client/src/locales/en.json dashboard.widgets) -->
+    <string name="home_untitled">Untitled</string>
+    <string name="home_reading_goal">Reading Goal</string>
+    <string name="home_reading_goal_year">Reading Goal %1$d</string>
+    <string name="home_goal_prompt">Set a reading goal to track your progress</string>
+    <string name="home_goal_set">Set goal</string>
+    <string name="home_goal_of">of %1$d</string>
+    <string name="home_goal_percent">%1$d%% complete</string>
+    <string name="home_goal_edit">Edit goal</string>
+
+    <string name="home_reading_dna">Reading DNA</string>
+    <string name="home_dna_not_enough">Read at least 5 books to unlock your Reading DNA</string>
+    <plurals name="home_dna_based_on">
+        <item quantity="one">Based on %d book</item>
+        <item quantity="other">Based on %d books</item>
+    </plurals>
+    <string name="home_dna_length">Length</string>
+    <string name="home_dna_variety">Variety</string>
+    <string name="home_dna_rhythm">Rhythm</string>
+    <string name="home_dna_time">Time</string>
+    <string name="home_dna_speed">Speed</string>
+    <string name="home_quoted">“%1$s”</string>
+
+    <string name="home_monthly_challenge">Monthly Challenge</string>
+    <string name="home_challenge_complete">Complete!</string>
+    <string name="home_challenge_progress">%1$d / %2$d</string>
+
+    <string name="home_highlight">Highlight of the Day</string>
+    <string name="home_highlight_empty">Highlight passages while reading to see them here</string>
+
+    <string name="home_neglected_gems">Neglected Gems</string>
+    <string name="home_gems_empty">All your top-rated books have been read!</string>
+    <string name="home_gems_rating">%1$s/5</string>
+    <string name="home_gems_waiting">%1$dd waiting</string>
+    <string name="home_gems_queue">Add to queue</string>
+    <string name="home_gems_queued">Queued</string>
+    <string name="home_gems_shuffle">Shuffle</string>
+
+    <string name="home_reading_rhythm">Reading Rhythm</string>
+    <string name="home_rhythm_empty">Start reading to see your rhythm take shape</string>
+    <plurals name="home_rhythm_active_days">
+        <item quantity="one">%d active day</item>
+        <item quantity="other">%d active days</item>
+    </plurals>
+    <string name="home_rhythm_consistency">%1$s · %2$d%% consistency</string>
+    <string name="home_rhythm_avg">avg %1$s/day</string>
+    <string name="home_rhythm_hint">Tap or drag across the bars to see a day</string>
+    <string name="home_time_seconds">%1$ds</string>
+    <string name="home_time_minutes">%1$dm</string>
+    <string name="home_time_hours">%1$dh</string>
+    <string name="home_time_hours_minutes">%1$dh %2$dm</string>
+    <string name="home_time_none">No reading</string>
+
+    <string name="home_diversity">Diversity Score</string>
+    <string name="home_diversity_not_enough">Read at least 3 books to see your diversity score</string>
+    <plurals name="home_diversity_analyzed">
+        <item quantity="one">%d book analyzed</item>
+        <item quantity="other">%d books analyzed</item>
+    </plurals>
+    <string name="home_diversity_of">/100</string>
+    <string name="home_diversity_genre">Genre</string>
+    <string name="home_diversity_author">Author</string>
+    <string name="home_diversity_era">Era</string>
+    <string name="home_diversity_language">Lang</string>
+
+    <string name="home_library_overview">Library Overview</string>
+    <string name="home_library_empty">Your library is empty. Add some books to get started.</string>
+    <string name="home_library_added">+%1$d added this year</string>
+    <string name="home_library_books">Books</string>
+    <string name="home_library_authors">Authors</string>
+    <string name="home_library_series">Series</string>
+    <string name="home_library_storage">Storage</string>
+
+    <string name="home_year_projection">Year Projection</string>
+    <string name="home_projection_books">books</string>
+    <string name="home_projection_up">Trending up</string>
+    <string name="home_projection_down">Trending down</string>
+    <string name="home_projection_steady">Steady pace</string>
+    <string name="home_projection_pages">pages</string>
+    <string name="home_projection_hours">hours</string>
+    <string name="home_projection_footer">%1$d read · %2$dd left</string>
+
+    <string name="home_long_wait">The Long Wait</string>
+    <string name="home_long_wait_empty">No books waiting. You\'ve started everything!</string>
+    <string name="home_long_wait_days">days waiting</string>
+    <plurals name="home_long_wait_pages">
+        <item quantity="one">%d page</item>
+        <item quantity="other">%d pages</item>
+    </plurals>
+    <string name="home_long_wait_start">Start Reading</string>
+
+    <!-- Shelves (dashboard.scroller, dashboard.settings.shelfNames) -->
+    <string name="home_shelf_continue_reading">Continue Reading</string>
+    <string name="home_shelf_want_to_read">Want to Read</string>
+    <string name="home_shelf_up_next">Up Next in Series</string>
+    <string name="home_shelf_random">Discover Something New</string>
+    <string name="home_shelf_smart_scope">Smart Scope</string>
+    <string name="home_shelf_empty_continue">No books in progress yet. Start reading one to see it here.</string>
+    <string name="home_shelf_empty_want">No books marked want to read yet.</string>
+    <string name="home_shelf_empty_up_next">No next-in-series picks yet. Finish a volume to surface the next one.</string>
+    <string name="home_shelf_empty_scope">No books match this Smart Scope.</string>
+    <string name="home_shelf_empty_default">No books found.</string>
+    <string name="home_no_shelves">All shelves are hidden.</string>
+
+    <!-- Customise (dashboard.settings) -->
+    <string name="home_customise">Customise</string>
+    <string name="home_customise_title">Customise Dashboard</string>
+    <string name="home_tab_shelves">Shelves</string>
+    <string name="home_tab_widgets">Widgets</string>
+    <string name="home_scope_title">Dashboard libraries</string>
+    <string name="home_scope_description">Choose which libraries contribute books and reading data to this dashboard.</string>
+    <string name="home_scope_all">All accessible libraries</string>
+    <string name="home_scope_none">No libraries selected</string>
+    <plurals name="home_scope_count">
+        <item quantity="one">%d library</item>
+        <item quantity="other">%d libraries</item>
+    </plurals>
+    <string name="home_scope_required">Select at least one library.</string>
+    <string name="home_scope_loading">Loading libraries…</string>
+    <string name="home_scope_failed">Couldn\'t load the libraries. Tap to try again.</string>
+    <string name="home_reorder_widgets">Drag a widget by its handle to reorder. Toggle to show or hide it.</string>
+    <string name="home_reorder_shelves">Drag a shelf by its handle to reorder. Toggle to show or hide it.</string>
+    <string name="home_rows_hint">Set how many rows of books each shelf shows. Narrow screens show at most two.</string>
+    <string name="home_rows">Rows</string>
+    <string name="home_books_per_row">Books per row</string>
+    <string name="home_smart_scope">Smart Scope</string>
+    <string name="home_no_smart_scopes">No Smart Scopes yet. Create one in the web app.</string>
+    <string name="home_add_shelf">Add shelf (%1$d/%2$d)</string>
+    <string name="home_reset">Reset to defaults</string>
+    <string name="home_cancel">Cancel</string>
+    <string name="home_save">Save</string>
+    <string name="home_save_failed">Couldn\'t save.</string>
+    <string name="home_move_up">Move up</string>
+    <string name="home_move_down">Move down</string>
+    <string name="home_remove_shelf">Remove shelf</string>
+    <string name="home_drag_handle">Drag to reorder</string>
+    <string name="home_arrange_tip">To mix widgets and shelves in any order, long-press a card\'s title on the Dashboard.</string>
+
+    <!-- Arranging the cards on the Dashboard -->
+    <string name="home_arrange">Rearrange the cards</string>
+    <string name="home_arrange_hint">Drag the cards by their handles, or long-press one to pick it up. Widgets and shelves can go in any order.</string>
+    <string name="home_arrange_done">Done</string>
+    <string name="home_arrange_failed">Couldn\'t save the new order, so it\'s back as it was.</string>
+</resources>

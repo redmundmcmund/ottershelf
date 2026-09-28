@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.achievements: Achievements, the unlock celebration and the year in review. Prefixed achievements_. -->
+<resources>
+    <string name="achievements_title">Achievements</string>
+    <!-- The header counts tiers (each level of a tiered badge is one), as the web's "20 / 87 tiers"; the filter chips count badges. -->
+    <string name="achievements_earned_of">%1$d of %2$d tiers earned</string>
+    <string name="achievements_badges_of">%1$d of %2$d badges · each level of a badge is a tier</string>
+    <string name="achievements_filter_all">All</string>
+    <string name="achievements_filter_earned">Earned %1$d</string>
+    <string name="achievements_filter_in_progress">In progress %1$d</string>
+    <string name="achievements_none_match">Nothing here for this filter</string>
+    <string name="achievements_load_failed">Couldn\'t load your achievements</string>
+    <string name="achievements_empty">No achievements yet</string>
+    <string name="achievements_secret">\?\?\?</string>
+    <string name="achievements_secret_hint">A secret achievement. Keep reading to reveal it.</string>
+    <string name="achievements_rarity_common">Common</string>
+    <string name="achievements_rarity_rare">Rare</string>
+    <string name="achievements_rarity_epic">Epic</string>
+    <string name="achievements_rarity_legendary">Legendary</string>
+    <string name="achievements_tier">Tier %1$d of %2$d</string>
+    <string name="achievements_progress">%1$s / %2$s</string>
+    <string name="achievements_next">Next: %1$s</string>
+    <string name="achievements_earned_on">Earned %1$s</string>
+    <string name="achievements_while_reading">While reading %1$s</string>
+    <string name="achievements_open_book">Open the book</string>
+    <string name="achievements_tiers">Tiers</string>
+    <string name="achievements_locked">Not earned yet</string>
+    <string name="achievements_earned">Earned</string>
+    <string name="achievements_rewind">Year in review</string>
+
+    <!-- The unlock celebration -->
+    <string name="achievements_unlocked">Achievement unlocked</string>
+    <string name="achievements_dismiss">Dismiss</string>
+
+    <!-- The year in review ("Rewind") -->
+    <string name="achievements_rewind_title">Rewind %1$d</string>
+    <string name="achievements_rewind_loading">Putting your year together</string>
+    <string name="achievements_rewind_failed">Couldn\'t put your year together</string>
+    <string name="achievements_rewind_close">Close</string>
+    <string name="achievements_rewind_next">Next</string>
+    <string name="achievements_rewind_back">Back</string>
+    <string name="achievements_rewind_done">Done</string>
+    <string name="achievements_rewind_previous_year">Previous year</string>
+    <string name="achievements_rewind_next_year">Next year</string>
+    <string name="achievements_rewind_intro_kicker">Your year in books</string>
+    <string name="achievements_rewind_intro_line">%1$s of reading across %2$s</string>
+    <string name="achievements_rewind_intro_empty">Nothing recorded for this year yet</string>
+    <string name="achievements_rewind_intro_hint">Swipe to see your year</string>
+    <string name="achievements_rewind_time_kicker">Time spent reading</string>
+    <string name="achievements_rewind_days_read">Days read</string>
+    <string name="achievements_rewind_sessions">Sessions</string>
+    <string name="achievements_rewind_per_day">Per reading day</string>
+    <string name="achievements_rewind_best_month">Your biggest month was %1$s, with %2$s</string>
+    <string name="achievements_rewind_month_chart">Reading time per month</string>
+    <string name="achievements_rewind_books_kicker">Books finished</string>
+    <string name="achievements_rewind_more">+%1$d</string>
+    <string name="achievements_rewind_fastest">Fastest: %1$s in %2$s</string>
+    <string name="achievements_rewind_most_time">Most time: %1$s, %2$s</string>
+    <string name="achievements_rewind_finished_chart">Finished per month</string>
+    <string name="achievements_rewind_streak_kicker">Longest streak</string>
+    <string name="achievements_rewind_streak_range">%1$s to %2$s</string>
+    <string name="achievements_rewind_best_day">Best day</string>
+    <string name="achievements_rewind_best_day_line">%1$s on %2$s</string>
+    <string name="achievements_rewind_all_time">All-time best streak</string>
+    <string name="achievements_rewind_hours_kicker">When you read</string>
+    <string name="achievements_rewind_hours_chart">Reading time by hour of day</string>
+    <string name="achievements_rewind_early_bird">An early bird</string>
+    <string name="achievements_rewind_daytime">A daytime reader</string>
+    <string name="achievements_rewind_evening">An evening reader</string>
+    <string name="achievements_rewind_night_owl">A night owl</string>
+    <string name="achievements_rewind_peak_line">Most of your reading happened around %1$s</string>
+    <string name="achievements_rewind_genres_kicker">Your genres</string>
+    <string name="achievements_rewind_genres_line">%1$s of your reading time</string>
+    <string name="achievements_rewind_authors_kicker">Your authors</string>
+    <string name="achievements_rewind_authors_line">You finished %1$s by %2$s</string>
+    <string name="achievements_rewind_badges_kicker">Badges earned</string>
+    <string name="achievements_rewind_outro_kicker">That was %1$d</string>
+    <string name="achievements_rewind_outro_line">Here\'s to the next chapter</string>
+    <string name="achievements_rewind_hours_stat">Reading time</string>
+    <string name="achievements_rewind_books_stat">Books finished</string>
+    <string name="achievements_rewind_streak_stat">Longest streak</string>
+    <string name="achievements_rewind_badges_stat">Badges</string>
+    <string name="achievements_hour">%1$02d:00</string>
+    <string name="achievements_hours_short">%1$s h</string>
+    <string name="achievements_tap_hint">Tap or drag across the chart for details</string>
+
+    <plurals name="achievements_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <plurals name="achievements_books">
+        <item quantity="one">%d book</item>
+        <item quantity="other">%d books</item>
+    </plurals>
+</resources>

@@ -1,0 +1,9 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  /* Transparent until readerOpen sets --bg: the WebView behind already has the theme's page colour. */
+  background: var(--bg, transparent);
+  -webkit-tap-highlight-color: transparent;
+}
+#app { position: absolute; inset: 0; }

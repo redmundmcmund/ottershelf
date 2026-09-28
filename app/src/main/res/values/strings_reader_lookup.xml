@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.reader.lookup: the reader's Look up (selection popup > Look up). -->
+<resources>
+    <!-- The selection popup's button, and the sheet's small title. -->
+    <string name="reader_lookup_action">Look up</string>
+    <string name="reader_lookup_title">Look up</string>
+
+    <string name="reader_lookup_tab_dictionary">Dictionary</string>
+    <string name="reader_lookup_tab_wikipedia">Wikipedia</string>
+
+    <!-- %1$s: the dictionary page shown (a selection "stopped" with no page of its own shows "stop"). -->
+    <string name="reader_lookup_showing">Showing results for %1$s</string>
+    <plurals name="reader_lookup_more">
+        <item quantity="one">%d more definition on Wiktionary</item>
+        <item quantity="other">%d more definitions on Wiktionary</item>
+    </plurals>
+    <string name="reader_lookup_open_wiktionary">Open in Wiktionary</string>
+    <string name="reader_lookup_open_wikipedia">Open in Wikipedia</string>
+    <string name="reader_lookup_disambiguation">Several articles share this name. Open Wikipedia to pick one.</string>
+
+    <!-- %1$s: what was looked up. -->
+    <string name="reader_lookup_no_definition">No dictionary entry for “%1$s”.</string>
+    <string name="reader_lookup_no_article">No Wikipedia article called “%1$s”.</string>
+    <string name="reader_lookup_try_wikipedia">Try Wikipedia</string>
+    <string name="reader_lookup_search_wiktionary">Search Wiktionary</string>
+    <string name="reader_lookup_search_wikipedia">Search Wikipedia</string>
+
+    <string name="reader_lookup_offline">You\'re offline, so this can\'t be looked up just now.</string>
+    <string name="reader_lookup_failed_dictionary">Couldn\'t reach Wiktionary.</string>
+    <string name="reader_lookup_failed_wikipedia">Couldn\'t reach Wikipedia.</string>
+    <string name="reader_lookup_apps_still_work">The apps below still work.</string>
+
+    <!-- More than twelve words: nothing is sent to Wikipedia. -->
+    <string name="reader_lookup_too_long">Select a word or a name to look it up.</string>
+    <string name="reader_lookup_too_long_apps">Select a word or a name to look it up, or send the whole passage to one of the apps below.</string>
+
+    <string name="reader_lookup_apps">Translate and other apps</string>
+</resources>

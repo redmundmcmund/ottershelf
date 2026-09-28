@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.history: the reading history (every reading of every book). Prefixed history_. -->
+<resources>
+    <string name="history_title">History</string>
+    <string name="history_open_calendar">Calendar</string>
+    <string name="history_open_history">Reading history</string>
+    <string name="history_untitled">Untitled</string>
+
+    <!-- Filter chips -->
+    <string name="history_filter_all">All</string>
+    <string name="history_filter_finished">Finished</string>
+    <string name="history_filter_reading">Reading</string>
+    <string name="history_filter_gave_up">Gave up</string>
+
+    <!-- Groups -->
+    <string name="history_reading_now">Reading now</string>
+    <string name="history_undated">No dates</string>
+    <!-- A year's summary joins its parts (books finished · days they took · given up) with this -->
+    <string name="history_summary_separator">" · "</string>
+    <plurals name="history_finished_count">
+        <item quantity="one">%1$d book finished</item>
+        <item quantity="other">%1$d books finished</item>
+    </plurals>
+    <plurals name="history_gave_up_count">
+        <item quantity="one">%1$d given up</item>
+        <item quantity="other">%1$d given up</item>
+    </plurals>
+    <plurals name="history_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="history_days_total">
+        <item quantity="one">%1$d day of reading</item>
+        <item quantity="other">%1$d days of reading</item>
+    </plurals>
+    <plurals name="history_book_count">
+        <item quantity="one">%1$d book</item>
+        <item quantity="other">%1$d books</item>
+    </plurals>
+    <plurals name="history_reading_count">
+        <item quantity="one">%1$d book on the go</item>
+        <item quantity="other">%1$d books on the go</item>
+    </plurals>
+
+    <!-- A reading's dates -->
+    <string name="history_started">Started %1$s</string>
+    <string name="history_finished">Finished %1$s</string>
+    <string name="history_skimmed">Skimmed %1$s</string>
+    <string name="history_gave_up">Gave up %1$s</string>
+    <string name="history_reading_since">Reading since %1$s</string>
+    <string name="history_on_hold_since">On hold · started %1$s</string>
+    <string name="history_reading_no_date">Reading</string>
+    <string name="history_on_hold_no_date">On hold</string>
+    <string name="history_finished_no_date">Finished</string>
+    <string name="history_skimmed_no_date">Skimmed</string>
+    <string name="history_gave_up_no_date">Gave up</string>
+    <!-- Started 3 Sept · Finished 21 Sept -->
+    <string name="history_dates">%1$s · %2$s</string>
+    <string name="history_day_n">Day %1$d</string>
+    <string name="history_reread">Reread #%1$d</string>
+    <string name="history_rating">Rated %1$d of 5</string>
+
+    <!-- A row's action: the reading's dates, in the Calendar's dates sheet -->
+    <string name="history_edit_dates">Edit dates</string>
+    <string name="history_add_dates">Add dates</string>
+
+    <!-- States -->
+    <string name="history_empty">Books you start, finish or give up show here, with their dates.</string>
+    <string name="history_empty_filter">Nothing here yet.</string>
+    <string name="history_load_failed">Couldn\'t load your reading history</string>
+    <string name="history_refresh_failed">Couldn\'t refresh: showing what was saved. Tap to try again.</string>
+    <plurals name="history_some_failed">
+        <item quantity="one">%1$d book\'s readings couldn\'t be loaded. Tap to try again.</item>
+        <item quantity="other">%1$d books\' readings couldn\'t be loaded. Tap to try again.</item>
+    </plurals>
+</resources>

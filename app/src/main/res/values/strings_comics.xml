@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- feature.comics: the comics reader (CBZ, CBR, CB7). -->
+
+    <!-- Opening -->
+    <string name="comics_offline_not_downloaded">No connection, and this comic isn\'t downloaded. Download it from its page to read it offline.</string>
+    <string name="comics_open_failed">Couldn\'t open the comic.</string>
+    <string name="comics_no_pages">This comic has no pages to show.</string>
+    <string name="comics_page_failed">Couldn\'t load this page.</string>
+    <string name="comics_fresh_start">Marked %1$s, so starting from the first page</string>
+    <string name="comics_reading_downloaded">Reading the downloaded copy</string>
+
+    <!-- Bars -->
+    <string name="comics_page_label">%1$d / %2$d</string>
+    <string name="comics_page_label_spread">%1$d-%2$d / %3$d</string>
+    <string name="comics_percent">%1$d%%</string>
+
+    <!-- Settings (the web's reader.cbz texts) -->
+    <string name="comics_settings">Reading settings</string>
+    <string name="comics_customized">Customised for this comic</string>
+    <string name="comics_reset">Reset</string>
+    <string name="comics_fit_mode">Fit mode</string>
+    <string name="comics_fit_page">Page</string>
+    <string name="comics_fit_width">Width</string>
+    <string name="comics_fit_height">Height</string>
+    <string name="comics_fit_actual">Actual</string>
+    <string name="comics_scroll_mode">Scroll mode</string>
+    <string name="comics_scroll_paged">Paged</string>
+    <string name="comics_scroll_infinite">Infinite</string>
+    <string name="comics_scroll_no_gaps">No gaps</string>
+    <string name="comics_scroll_hint">Use \"No gaps\" for webtoons and vertical strips.</string>
+    <string name="comics_direction">Reading direction</string>
+    <string name="comics_direction_ltr">Left to right</string>
+    <string name="comics_direction_rtl">Right to left</string>
+    <string name="comics_page_view">Page view</string>
+    <string name="comics_view_single">Single</string>
+    <string name="comics_view_two_page">Two-page</string>
+    <string name="comics_two_page_hint">Two pages show side by side in landscape.</string>
+    <string name="comics_two_page_paged_only">Two pages are shown only in paged mode.</string>
+    <string name="comics_spread_alignment">Spread alignment</string>
+    <string name="comics_spread_normal">Normal</string>
+    <string name="comics_spread_shifted">Shifted</string>
+    <string name="comics_wide_pages">Wide pages</string>
+    <string name="comics_wide_auto">Auto</string>
+    <string name="comics_wide_in_spreads">In spreads</string>
+    <string name="comics_spread_gap">Spread gap</string>
+    <string name="comics_spread_gap_value">%1$d</string>
+    <string name="comics_less">Less</string>
+    <string name="comics_more">More</string>
+    <string name="comics_force_two_page">Two pages in portrait too</string>
+    <string name="comics_background">Background</string>
+    <string name="comics_bg_black">Black</string>
+    <string name="comics_bg_gray">Gray</string>
+    <string name="comics_bg_white">White</string>
+    <string name="comics_auto_advance">Auto-advance</string>
+    <string name="comics_auto_advance_hint">Turning past the last page opens the next book in the series.</string>
+    <string name="comics_auto_advance_paged_only">Auto-advance applies in paged mode only.</string>
+    <string name="comics_default_note">These settings apply to this comic.</string>
+    <string name="comics_use_as_default">Use for all comics</string>
+
+    <!-- The next comic of the series -->
+    <string name="comics_next_eyebrow">Next in series</string>
+    <string name="comics_next_action">Read next</string>
+    <string name="comics_next_open">Read next: %1$s</string>
+    <string name="comics_next_numbered">#%1$s %2$s</string>
+    <string name="comics_next_untitled">Untitled</string>
+    <string name="comics_next_auto_hint">Turn the page again to continue</string>
+</resources>

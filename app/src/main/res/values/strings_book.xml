@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.book. -->
+<resources>
+    <string name="book_title">Book</string>
+    <string name="book_untitled">Untitled</string>
+    <!-- Toolbar subtitle when the server can't be reached and the downloaded copy's page shows. -->
+    <string name="book_offline_copy">Offline copy</string>
+    <string name="book_load_failed">Couldn\'t load this book.</string>
+    <string name="book_series_with_index">%1$s  #%2$s</string>
+    <string name="book_pages">%1$d pages</string>
+    <string name="book_read">Read</string>
+    <!-- Read for a file that isn't an EPUB: %1$s is its format, "PDF", "CBZ", "MOBI". -->
+    <string name="book_read_format">Read %1$s</string>
+    <string name="book_show_more">Show more</string>
+    <string name="book_show_less">Show less</string>
+
+    <string name="book_set_status">Set status</string>
+    <string name="book_status_failed">Couldn\'t set status: %1$s</string>
+    <string name="book_cancel">Cancel</string>
+
+    <string name="book_download">Download</string>
+    <string name="book_downloading">Downloading…</string>
+    <string name="book_downloading_percent">Downloading %1$d%%</string>
+    <string name="book_download_waiting">Waiting…</string>
+    <string name="book_downloaded">Downloaded</string>
+    <string name="book_update_download">Update download</string>
+    <string name="book_stop_download_question">Stop downloading this book?</string>
+    <string name="book_stop">Stop</string>
+    <string name="book_keep_going">Keep going</string>
+    <string name="book_update_download_message">The book\'s file has changed on the server since it was downloaded. Download it again? Your reading position is kept.</string>
+    <string name="book_remove">Remove</string>
+    <string name="book_downloaded_message">This book is on this device, so it can be read without a connection (%1$s).</string>
+    <string name="book_remove_download">Remove download</string>
+    <string name="book_keep">Keep</string>
+
+    <!-- Tracking: the progress card (Bookmory's current-book card). -->
+    <string name="book_day_n">Day %1$d</string>
+    <string name="book_reading_now">Reading</string>
+    <string name="book_finished">Finished</string>
+    <string name="book_not_started">Not started yet</string>
+    <string name="book_started_on">Started %1$s</string>
+    <string name="book_finished_on">Finished %1$s</string>
+    <string name="book_first_reading">First reading</string>
+    <!-- Which reading this is, from the second on: "Reread #2" is the book's second reading. -->
+    <string name="book_reread_n">Reread #%1$d</string>
+    <string name="book_page_n">p. %1$d</string>
+    <string name="book_page_unknown">p. –</string>
+    <string name="book_set_total">set total</string>
+    <string name="book_edit_page">Set the current page</string>
+    <string name="book_percent">%1$d%%</string>
+    <string name="book_page_by_hand">Page set by hand, until your next session</string>
+    <string name="book_pace_pages">%1$d pages/h</string>
+    <string name="book_time_left">%1$s left</string>
+    <string name="book_start_timer">Start timer</string>
+    <string name="book_open_timer">Timer running</string>
+    <string name="book_log_session">Log a session</string>
+    <string name="book_mark_finished">Mark as finished</string>
+    <string name="book_duration_under_min">&lt; 1 min</string>
+    <string name="book_duration_min">%1$d min</string>
+    <string name="book_duration_h">%1$d h</string>
+    <string name="book_duration_h_min">%1$d h %2$d min</string>
+
+    <!-- Tracking dialogs. -->
+    <string name="book_save">Save</string>
+    <string name="book_ok">OK</string>
+    <string name="book_delete">Delete</string>
+    <string name="book_edit">Edit</string>
+    <string name="book_page_total_title">Pages in your edition</string>
+    <string name="book_page_total_message">BookOrbit says %1$d. Your own number is kept for this book only.</string>
+    <string name="book_page_total_message_none">How many pages your copy has.</string>
+    <string name="book_page_total_reset">Use BookOrbit\'s</string>
+    <string name="book_current_page_title">Current page</string>
+    <string name="book_current_page_message">Shown until your next reading session. Your ebook position isn\'t changed.</string>
+    <string name="book_field_minutes">Minutes</string>
+    <string name="book_field_page">Page reached (of %1$d, optional)</string>
+    <string name="book_field_percent">Percent reached (optional)</string>
+    <string name="book_log_minutes_invalid">1 to 1440 minutes</string>
+    <string name="book_log_future">A session can\'t start in the future</string>
+    <string name="book_log_page_invalid">Up to page %1$d</string>
+    <string name="book_log_percent_invalid">Up to 100</string>
+    <string name="book_finish_question">Mark as finished?</string>
+    <string name="book_finish_message">“%1$s” will be marked as read today.</string>
+    <string name="book_session_menu_title">Session, %1$s</string>
+    <string name="book_session_move">Move to another time</string>
+    <string name="book_session_delete">Delete session</string>
+    <string name="book_session_delete_question">Delete this session?</string>
+    <string name="book_session_delete_message">%1$s on %2$s. This can\'t be undone.</string>
+    <string name="book_move_title">Move session</string>
+    <string name="book_move_message">It keeps its length (%1$s).</string>
+    <string name="book_field_started">Started</string>
+    <string name="book_field_ended">Ended</string>
+    <string name="book_field_not_set">Not set</string>
+    <string name="book_past_read_dates_invalid">The end can\'t be before the start</string>
+
+    <!-- Tracking messages (snackbar). -->
+    <string name="book_session_logged">Session saved</string>
+    <string name="book_session_queued">Saved on this phone; it\'s sent when you\'re back online</string>
+    <string name="book_tracking_failed">Couldn\'t save: %1$s</string>
+    <string name="book_session_deleted">Session deleted</string>
+    <string name="book_session_moved">Session moved</string>
+    <string name="book_session_future">A session can\'t end in the future</string>
+    <string name="book_session_overlap">That time overlaps another session</string>
+    <string name="book_past_read_added">Past read added</string>
+    <string name="book_review_saved">Review saved</string>
+
+    <!-- Tracking: the reading log (Bookmory's book timeline). -->
+    <string name="book_log_title">Reading log</string>
+    <plurals name="book_log_summary">
+        <item quantity="one">%1$d session · %2$s</item>
+        <item quantity="other">%1$d sessions · %2$s</item>
+    </plurals>
+    <string name="book_log_empty">No reading recorded yet. Start the timer or log a session.</string>
+    <string name="book_log_failed">Couldn\'t load the reading log.</string>
+    <string name="book_log_add_past">Add a past read</string>
+    <string name="book_log_more">Show older</string>
+    <string name="book_log_started">Started reading</string>
+    <string name="book_log_finished">Finished</string>
+    <string name="book_log_skimmed">Skimmed</string>
+    <string name="book_log_abandoned">Gave up</string>
+    <string name="book_log_to_page">to p. %1$d</string>
+    <!-- %1$s is signed: "+12". -->
+    <plurals name="book_log_pages">
+        <item quantity="one">%1$s page</item>
+        <item quantity="other">%1$s pages</item>
+    </plurals>
+    <string name="book_log_percent">%1$s%%</string>
+    <string name="book_source_manual">By hand</string>
+    <string name="book_source_android">Phone</string>
+    <string name="book_source_web">Web</string>
+
+    <!-- Tracking: rating and private review. -->
+    <string name="book_rating_title">Your rating</string>
+    <string name="book_rating_locked">The rating is locked for this book.</string>
+    <plurals name="book_stars">
+        <item quantity="one">%1$d star</item>
+        <item quantity="other">%1$d stars</item>
+    </plurals>
+    <string name="book_review_title">Private review</string>
+    <string name="book_review_add">Write a private note about this book…</string>
+    <string name="book_review_private">Only you can see this.</string>
+
+    <!-- The finish flow. -->
+    <string name="book_celebrate_title">Congratulations!</string>
+    <string name="book_celebrate_message">You\'re all done!</string>
+    <plurals name="book_celebrate_days">
+        <item quantity="one">Read in %1$d day</item>
+        <item quantity="other">Read in %1$d days</item>
+    </plurals>
+    <string name="book_continue">Continue</string>
+    <string name="book_rate_title">How was it?</string>
+    <string name="book_rate_skip">Skip</string>
+    <string name="book_achievement_title">Achievement unlocked</string>
+    <string name="book_achievement_ok">Nice!</string>
+</resources>

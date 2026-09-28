@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The dev build (R8, not debuggable) installs as the dev package (app/build.gradle.kts,
+         devApplicationId), over the debug build and next to a release build; same name as
+         src/debug/res. -->
+    <string name="app_name">Ottershelf (dev)</string>
+</resources>

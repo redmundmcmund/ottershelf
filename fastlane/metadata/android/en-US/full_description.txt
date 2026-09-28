@@ -1,0 +1,45 @@
+Ottershelf is an open-source Android app for reading, tracking and annotating the books on a self-hosted BookOrbit server.
+
+Ottershelf requires your own BookOrbit server, or an account on one, reachable over HTTPS. It contains no books, no store and no server of its own: it shows what your server holds.
+
+Ottershelf is an unofficial, independent app. It is a modified version of BookOrbit and is not an official BookOrbit release, and it is not affiliated with, approved, sponsored or endorsed by the BookOrbit project.
+
+READING
+- Ebooks: EPUB, KEPUB, MOBI, AZW3, AZW and FB2, in pages or continuous scrolling, with text size, line spacing, margins, fonts, justification, hyphenation and page colours
+- PDF: continuous or single page, fit to width or page, night mode, outline, search and password-protected files
+- Comics: CBZ, CBR and CB7, paged or vertical scrolling for webtoons, right-to-left, two-page spreads and zoom
+- Highlights in ten colours and four styles, notes, bookmarks and full-text search
+- Look up a word or phrase in Wiktionary and Wikipedia, or send it to a dictionary or translation app
+- Download books to read offline; downloads continue in the background
+- Reading position and sessions sync with your server, and wait on the phone while you are offline
+
+LIBRARY
+- Dashboard with BookOrbit's widgets and shelves, arranged the way you like
+- All books, libraries, smart scopes, collections, authors and series
+- Search, sorting and filters, in a grid or a list
+- Book pages with your status, rating, private review and reading log
+- A suggestion for the next unread book in a series
+- Scan a paper book's ISBN barcode to find it in your library
+- Book requests, and editing of titles, authors, series and covers, for accounts with those permissions
+
+TRACKING
+- Reading timer, counting up or down, with a notification to pause or stop it
+- Log sessions by hand, and record past reads and rereads
+- Calendar, reading history, statistics and reading goals
+- Achievements and a year in review
+- All your highlights and notes in one place: filter, random note, memorize, export as Markdown, share as an image
+- Quotes typed in, or read from a photo of the page on the phone
+
+APPEARANCE
+- Light, dark or system theme, accent colours, corner radius and background patterns, optionally synced with your account
+
+PRIVACY
+- No analytics, ads, crash reporting or trackers
+- The app connects only to the server you enter, and to Wiktionary and Wikipedia when you tap Look up, without your account's token
+- The camera is used only for ISBN scanning, page photos and cover photos, and images are processed on the phone
+- HTTPS only, and sign-in tokens are encrypted on the phone
+
+OPEN SOURCE
+Ottershelf is free software under the GNU Affero General Public License, version 3 only, with BookOrbit's additional terms. The source code is at https://github.com/redmundmcmund/ottershelf
+
+Requires Android 15 or later.

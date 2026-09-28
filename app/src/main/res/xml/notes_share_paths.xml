@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- feature.notes: files handed to the share sheet (quote card images, highlights as Markdown). -->
+<paths>
+    <cache-path name="notes_share" path="notes-share/" />
+</paths>

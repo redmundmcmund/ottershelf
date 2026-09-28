@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by ui.theme. Compose draws everything; these only cover the window before it does. -->
+<resources>
+    <style name="Theme.Ottershelf" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+    </style>
+
+    <!-- Launch theme: core-splashscreen, then Theme.Ottershelf once MainActivity starts. -->
+    <style name="Theme.Ottershelf.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/window_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.Ottershelf</item>
+    </style>
+</resources>

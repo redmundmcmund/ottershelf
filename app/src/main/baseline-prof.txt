@@ -1,0 +1,31 @@
+# The app's own cold-start path (ARCHITECTURE.md, "Release build (R8)"), compiled ahead of time in
+# the dev and release builds: the Application and its container, the activity, the shell (ui.nav),
+# the theme, the saved appearance the splash waits for (core.theme), the session and the Api, and
+# the Dashboard. AGP merges these with the libraries' rules and R8 renames them.
+# Only the start path (about 450 KB of bytecode): ART's JIT profile covers the rest of the app within
+# a day, and rules over the whole app would compile all of its roughly 1.5 MB of bytecode into the
+# install. BaselineProfileTest checks that every rule still names a class or package.
+
+Lio/github/ottershelf/OttershelfApp**;
+HSPLio/github/ottershelf/OttershelfApp**;->**(**)**
+Lio/github/ottershelf/AppContainer**;
+HSPLio/github/ottershelf/AppContainer**;->**(**)**
+Lio/github/ottershelf/AppKt;
+HSPLio/github/ottershelf/AppKt;->**(**)**
+Lio/github/ottershelf/MainActivity**;
+HSPLio/github/ottershelf/MainActivity**;->**(**)**
+
+Lio/github/ottershelf/ui/nav/**;
+HSPLio/github/ottershelf/ui/nav/**;->**(**)**
+Lio/github/ottershelf/ui/theme/**;
+HSPLio/github/ottershelf/ui/theme/**;->**(**)**
+
+Lio/github/ottershelf/core/theme/**;
+HSPLio/github/ottershelf/core/theme/**;->**(**)**
+Lio/github/ottershelf/core/session/**;
+HSPLio/github/ottershelf/core/session/**;->**(**)**
+Lio/github/ottershelf/core/network/**;
+HSPLio/github/ottershelf/core/network/**;->**(**)**
+
+Lio/github/ottershelf/feature/home/**;
+HSPLio/github/ottershelf/feature/home/**;->**(**)**

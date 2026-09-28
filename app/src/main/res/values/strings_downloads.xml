@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.downloads. -->
+<resources>
+    <string name="downloads_count">%1$d books on this device</string>
+    <string name="downloads_empty">No downloaded books yet.\n\nOpen a book and tap Download to keep it on this device for reading without a connection.</string>
+    <string name="downloads_no_match">No books here</string>
+    <string name="downloads_downloading">Downloading…</string>
+    <string name="downloads_downloading_percent">Downloading %1$d%%</string>
+    <string name="downloads_waiting">Waiting…</string>
+    <string name="downloads_menu_read">Read</string>
+    <string name="downloads_menu_details">Book page</string>
+    <string name="downloads_remove">Remove download</string>
+    <!-- %1$s: the size on the device. -->
+    <string name="downloads_remove_message">This book is on this device, so it can be read without a connection (%1$s). Your reading position is kept if you remove it.</string>
+    <string name="downloads_keep">Keep</string>
+    <string name="downloads_stop_message">Stop downloading this book?</string>
+    <string name="downloads_stop">Stop</string>
+    <string name="downloads_keep_going">Keep going</string>
+</resources>

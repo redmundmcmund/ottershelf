@@ -1,0 +1,7 @@
+First public release of Ottershelf.
+- Read EPUB, KEPUB, MOBI, AZW3, FB2, PDF and comics (CBZ, CBR, CB7) from your BookOrbit server, and download books to read offline
+- Reading progress and sessions synced with your server
+- Highlights, notes, bookmarks, quotes and Look up
+- Dashboard, library, series, ISBN scanning and book requests
+- Reading timer, calendar, history, statistics, goals and achievements
+- Fully open source: no analytics, ads or trackers

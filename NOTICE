@@ -1,0 +1,59 @@
+Ottershelf
+
+Copyright (C) 2026 the Ottershelf contributors.
+
+Ottershelf is an Android reading app for self-hosted BookOrbit servers. It is a modified version
+of BookOrbit: it contains material from BookOrbit (its vendored foliate-js reader, and code
+ported from its web client and API types). This is a modified version of BookOrbit and is not an
+official BookOrbit release. It is not approved, sponsored or endorsed by the BookOrbit project.
+
+Ottershelf is free software: you can redistribute it and/or modify it under the terms of the GNU
+Affero General Public License, version 3 only (LICENSE), together with BookOrbit's additional
+terms (ADDITIONAL_TERMS.md), as permitted by section 7 of that licence. It is distributed without
+any warranty. Third-party components keep their own licences (THIRD_PARTY_NOTICES.md).
+
+Modifications: the files under app/src/main/assets/foliate/ are BookOrbit's copy of foliate-js,
+changed for this app; the changed lines are marked "[bookorbit-android]". The app's Kotlin code
+ports parts of BookOrbit's web client (each file names the BookOrbit source it follows). The git
+history of this repository records every change and its date.
+
+The attribution BookOrbit requires (ADDITIONAL_TERMS.md, section 1), shown in the app under
+Settings > About Ottershelf:
+
+    Powered by BookOrbit
+    Copyright (C) 2025-2026 neon.
+    Additional copyright is held by the respective BookOrbit contributors.
+    Original project: https://github.com/bookorbit/bookorbit
+    Licensed under the GNU Affero General Public License, version 3 only, with additional terms.
+    This software is provided without warranty. You may redistribute and modify it under those
+    terms.
+
+BookOrbit's own notice, unchanged:
+
+--------------------------------------------------------------------------------
+BookOrbit Attribution and Legal Notice
+
+Copyright (C) 2025-2026 neon.
+Additional copyright is held by the respective BookOrbit contributors.
+
+BookOrbit is free software licensed under the GNU Affero General Public
+License, version 3 only. See LICENSE for the complete license text.
+
+BookOrbit material owned by neon and contributions whose copyright holders
+expressly accept the terms are also subject to the non-permissive additional
+terms in ADDITIONAL_TERMS.md, as authorized by sections 7(b), 7(c), 7(d), and
+7(e) of the GNU AGPL v3.
+
+Other contributions remain subject to the license terms under which they were
+originally submitted.
+
+The required attribution is:
+
+    Powered by BookOrbit
+    Copyright (C) 2025-2026 neon.
+    Additional copyright is held by the respective BookOrbit contributors.
+    Original project: https://github.com/bookorbit/bookorbit
+
+See ADDITIONAL_TERMS.md for the conditions governing display, source access,
+modified versions, preservation, and trademarks.
+--------------------------------------------------------------------------------

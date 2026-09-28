@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+<description>
+    <title-info>
+        <genre>antique</genre>
+        <author><first-name>Test</first-name><last-name>Author</last-name></author>
+        <book-title>Orbit Sample</book-title>
+        <lang>en</lang>
+    </title-info>
+    <document-info>
+        <author><first-name>Test</first-name><last-name>Author</last-name></author>
+        <program-used>calibre 8.16.2</program-used>
+        <date>28.9.2026</date>
+        <id>973f7bf2-9ad7-4b78-884d-1cb0fa62adbc</id>
+        <version>1.0</version>
+    </document-info>
+    <publish-info>
+    </publish-info>
+</description>
+<body>
+<section>
+<p><strong>Chapter One</strong></p>
+<p>The first chapter begins here. It was the best of times, it was the worst of times.</p>
+<p>A second paragraph with enough words to wrap across a few lines on a phone screen, so that the page has something to lay out and highlight.</p>
+<p><strong>Chapter Two</strong></p>
+<p>The second chapter continues the story. The quick brown fox jumps over the lazy dog near the orbit station.</p>
+<p>Another paragraph in chapter two, with the searchable word zephyr in it.</p>
+<p><strong>Chapter Three</strong></p>
+<p>The third and last chapter ends the sample. Goodbye.</p>
+</section>
+</body>
+
+</FictionBook>

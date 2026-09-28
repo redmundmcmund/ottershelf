@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by the navigation shell (ui.nav): the drawer, the toolbar and its search. Prefixed nav_. -->
+<resources>
+    <!-- The drawer's header: "Ottershelf" with "shelf" in the accent. -->
+    <string name="nav_wordmark_otter" translatable="false">Otter</string>
+    <string name="nav_wordmark_shelf" translatable="false">shelf</string>
+    <string name="nav_lists_failed">Couldn\'t reach the server (%1$s). Showing books on this device.</string>
+
+    <!-- The drawer's rows -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_all_books">All books</string>
+    <string name="nav_downloaded">Downloaded</string>
+    <string name="nav_book_requests">Book requests</string>
+    <string name="nav_authors">Authors</string>
+    <string name="nav_series">Series</string>
+    <string name="nav_libraries">Libraries</string>
+    <string name="nav_smart_scopes">Smart scopes</string>
+    <string name="nav_collections">Collections</string>
+    <string name="nav_tracking">Tracking</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_retry">Retry</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_sign_out">Sign out</string>
+
+    <!-- The toolbar -->
+    <string name="nav_open_drawer">Open navigation</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_close_search">Close search</string>
+    <string name="nav_clear_search">Clear</string>
+
+    <!-- Pushed screens' top bar (DetailScaffold) -->
+    <string name="nav_back">Back</string>
+
+    <!-- Snackbar: a reading session saved offline that the server refused when it was finally sent -->
+    <string name="nav_session_rejected">A reading session saved offline wasn\'t accepted: %1$s</string>
+</resources>

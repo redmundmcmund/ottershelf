@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- feature.notes: highlights and notes (the book page's card, Highlights, Notes, Memorize, quote cards). -->
+<resources>
+    <string name="notes_title">Notes</string>
+    <string name="notes_book_section">Highlights &amp; notes</string>
+    <string name="notes_highlights_title">Highlights &amp; notes</string>
+    <string name="notes_section_empty">No highlights yet. Highlights made in the web reader, KOReader or Kobo show here.</string>
+    <string name="notes_section_failed">Couldn\'t load highlights. Tap to try again.</string>
+    <string name="notes_see_all">See all %1$d</string>
+    <string name="notes_book_empty">This book has no highlights yet.</string>
+    <string name="notes_no_chapter">No chapter</string>
+    <string name="notes_untitled">Untitled</string>
+
+    <plurals name="notes_highlights_count">
+        <item quantity="one">%1$d highlight</item>
+        <item quantity="other">%1$d highlights</item>
+    </plurals>
+    <plurals name="notes_notes_count">
+        <item quantity="one">%1$d note</item>
+        <item quantity="other">%1$d notes</item>
+    </plurals>
+    <plurals name="notes_chapters_count">
+        <item quantity="one">%1$d chapter</item>
+        <item quantity="other">%1$d chapters</item>
+    </plurals>
+    <plurals name="notes_books_count">
+        <item quantity="one">%1$d book</item>
+        <item quantity="other">%1$d books</item>
+    </plurals>
+
+    <!-- Card actions -->
+    <string name="notes_open_reader">Open in reader</string>
+    <string name="notes_add_note">Add a note</string>
+    <string name="notes_edit_note">Edit note</string>
+    <string name="notes_colour_style">Colour and style</string>
+    <string name="notes_share_image">Share as image</string>
+    <string name="notes_like">Like</string>
+    <string name="notes_unlike">Unlike</string>
+    <string name="notes_delete">Delete</string>
+    <string name="notes_delete_title">Delete this highlight?</string>
+    <string name="notes_delete_text">It moves to the trash in BookOrbit web, where it can be restored.</string>
+    <string name="notes_note_hint">Your note</string>
+    <string name="notes_save">Save</string>
+    <string name="notes_cancel">Cancel</string>
+    <string name="notes_saving">Saving…</string>
+    <string name="notes_action_failed">That didn\'t work: %1$s</string>
+    <string name="notes_likes_full">You have %1$d liked highlights, as many as can be kept. Unlike some first.</string>
+    <string name="notes_export">Export as Markdown</string>
+    <string name="notes_export_subject">Highlights from %1$s</string>
+    <string name="notes_load_failed">Couldn\'t load highlights</string>
+
+    <!-- The Notes feed -->
+    <string name="notes_results_for">Results for “%1$s”</string>
+    <string name="notes_random">Random note</string>
+    <string name="notes_random_title">A random note</string>
+    <string name="notes_random_another">Another</string>
+    <string name="notes_random_failed">Couldn\'t pick a note. Check the connection and try again.</string>
+    <string name="notes_filter_book">Book</string>
+    <string name="notes_filter_colour">Colour</string>
+    <string name="notes_filter_notes">With notes</string>
+    <string name="notes_filter_liked">Liked</string>
+    <string name="notes_all_books">All books</string>
+    <string name="notes_all_colours">All colours</string>
+    <string name="notes_empty">No highlights yet. Highlights made in the web reader, KOReader or Kobo show here.</string>
+    <string name="notes_empty_liked">No liked notes yet. Tap the heart on a note to keep it here.</string>
+    <string name="notes_none_match">Nothing matches these filters.</string>
+    <string name="notes_colour_yellow">Yellow</string>
+    <string name="notes_colour_green">Green</string>
+    <string name="notes_colour_blue">Blue</string>
+    <string name="notes_colour_pink">Pink</string>
+    <string name="notes_colour_orange">Orange</string>
+    <string name="notes_colour_red">Red</string>
+    <string name="notes_colour_olive">Olive</string>
+    <string name="notes_colour_cyan">Cyan</string>
+    <string name="notes_colour_purple">Purple</string>
+    <string name="notes_colour_gray">Grey</string>
+
+    <!-- Memorize -->
+    <string name="notes_memorize">Memorize</string>
+    <string name="notes_memorize_all">All highlights</string>
+    <string name="notes_memorize_liked">Liked notes</string>
+    <string name="notes_memorize_tap">Tap the card for the next one</string>
+    <string name="notes_memorize_new">First time</string>
+    <plurals name="notes_memorize_session">
+        <item quantity="one">%1$d reviewed now</item>
+        <item quantity="other">%1$d reviewed now</item>
+    </plurals>
+    <plurals name="notes_memorize_reviewed">
+        <item quantity="one">Reviewed once</item>
+        <item quantity="other">Reviewed %1$d times</item>
+    </plurals>
+
+    <!-- Quote card -->
+    <string name="notes_card_title">Share as image</string>
+    <string name="notes_card_shape">Shape</string>
+    <string name="notes_card_background">Background</string>
+    <string name="notes_card_bg_theme">Theme</string>
+    <string name="notes_card_bg_tint">Cover colour</string>
+    <string name="notes_card_bg_blur">Blurred cover</string>
+    <string name="notes_card_text">Text size</string>
+    <string name="notes_card_with_note">Include my note</string>
+    <string name="notes_card_save">Save</string>
+    <string name="notes_card_share">Share</string>
+    <string name="notes_image_saved">Saved to Pictures/Ottershelf</string>
+    <string name="notes_image_failed">Couldn\'t make the image</string>
+    <string name="notes_view_photo">View the photo</string>
+</resources>

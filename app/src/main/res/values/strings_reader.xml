@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.reader. -->
+<resources>
+    <string name="reader_title">Reader</string>
+    <string name="reader_contents">Contents</string>
+    <string name="reader_settings">Reading settings</string>
+    <string name="reader_toc_empty">This book has no table of contents.</string>
+
+    <!-- Bottom bar: foliate's locations (about a page each) and the percentage. -->
+    <string name="reader_position_page">Page %1$d of %2$d  ·  %3$d%%</string>
+    <string name="reader_position_percent">%1$d%%</string>
+
+    <string name="reader_offline_not_downloaded">No connection, and this book isn\'t downloaded. Download it from its page to read it offline.</string>
+    <string name="reader_open_failed">Couldn\'t open the book.</string>
+    <string name="reader_stopped">The reader stopped unexpectedly.</string>
+    <!-- %1$s: the read status (Read, Unread). -->
+    <string name="reader_fresh_start">Marked %1$s, so starting from the beginning</string>
+
+    <!-- Two reading positions (read offline here while the server moved on). -->
+    <string name="reader_conflict_title">Two reading positions</string>
+    <string name="reader_conflict_device">On this device: %1$s, read %2$s without a connection.</string>
+    <string name="reader_conflict_server">On the server: %1$s%2$s, from another device or the web app.</string>
+    <string name="reader_conflict_last_read">" (last read %1$s)"</string>
+    <string name="reader_conflict_question">Which do you want to continue from?</string>
+    <string name="reader_conflict_keep_device">This device · %1$s</string>
+    <string name="reader_conflict_keep_server">Server · %1$s</string>
+
+    <!-- Reading settings -->
+    <string name="reader_theme_app">App</string>
+    <string name="reader_theme_original">Original</string>
+    <string name="reader_theme_sepia">Sepia</string>
+    <string name="reader_theme_dark">Dark</string>
+    <string name="reader_theme_black">Black</string>
+    <string name="reader_text_size">Text size</string>
+    <string name="reader_text_size_value">%1$dpx</string>
+    <string name="reader_smaller">Smaller text</string>
+    <string name="reader_larger">Larger text</string>
+    <string name="reader_line_spacing">Line spacing</string>
+    <string name="reader_less">Less</string>
+    <string name="reader_more">More</string>
+    <string name="reader_margins">Margins</string>
+    <string name="reader_margin_narrow">Narrow</string>
+    <string name="reader_margin_normal">Normal</string>
+    <string name="reader_margin_wide">Wide</string>
+    <string name="reader_font">Font</string>
+    <string name="reader_font_publisher">Book</string>
+    <string name="reader_font_serif">Serif</string>
+    <string name="reader_font_sans">Sans</string>
+    <string name="reader_layout">Layout</string>
+    <string name="reader_flow_paginated">Pages</string>
+    <string name="reader_flow_scrolled">Scroll</string>
+    <string name="reader_animated">Page-turn animation</string>
+    <string name="reader_justify">Justify text</string>
+    <string name="reader_hyphenate">Hyphenation</string>
+
+    <!-- Reading settings: sections and the options named as the web reader's -->
+    <string name="reader_section_page">Page colour</string>
+    <string name="reader_section_text">Text</string>
+    <string name="reader_section_spacing">Spacing</string>
+    <string name="reader_reading_flow">Reading flow</string>
+    <string name="reader_theme_custom">Custom</string>
+    <string name="reader_custom_background">Background</string>
+    <string name="reader_custom_text">Text</string>
+    <!-- %1$s: the contrast ratio, e.g. 2.3 -->
+    <string name="reader_contrast_low">Low contrast (%1$s:1): the text may be hard to read.</string>
+    <string name="reader_contrast_ok">Contrast %1$s:1</string>
+    <string name="reader_page_width">Page width</string>
+    <string name="reader_width_narrow">Narrow</string>
+    <string name="reader_width_medium">Medium</string>
+    <string name="reader_width_wide">Wide</string>
+    <string name="reader_width_full">Full</string>
+    <string name="reader_page_width_hint">Every width fills this screen; the difference shows on wider pages, such as in landscape.</string>
+    <string name="reader_paragraph_spacing">Paragraph spacing</string>
+    <string name="reader_letter_spacing">Letter spacing</string>
+    <string name="reader_word_spacing">Word spacing</string>
+    <string name="reader_text_indent">First-line indent</string>
+    <!-- A spacing left as the book has it -->
+    <string name="reader_spacing_book">Book</string>
+    <!-- %1$s: a number, e.g. 0.05 -->
+    <string name="reader_em_value">%1$s em</string>
+    <string name="reader_page_spreads">Page spreads</string>
+    <string name="reader_spread_auto">Book default</string>
+    <string name="reader_spread_none">Single page</string>
+    <string name="reader_page_spreads_hint">Choose how this image-based book pairs its pages.</string>
+
+    <!-- The custom page colour picker -->
+    <string name="reader_colour_background_title">Background colour</string>
+    <string name="reader_colour_text_title">Text colour</string>
+    <string name="reader_colour_sample">The quick brown fox jumps over the lazy dog.</string>
+    <string name="reader_colour_hue">Hue</string>
+    <string name="reader_colour_saturation">Saturation</string>
+    <string name="reader_colour_lightness">Lightness</string>
+    <string name="reader_colour_hex">Hex</string>
+    <string name="reader_done">Done</string>
+
+    <!-- The footer (bottom bar): tap to cycle page / time left in the chapter / in the book -->
+    <string name="reader_footer_cycle">Change what the footer shows</string>
+    <!-- %1$s: a reading time (12 min), %2$d: percent through the book -->
+    <string name="reader_footer_chapter_left">%1$s left in chapter  ·  %2$d%%</string>
+    <string name="reader_footer_book_left">%1$s left in book  ·  %2$d%%</string>
+    <string name="reader_footer_no_estimate">No time estimate yet  ·  %1$d%%</string>
+    <string name="reader_duration_under_min">&lt; 1 min</string>
+    <string name="reader_duration_min">%1$d min</string>
+    <string name="reader_duration_h">%1$d h</string>
+    <string name="reader_duration_h_min">%1$d h %2$d min</string>
+
+    <!-- Scrolled flow, at the end of a chapter -->
+    <string name="reader_next_chapter_hint">Swipe up for the next chapter</string>
+
+    <!-- Highlights, notes and bookmarks (feature.reader.annotations) -->
+    <string name="reader_bookmark_add">Bookmark this page</string>
+    <string name="reader_bookmark_remove">Remove the bookmark</string>
+    <string name="reader_notes">Highlights and bookmarks</string>
+    <string name="reader_note_add">Add note</string>
+    <string name="reader_note_edit">Edit note</string>
+    <string name="reader_note_placeholder">Your thoughts on this passage</string>
+    <string name="reader_copy">Copy</string>
+    <string name="reader_copied">Copied</string>
+    <string name="reader_share">Share</string>
+    <string name="reader_share_title">Share quote</string>
+    <string name="reader_save">Save</string>
+    <string name="reader_cancel">Cancel</string>
+    <string name="reader_delete">Delete</string>
+    <string name="reader_highlight_delete">Delete highlight</string>
+    <string name="reader_highlight_delete_question">Delete this highlight?</string>
+    <string name="reader_highlight_delete_note">Its note is deleted with it.</string>
+    <string name="reader_bookmark_delete_question">Delete this bookmark?</string>
+    <!-- %1$s: the server's message -->
+    <string name="reader_note_rejected">Couldn\'t save that change: %1$s</string>
+
+    <string name="reader_color_yellow">Yellow</string>
+    <string name="reader_color_green">Green</string>
+    <string name="reader_color_blue">Blue</string>
+    <string name="reader_color_pink">Pink</string>
+    <string name="reader_color_orange">Orange</string>
+    <string name="reader_color_red">Red</string>
+    <string name="reader_color_olive">Olive</string>
+    <string name="reader_color_cyan">Cyan</string>
+    <string name="reader_color_purple">Purple</string>
+    <string name="reader_color_gray">Gray</string>
+    <string name="reader_style_highlight">Highlight</string>
+    <string name="reader_style_underline">Underline</string>
+    <string name="reader_style_strikethrough">Strikethrough</string>
+    <string name="reader_style_squiggly">Squiggly underline</string>
+
+    <string name="reader_notes_highlights">Highlights</string>
+    <string name="reader_notes_bookmarks">Bookmarks</string>
+    <string name="reader_notes_search">Search</string>
+    <!-- %1$d: how many highlights -->
+    <string name="reader_notes_all">All · %1$d</string>
+    <string name="reader_notes_no_chapter">Other</string>
+    <string name="reader_notes_waiting">Waiting to sync</string>
+    <string name="reader_notes_no_highlights">No highlights yet. Press and hold on the text to highlight it or add a note.</string>
+    <string name="reader_notes_no_bookmarks">No bookmarks yet. The bookmark button at the top marks the page you\'re on.</string>
+    <string name="reader_notes_bookmarks_hint">Swipe left or press and hold to delete.</string>
+
+    <string name="reader_search_placeholder">Search in this book</string>
+    <string name="reader_search_clear">Clear the search</string>
+    <string name="reader_search_hint">Search the whole book. Matches are marked in the page.</string>
+    <!-- %1$d: percent of the book searched -->
+    <string name="reader_search_searching">Searching… %1$d%%</string>
+    <string name="reader_search_failed">The search stopped before the end.</string>
+    <!-- %1$s: the query -->
+    <string name="reader_search_none">No matches for “%1$s”</string>
+    <plurals name="reader_search_results">
+        <item quantity="one">%1$d match</item>
+        <item quantity="other">%1$d matches</item>
+    </plurals>
+</resources>

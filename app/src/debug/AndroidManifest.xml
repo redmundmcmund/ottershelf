@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The debug build, on a phone only during device tests and devtools sessions (day to day it
+     runs the dev build, which has none of this): the tooling activities its debug-only libraries bring are
+     closed to other apps. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+        <!-- ui-tooling's preview host renders any composable an intent names, by reflection, and was
+             exported. Previews still render in Android Studio; only "Run preview on device" needs it. -->
+        <activity
+            android:name="androidx.compose.ui.tooling.PreviewActivity"
+            tools:node="remove" />
+
+        <!-- ui-test-manifest's empty activity: Compose and screenshot tests under Robolectric and the
+             device tests' LockScreenHost start it from inside the app, so it needn't be exported. -->
+        <activity
+            android:name="androidx.activity.ComponentActivity"
+            android:exported="false"
+            tools:replace="android:exported" />
+    </application>
+</manifest>

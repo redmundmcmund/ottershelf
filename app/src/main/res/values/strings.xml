@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Shared strings: the app name and common components (ui.components). The navigation shell's
+  (ui.nav, nav_*) are in strings_nav.xml. Feature strings live in strings_<feature>.xml, prefixed
+  <feature>_ (see ARCHITECTURE.md). The debug app name is in src/debug/res/values/strings.xml.
+-->
+<resources>
+    <string name="app_name">Ottershelf</string>
+
+    <!-- ui.components -->
+    <string name="common_retry">Retry</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_placeholder">Placeholder: this screen is built in a later step.</string>
+</resources>

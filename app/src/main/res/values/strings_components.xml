@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared components (ui.components) and the theme/icon layers. Prefixed components_. -->
+<resources>
+    <string name="components_untitled">Untitled</string>
+    <string name="components_loading">Loading</string>
+    <string name="components_load_failed">Couldn\'t load this.</string>
+    <string name="components_tap_to_retry">Tap to retry</string>
+    <string name="components_retry">Retry</string>
+    <string name="components_nothing_here">Nothing here yet.</string>
+    <string name="components_series_position">#%1$s</string>
+    <string name="components_percent">%1$d%%</string>
+    <string name="components_theme_save_failed">Couldn\'t save the appearance to your account.</string>
+</resources>

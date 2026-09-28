@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.timer: the reading timer, its save form and result screen, the Dashboard's
+     timer bar and the reader's timer notice. Prefixed timer_. -->
+<resources>
+    <string name="timer_title">Reading timer</string>
+
+    <!-- The timer -->
+    <string name="timer_ready">Ready when you are</string>
+    <string name="timer_reading">Reading…</string>
+    <string name="timer_paused">Paused</string>
+    <string name="timer_times_up">Time\'s up</string>
+    <string name="timer_stopped">Stopped</string>
+    <string name="timer_count_up">Count up</string>
+    <string name="timer_countdown">Countdown</string>
+    <string name="timer_started_at">Started at %1$s</string>
+    <string name="timer_goal_of">%1$d min goal</string>
+    <string name="timer_less">Less time</string>
+    <string name="timer_more">More time</string>
+    <string name="timer_start">Start</string>
+    <string name="timer_pause">Pause</string>
+    <string name="timer_resume">Resume</string>
+    <string name="timer_cancel">Cancel</string>
+    <string name="timer_save">Save</string>
+    <string name="timer_stopped_hint">Save this session with the page you reached, or cancel it.</string>
+    <string name="timer_keep_screen_on">Keep screen on</string>
+    <string name="timer_page_of">p. %1$d / %2$d</string>
+    <string name="timer_page">p. %1$d</string>
+    <string name="timer_percent">%1$d%%</string>
+    <string name="timer_busy">A timer is already running for %1$s.</string>
+    <string name="timer_open_other">Open that timer</string>
+    <string name="timer_untitled">another book</string>
+    <string name="timer_cancel_title">Cancel this session?</string>
+    <string name="timer_cancel_message">The time on the timer won\'t be saved.</string>
+    <string name="timer_cancel_confirm">Discard</string>
+    <string name="timer_keep_reading">Keep reading</string>
+
+    <!-- Durations -->
+    <string name="timer_seconds">%1$d s</string>
+    <string name="timer_minutes">%1$d min</string>
+    <string name="timer_hours_minutes">%1$d h %2$d min</string>
+
+    <!-- The save form -->
+    <string name="timer_save_title">Save session</string>
+    <string name="timer_save_read">%1$s read</string>
+    <string name="timer_unit_pages">Pages</string>
+    <string name="timer_unit_percent">Percent</string>
+    <string name="timer_page_reached">Page reached</string>
+    <string name="timer_of">of</string>
+    <string name="timer_total_pages">Total pages</string>
+    <string name="timer_percent_reached">Progress reached</string>
+    <string name="timer_started_page">You started on p. %1$d. The total is your edition\'s; change it if yours differs.</string>
+    <string name="timer_started_percent">You started at %1$s%%.</string>
+    <string name="timer_no_page_hint">Leave it empty to save only the time.</string>
+    <string name="timer_error_number">Enter whole numbers.</string>
+    <string name="timer_error_total">Enter the book\'s total pages too.</string>
+    <string name="timer_error_page_high">The page is past the last page.</string>
+    <string name="timer_error_percent">Enter a percentage from 0 to 100.</string>
+    <string name="timer_later">Not now</string>
+    <string name="timer_saving">Saving…</string>
+    <string name="timer_save_failed">Couldn\'t save: %1$s</string>
+    <string name="timer_too_short">Less than 10 seconds of reading: there\'s nothing to save.</string>
+
+    <!-- The result screen -->
+    <string name="timer_result_title">Session saved</string>
+    <string name="timer_result_rejected_title">Session not saved</string>
+    <string name="timer_result_sent">Added to your reading history.</string>
+    <string name="timer_result_queued">Saved on this phone. It will be sent when you\'re back online.</string>
+    <string name="timer_result_rejected">The server didn\'t accept this session: %1$s</string>
+    <string name="timer_stat_time">Reading time</string>
+    <string name="timer_stat_pages">Pages read</string>
+    <string name="timer_stat_progress">Progress gained</string>
+    <string name="timer_stat_speed">Pages per hour</string>
+    <string name="timer_stat_pages_left">Pages left</string>
+    <string name="timer_stat_percent_left">Left to read</string>
+    <string name="timer_stat_time_left">Estimated time left</string>
+    <string name="timer_signed_percent">%1$s%%</string>
+    <string name="timer_daily_goal">Daily goal</string>
+    <string name="timer_goal_today">%1$d of %2$d min today</string>
+    <string name="timer_goal_reached">Goal reached today. Well done!</string>
+    <string name="timer_goal_to_go">%1$d min to go</string>
+    <string name="timer_done">Done</string>
+    <string name="timer_result_gone">This session has already been saved or discarded.</string>
+
+    <!-- The Dashboard's timer bar and row button -->
+    <string name="timer_bar_reading">Reading %1$s</string>
+    <string name="timer_bar_paused">Paused: %1$s</string>
+    <string name="timer_bar_unsaved">Save your session: %1$s</string>
+    <string name="timer_row_button">Reading timer</string>
+
+    <!-- The reader's notice -->
+    <string name="timer_reader_title">A timer is running</string>
+    <!-- %1$s: how long the timer has run, e.g. 25 min or 9 h 12 min -->
+    <string name="timer_reader_message">The reading timer is on for this book and has run for %1$s. The reader records its own reading session, so the same time would count twice.\n\nStop the timer? The time so far is saved.</string>
+    <string name="timer_reader_stop">Stop timer</string>
+    <string name="timer_reader_keep">Keep it running</string>
+</resources>

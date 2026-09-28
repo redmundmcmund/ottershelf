@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.library. -->
+<resources>
+    <string name="library_authors">Authors</string>
+    <string name="library_series">Series</string>
+    <!-- Under an author's or a series' name in the pushed book list's toolbar (Nexus BooksActivity). -->
+    <string name="library_subtitle_author">Author</string>
+    <string name="library_subtitle_series">Series</string>
+
+    <string name="library_empty_books">No books here</string>
+    <string name="library_no_books_match">No books match</string>
+    <string name="library_empty_authors">No authors yet</string>
+    <string name="library_no_authors_match">No authors match</string>
+    <string name="library_empty_series">No series yet</string>
+    <string name="library_no_series_match">No series match</string>
+    <string name="library_books_failed">Couldn\'t load books.</string>
+    <string name="library_list_failed">Couldn\'t load this.</string>
+    <string name="library_refresh_failed">Couldn\'t refresh: %1$s</string>
+
+    <plurals name="library_book_count">
+        <item quantity="one">%1$d book</item>
+        <item quantity="other">%1$d books</item>
+    </plurals>
+    <string name="library_series_all_read">All read</string>
+    <string name="library_series_read_of">%1$d of %2$d read</string>
+
+    <!-- Sort and filter (the book grids' toolbar action, sheet and chip row). -->
+    <string name="library_sort_action">Sort and filter</string>
+    <string name="library_sort_sheet_title">Sort and filter</string>
+    <string name="library_sort_by">Sort by</string>
+    <string name="library_order">Order</string>
+    <string name="library_show">Show</string>
+    <string name="library_sort_reset">Reset</string>
+    <string name="library_sort_done">Done</string>
+    <string name="library_sort_title">Title</string>
+    <string name="library_sort_author">Author</string>
+    <string name="library_sort_series">Series</string>
+    <string name="library_sort_series_order">Series order</string>
+    <string name="library_sort_read_status">Read status</string>
+    <string name="library_sort_added">Date added</string>
+    <string name="library_sort_last_read">Last read</string>
+    <string name="library_sort_published">Published</string>
+    <string name="library_order_a_z">A to Z</string>
+    <string name="library_order_z_a">Z to A</string>
+    <string name="library_order_first_last">First to last</string>
+    <string name="library_order_last_first">Last to first</string>
+    <string name="library_order_reading_first">Reading first</string>
+    <string name="library_order_reading_last">Reading last</string>
+    <string name="library_order_recent_first">Most recent first</string>
+    <string name="library_order_recent_last">Least recent first</string>
+    <string name="library_order_newest">Newest first</string>
+    <string name="library_order_oldest">Oldest first</string>
+    <string name="library_filter_reading_only">Reading only</string>
+    <string name="library_filter_reading_only_detail">Books you\'re reading or re-reading</string>
+    <string name="library_filter_hide_read">Hide read</string>
+    <string name="library_filter_hide_read_detail">Books marked Read</string>
+    <string name="library_filter_hide_unread">Hide unread</string>
+    <string name="library_filter_hide_unread_detail">Books marked Unread, or with no status yet</string>
+    <!-- The chip for the sort: "Author · Z to A". -->
+    <string name="library_chip_sort">%1$s · %2$s</string>
+    <string name="library_chip_clear">Clear</string>
+    <string name="library_no_books_filtered">No books match these filters</string>
+    <string name="library_no_books_both_hidden">Nothing left with Hide read and Hide unread both on: only books you\'re reading, want to read, have on hold, skimmed or abandoned show then.</string>
+    <string name="library_clear_filters">Clear filters</string>
+
+    <!-- The view menu (the book grids' toolbar): grid or list, and the cover size. -->
+    <string name="library_view_action">View options</string>
+    <string name="library_view_title">View</string>
+    <string name="library_view_grid">Grid</string>
+    <string name="library_view_list">List</string>
+    <string name="library_view_covers_per_row">Covers per row</string>
+    <string name="library_view_fewer">Fewer per row, bigger covers</string>
+    <string name="library_view_more">More per row, smaller covers</string>
+    <string name="library_view_pinch_hint">Or pinch the grid</string>
+
+    <!-- A book as a row of the list view. -->
+    <string name="library_row_series">%1$s #%2$s</string>
+    <string name="library_row_percent">%1$d%%</string>
+    <string name="library_rated">Rated %1$d of 5</string>
+
+    <!-- The quick view (a long press on a cover). -->
+    <string name="library_quick_read">Read</string>
+    <string name="library_quick_read_format">Read %1$s</string>
+    <!-- A finished book: its status button already says "Read", so opening it says Open -->
+    <string name="library_quick_open">Open</string>
+    <string name="library_quick_open_format">Open %1$s</string>
+    <string name="library_quick_continue">Continue · %1$d%%</string>
+    <string name="library_quick_continue_format">Continue %1$s · %2$d%%</string>
+    <string name="library_quick_details">Book page</string>
+    <string name="library_quick_download">Download</string>
+    <string name="library_quick_downloading">Downloading…</string>
+    <string name="library_quick_downloading_percent">Downloading %1$d%%</string>
+    <string name="library_quick_download_waiting">Waiting…</string>
+    <string name="library_quick_downloaded">Downloaded</string>
+    <string name="library_quick_update">Update download</string>
+    <string name="library_quick_status_failed">Couldn\'t set status: %1$s</string>
+    <string name="library_quick_load_failed">Couldn\'t load this book\'s details.</string>
+    <string name="library_quick_retry">Retry</string>
+    <string name="library_quick_stop_question">Stop downloading this book?</string>
+    <string name="library_quick_stop">Stop</string>
+    <string name="library_quick_keep_going">Keep going</string>
+    <string name="library_quick_update_message">The book\'s file has changed on the server since it was downloaded. Download it again? Your reading position is kept.</string>
+    <string name="library_quick_remove">Remove</string>
+    <string name="library_quick_cancel">Cancel</string>
+    <string name="library_quick_downloaded_message">This book is on this device, so it can be read without a connection (%1$s).</string>
+    <string name="library_quick_remove_download">Remove download</string>
+    <string name="library_quick_keep">Keep</string>
+</resources>

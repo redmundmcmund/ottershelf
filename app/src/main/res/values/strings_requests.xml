@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.requests (Book requests). -->
+<resources>
+    <string name="requests_title">Book requests</string>
+    <string name="requests_tab_search">Request a book</string>
+    <string name="requests_tab_mine">My requests</string>
+
+    <!-- Request a book -->
+    <string name="requests_field_title">Title</string>
+    <string name="requests_field_author">Author</string>
+    <string name="requests_search">Search</string>
+    <string name="requests_go_to">Requests go to</string>
+    <string name="requests_server_default">Server default</string>
+    <string name="requests_server_default_named">Server default (%1$s)</string>
+    <string name="requests_hint">Search by title and/or author. Results come from your server\'s metadata providers.</string>
+    <string name="requests_need_input">Enter a title or an author.</string>
+    <string name="requests_searching">Searching…</string>
+    <string name="requests_searching_found">Searching… %1$d found so far</string>
+    <plurals name="requests_found">
+        <item quantity="one">%d book found</item>
+        <item quantity="other">%d books found</item>
+    </plurals>
+    <string name="requests_no_matches">No matches. Try fewer words, or just the author.</string>
+    <string name="requests_search_failed">Search failed: %1$s</string>
+    <string name="requests_state_requested">Requested · %1$s</string>
+    <string name="requests_state_owned">In your library</string>
+    <string name="requests_state_already">Already requested · %1$s</string>
+    <string name="requests_state_someone">Someone already asked for this</string>
+    <string name="requests_action_request">Request</string>
+    <string name="requests_action_requested">Requested</string>
+    <string name="requests_action_open">Open</string>
+    <string name="requests_action_join">Join</string>
+
+    <!-- My requests -->
+    <string name="requests_show_dismissed">Show dismissed</string>
+    <string name="requests_mine_empty">You haven\'t requested any books yet.</string>
+    <string name="requests_forbidden">Your account doesn\'t have permission to request books.</string>
+    <string name="requests_mine_failed">Couldn\'t load your requests.</string>
+    <string name="requests_open_book">Open book</string>
+    <string name="requests_cancel">Cancel</string>
+    <string name="requests_dismiss">Dismiss</string>
+    <string name="requests_restore">Restore</string>
+    <string name="requests_leave">Leave</string>
+    <string name="requests_status_progress">%1$s · %2$d%%</string>
+    <string name="requests_status_dismissed">%1$s · dismissed</string>
+    <string name="requests_cancel_title">Cancel this request?</string>
+    <string name="requests_cancel_message_download">This also stops the download that\'s in progress.</string>
+    <string name="requests_cancel_message">“%1$s” won\'t be fetched.</string>
+    <string name="requests_cancel_confirm">Cancel request</string>
+    <string name="requests_cancel_keep">Keep</string>
+
+    <!-- Messages -->
+    <string name="requests_msg_joined">Joined the existing request</string>
+    <string name="requests_msg_joined_library">Joined the existing request. It will be filed in %1$s</string>
+    <string name="requests_msg_requested">Requested “%1$s”</string>
+    <string name="requests_msg_requested_library">Requested “%1$s” → %2$s</string>
+    <string name="requests_msg_library_forbidden">You no longer have access to that library, so requests now go to the server default. Tap Request again.</string>
+    <string name="requests_msg_request_failed">Couldn\'t request: %1$s</string>
+    <string name="requests_msg_cancel_failed">Couldn\'t cancel “%1$s”: %2$s</string>
+    <string name="requests_msg_dismiss_failed">Couldn\'t dismiss “%1$s”: %2$s</string>
+    <string name="requests_msg_restore_failed">Couldn\'t restore “%1$s”: %2$s</string>
+    <string name="requests_msg_leave_failed">Couldn\'t leave “%1$s”: %2$s</string>
+
+    <!-- Statuses (the web's bookRequests.status) -->
+    <string name="requests_status_pending">Pending</string>
+    <string name="requests_status_approved">Approved</string>
+    <string name="requests_status_searching">Searching</string>
+    <string name="requests_status_grabbed">Grabbed</string>
+    <string name="requests_status_downloading">Downloading</string>
+    <string name="requests_status_importing">Importing</string>
+    <string name="requests_status_needs_review">Needs review</string>
+    <string name="requests_status_available">Available</string>
+    <string name="requests_status_rejected">Rejected</string>
+    <string name="requests_status_failed">Failed</string>
+    <string name="requests_status_cancelled">Cancelled</string>
+
+    <!-- Request detail (the web's request drawer) -->
+    <string name="requests_step_asked">Asked</string>
+    <string name="requests_step_approved">Approved</string>
+    <string name="requests_step_release">Release found</string>
+    <string name="requests_step_downloading">Downloading</string>
+    <string name="requests_step_filed">Filed</string>
+    <string name="requests_detail_requested_on">Requested %1$s</string>
+    <string name="requests_detail_requested_by">Requested by %1$s</string>
+    <string name="requests_detail_library">Goes to %1$s</string>
+    <plurals name="requests_detail_subscribers">
+        <item quantity="one">Also wanted by %d other person</item>
+        <item quantity="other">Also wanted by %d other people</item>
+    </plurals>
+    <string name="requests_detail_note">Your note</string>
+    <string name="requests_detail_decision">From the reviewer</string>
+    <string name="requests_detail_bytes">%1$s of %2$s</string>
+</resources>

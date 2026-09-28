@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <!-- The web reader's CSP, roughly: a book's own scripts (and remote pages it frames) don't run,
+       and nothing is fetched from anywhere but the app. The chapters' blob: documents inherit it.
+       Scripts come from the APK's assets only, never from the book's files on the same host; frames
+       are foliate's blob: chapters only, so a chapter can't frame this page or a book's file. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src https://appassets.androidplatform.net/assets/; style-src 'self' 'unsafe-inline' blob:; img-src 'self' data: blob:; font-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' blob: data:; frame-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="reader.css">
+  <script type="module" src="reader.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>

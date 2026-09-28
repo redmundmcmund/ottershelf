@@ -1,0 +1,22 @@
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+captures/
+.kotlin/
+
+# Built apps and heap dumps (a heap dump holds the session's tokens)
+*.apk
+*.aab
+*.hprof
+
+# Signing: the keystore and its passwords live outside the repository (ARCHITECTURE.md, "Release build (R8)")
+*.jks
+*.keystore
+*.p12
+keystore.properties
+signing.properties
+
+# tools/device-tests/run.sh's default output folder
+device-test-output/

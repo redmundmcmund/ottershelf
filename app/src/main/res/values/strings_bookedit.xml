@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.bookedit: editing a book's title, authors, series and cover. -->
+<resources>
+    <string name="bookedit_title">Edit details</string>
+    <!-- The book page's toolbar pencil. -->
+    <string name="bookedit_edit_details">Edit details</string>
+
+    <string name="bookedit_cover">Cover</string>
+    <string name="bookedit_details">Details</string>
+    <string name="bookedit_choose_photo">Choose a photo</string>
+    <string name="bookedit_take_photo">Take a photo</string>
+    <string name="bookedit_find_online">Find one online</string>
+    <string name="bookedit_file_cover">Use the file\'s cover</string>
+    <string name="bookedit_cover_updated">Cover changed.</string>
+    <string name="bookedit_cover_none_in_file">The book\'s file has no cover in it.</string>
+    <!-- After removing the cover the user added, when the server had no cover from the book's file to fall back on. -->
+    <string name="bookedit_cover_none_left">Your cover is removed. The server has no cover from the book\'s file to show instead, so the book has none now.</string>
+    <string name="bookedit_photo_unreadable">Couldn\'t read that photo.</string>
+    <string name="bookedit_camera_failed">The camera couldn\'t start.</string>
+    <string name="bookedit_cover_failed">The cover didn\'t change: %1$s.</string>
+    <string name="bookedit_cover_locked">The cover is locked, so refreshing the library\'s metadata leaves it as it is.</string>
+    <string name="bookedit_changing_cover">Changing the cover</string>
+
+    <string name="bookedit_field_title">Title</string>
+    <string name="bookedit_field_authors">Authors</string>
+    <string name="bookedit_field_series">Series</string>
+    <string name="bookedit_field_number">Number</string>
+    <string name="bookedit_author_hint">Add an author</string>
+    <string name="bookedit_series_hint">Not in a series</string>
+    <string name="bookedit_number_hint">e.g. 2</string>
+    <!-- The first row of the author suggestions: %1$s is the name as typed. -->
+    <string name="bookedit_add_author">Add “%1$s”</string>
+    <string name="bookedit_new_to_library">New to the library</string>
+    <string name="bookedit_searching">Looking in the library…</string>
+    <plurals name="bookedit_books">
+        <item quantity="one">%d book</item>
+        <item quantity="other">%d books</item>
+    </plurals>
+    <!-- A series suggestion's second line: "9 books · L. Frank Baum". -->
+    <string name="bookedit_series_line">%1$s · %2$s</string>
+    <string name="bookedit_new_series">Not in the library yet: saving adds it as a new series.</string>
+    <string name="bookedit_remove_author">Remove %1$s</string>
+    <string name="bookedit_clear_series">Take it out of the series</string>
+    <string name="bookedit_title_empty">The title can\'t be empty.</string>
+    <string name="bookedit_no_authors">Add at least one author.</string>
+    <string name="bookedit_index_invalid">Use a number, like 2 or 2.5.</string>
+    <string name="bookedit_index_needs_series">Pick a series first.</string>
+
+    <string name="bookedit_locked">Locked</string>
+    <string name="bookedit_unlock">Unlock</string>
+    <string name="bookedit_unlocking">Unlocking…</string>
+    <string name="bookedit_unlock_title_title">Unlock the title?</string>
+    <string name="bookedit_unlock_authors_title">Unlock the authors?</string>
+    <string name="bookedit_unlock_series_title">Unlock the series?</string>
+    <string name="bookedit_unlock_cover_title">Unlock the cover?</string>
+    <string name="bookedit_unlock_message">It was locked on the server so that refreshing the library\'s metadata keeps it as it is. Once unlocked you can change it here, and a refresh may change it too. This is for everyone who uses the library.</string>
+    <string name="bookedit_unlock_failed">Couldn\'t unlock it: %1$s.</string>
+
+    <string name="bookedit_save">Save changes</string>
+    <string name="bookedit_saving">Saving…</string>
+    <string name="bookedit_everyone">Changes are saved to the library, so everyone who uses it sees them.</string>
+    <string name="bookedit_save_failed">Not saved: %1$s. What you typed is still here.</string>
+
+    <!-- The reasons, after "Not saved:", "The cover didn't change:" and the like. -->
+    <string name="bookedit_error_offline">you\'re offline</string>
+    <string name="bookedit_error_forbidden">your account isn\'t allowed to edit book details</string>
+    <string name="bookedit_error_http">the server answered with error %1$d</string>
+
+    <string name="bookedit_load_failed">Couldn\'t load this book\'s details.</string>
+    <string name="bookedit_cant_edit">Your account isn\'t allowed to edit book details.</string>
+
+    <string name="bookedit_discard_title">Discard your changes?</string>
+    <string name="bookedit_discard_message">What you typed hasn\'t been saved.</string>
+    <string name="bookedit_discard">Discard</string>
+    <string name="bookedit_keep_editing">Keep editing</string>
+    <string name="bookedit_cancel">Cancel</string>
+
+    <string name="bookedit_use_cover_title">Use this cover?</string>
+    <string name="bookedit_use_cover">Use this cover</string>
+    <string name="bookedit_try_again">Try again</string>
+    <!-- A found cover's size in pixels. -->
+    <string name="bookedit_cover_size">%1$d × %2$d</string>
+    <string name="bookedit_cover_source">%1$s · %2$s</string>
+    <string name="bookedit_restore_title">Use the file\'s cover?</string>
+    <string name="bookedit_restore_message">The cover you added is removed for good. The book shows the cover from its file, if it has one.</string>
+
+    <string name="bookedit_search_title">Find a cover online</string>
+    <string name="bookedit_search_book_title">Title</string>
+    <string name="bookedit_search_author">Author</string>
+    <string name="bookedit_search">Search</string>
+    <string name="bookedit_search_none">No covers found. Try another source, or fewer words in the title.</string>
+    <string name="bookedit_search_failed">Couldn\'t search: %1$s.</string>
+    <string name="bookedit_search_note">Searched by your BookOrbit server, and the previews come through it.</string>
+    <string name="bookedit_provider_duckduckgo">DuckDuckGo</string>
+    <string name="bookedit_provider_itunes">iTunes</string>
+    <string name="bookedit_provider_all">All</string>
+
+    <string name="bookedit_camera_hint">Fit the cover inside the frame</string>
+    <string name="bookedit_shutter">Take the photo</string>
+    <string name="bookedit_close">Close</string>
+    <string name="bookedit_camera_title">Photograph the cover</string>
+    <string name="bookedit_camera_rationale">Ottershelf needs the camera for this. The photo is cut to the frame and made smaller on the phone, then saved as the book\'s cover on the server.</string>
+    <string name="bookedit_camera_continue">Continue</string>
+    <string name="bookedit_camera_denied_title">The camera isn\'t allowed</string>
+    <string name="bookedit_camera_denied">Allow the camera for Ottershelf in the phone\'s settings, or choose a photo instead.</string>
+    <string name="bookedit_open_settings">Open settings</string>
+</resources>

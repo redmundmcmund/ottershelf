@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.seriesnext: the next book in a series (finish celebration, book page, timer result, the reader's last page). -->
+<resources>
+    <!-- Eyebrow over the next book on the finish celebration, the timer's result and the reader's last page. -->
+    <string name="seriesnext_eyebrow">Next in the series</string>
+    <!-- Eyebrow over the next book on the book page of a series book the user has finished. -->
+    <string name="seriesnext_row_eyebrow">Next in series</string>
+    <!-- %1$s is the book's number in the series ("4", "4.5"), %2$s the series' name. -->
+    <string name="seriesnext_book_of">Book %1$s of %2$s</string>
+    <!-- The series' name isn't known. -->
+    <string name="seriesnext_book_n">Book %1$s</string>
+    <string name="seriesnext_untitled">Untitled</string>
+    <string name="seriesnext_read">Read</string>
+    <string name="seriesnext_details">Details</string>
+    <!-- Accessibility: %1$s is the next book's title. -->
+    <string name="seriesnext_read_desc">Read %1$s</string>
+    <string name="seriesnext_details_desc">Open %1$s</string>
+    <string name="seriesnext_close">Close</string>
+    <!-- Every volume of the series in the library is read. %1$d is how many (2 or more), %2$s the series' name. -->
+    <string name="seriesnext_all_read">You\'ve read all %1$d in %2$s</string>
+    <string name="seriesnext_all_read_plain">You\'ve read all %1$d</string>
+</resources>

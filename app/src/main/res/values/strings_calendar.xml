@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owned by feature.calendar: the reading calendar, a day's reading and reading goals. Prefixed calendar_. -->
+<resources>
+    <string name="calendar_title">Calendar</string>
+    <string name="calendar_goals_title">Reading goals</string>
+    <string name="calendar_untitled">Untitled</string>
+    <string name="calendar_retry">Retry</string>
+    <string name="calendar_save">Save</string>
+    <string name="calendar_cancel">Cancel</string>
+
+    <!-- Durations and numbers -->
+    <string name="calendar_seconds">%1$d s</string>
+    <string name="calendar_minutes">%1$d min</string>
+    <string name="calendar_hours">%1$d h</string>
+    <string name="calendar_hours_minutes">%1$d h %2$d min</string>
+    <string name="calendar_percent">%1$d%%</string>
+    <plurals name="calendar_books">
+        <item quantity="one">%1$d book</item>
+        <item quantity="other">%1$d books</item>
+    </plurals>
+    <plurals name="calendar_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+
+    <!-- The Book Calendar -->
+    <string name="calendar_heading">Book Calendar</string>
+    <string name="calendar_subtitle">How much have you read this month?</string>
+    <string name="calendar_save_image">Save as image</string>
+    <string name="calendar_saved">Saved to Pictures/Ottershelf</string>
+    <string name="calendar_save_failed">Couldn\'t save the image</string>
+    <!-- Days read · total time · books -->
+    <string name="calendar_summary">%1$s · %2$s · %3$s</string>
+    <string name="calendar_summary_loading">Loading…</string>
+    <string name="calendar_summary_none">No reading logged</string>
+    <plurals name="calendar_days_read">
+        <item quantity="one">%1$d day read</item>
+        <item quantity="other">%1$d days read</item>
+    </plurals>
+    <string name="calendar_nothing_this_month">Covers appear here on the days you read.</string>
+    <string name="calendar_load_failed">Couldn\'t load this month</string>
+    <string name="calendar_refresh_failed">Couldn\'t refresh: showing what was saved. Tap to try again.</string>
+    <string name="calendar_month_books">Books this month</string>
+    <!-- Days read · time -->
+    <string name="calendar_book_line">%1$s · %2$s</string>
+
+    <!-- A day -->
+    <string name="calendar_day_reading_time">Reading time</string>
+    <!-- Sessions · books -->
+    <string name="calendar_day_counts">%1$s · %2$s</string>
+    <plurals name="calendar_sessions">
+        <item quantity="one">%1$d session</item>
+        <item quantity="other">%1$d sessions</item>
+    </plurals>
+    <string name="calendar_day_sessions">Sessions</string>
+    <string name="calendar_day_empty">No reading on this day</string>
+    <string name="calendar_day_failed">Couldn\'t load this day</string>
+    <!-- Start – end -->
+    <string name="calendar_session_span">%1$s – %2$s</string>
+    <!-- Sign, then pages: "+23 pages" -->
+    <plurals name="calendar_pages_read">
+        <item quantity="one">%1$s%2$d page</item>
+        <item quantity="other">%1$s%2$d pages</item>
+    </plurals>
+    <!-- Sign, then the number: "+4.5%" -->
+    <string name="calendar_percent_read">%1$s%2$s%%</string>
+    <string name="calendar_of_minutes">of %1$d min</string>
+    <string name="calendar_goal_reached">Daily goal reached</string>
+    <string name="calendar_goal_to_go">%1$d min to go</string>
+
+    <!-- Reading goals -->
+    <string name="calendar_yearly_goal">%1$d reading goal</string>
+    <string name="calendar_of_books">/ %1$d books</string>
+    <string name="calendar_done">done</string>
+    <string name="calendar_no_yearly_goal">No yearly goal yet.</string>
+    <plurals name="calendar_finished_this_year">
+        <item quantity="one">%1$d book finished so far this year</item>
+        <item quantity="other">%1$d books finished so far this year</item>
+    </plurals>
+    <string name="calendar_set_goal">Set a goal</string>
+    <string name="calendar_change_goal">Change goal</string>
+    <string name="calendar_remove_goal">Remove</string>
+    <string name="calendar_goal_done">Goal reached!</string>
+    <string name="calendar_pace_ahead">Ahead of pace</string>
+    <string name="calendar_pace_on">On pace</string>
+    <string name="calendar_pace_behind">Behind pace</string>
+    <plurals name="calendar_books_to_go">
+        <item quantity="one">%1$d book to go</item>
+        <item quantity="other">%1$d books to go</item>
+    </plurals>
+    <string name="calendar_projected">At this rate: %1$s books by 31 December</string>
+    <string name="calendar_expected_now">On pace would be %1$d by today</string>
+    <string name="calendar_yearly_dialog_title">Yearly goal</string>
+    <string name="calendar_yearly_dialog_message">How many books do you want to finish in %1$d?</string>
+    <string name="calendar_books_unit">books</string>
+    <string name="calendar_yearly_saved">Yearly goal saved</string>
+    <string name="calendar_yearly_failed">Couldn\'t save the yearly goal</string>
+    <string name="calendar_daily_goal">Daily goal</string>
+    <string name="calendar_no_daily_goal">No daily goal yet. Pick how many minutes a day you\'d like to read.</string>
+    <string name="calendar_minutes_a_day">%1$d minutes a day</string>
+    <string name="calendar_minutes_short">%1$d min</string>
+    <string name="calendar_today">today</string>
+    <string name="calendar_today_unknown">Today\'s reading time isn\'t available right now.</string>
+    <string name="calendar_daily_dialog_title">Daily goal</string>
+    <string name="calendar_daily_dialog_message">Minutes of reading a day</string>
+    <string name="calendar_minutes_unit">min</string>
+    <string name="calendar_current_streak">Current streak</string>
+    <string name="calendar_longest_streak">Longest streak</string>
+    <plurals name="calendar_streak_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <string name="calendar_last_seven">Last 7 days</string>
+    <string name="calendar_previous_seven">The 7 days before: %1$s</string>
+    <string name="calendar_stats_failed">Couldn\'t load your reading statistics.</string>
+
+    <!-- Readings on the calendar: a book started, finished or given up on a day -->
+    <string name="calendar_mark_finished">Finished</string>
+    <string name="calendar_mark_gave_up">Gave up</string>
+    <string name="calendar_mark_started">Started</string>
+    <string name="calendar_day_readings">Started and finished</string>
+    <!-- The month's list: "5 days · 3 h · Finished 21 Sept" -->
+    <string name="calendar_book_line_marked">%1$s · %2$s</string>
+
+    <!-- Adding a book's dates: the picker -->
+    <string name="calendar_add_book">Add a book</string>
+    <string name="calendar_add_book_for_day">Add a book for this day</string>
+    <string name="calendar_picker_for_day">For %1$s</string>
+    <string name="calendar_picker_search">Title or author</string>
+    <string name="calendar_picker_clear">Clear the search</string>
+    <string name="calendar_picker_scan">Scan a book</string>
+    <string name="calendar_picker_scan_detail">Find it by the barcode on the back</string>
+    <string name="calendar_picker_reading_now">Reading now</string>
+    <string name="calendar_picker_results">In your library</string>
+    <string name="calendar_picker_nothing_reading">Search your library by title or author.</string>
+    <string name="calendar_picker_no_results">No books match that.</string>
+    <string name="calendar_picker_failed">Couldn\'t search your library</string>
+
+    <!-- Adding a book's dates: the dates sheet -->
+    <string name="calendar_dates_add_title">When did you read it?</string>
+    <string name="calendar_dates_edit_title">Edit dates</string>
+    <string name="calendar_dates_add_dates_title">Add dates</string>
+    <string name="calendar_dates_loading">Looking at its readings…</string>
+    <string name="calendar_dates_load_failed">Couldn\'t load this book\'s readings.</string>
+    <string name="calendar_dates_readings">Readings of this book</string>
+    <string name="calendar_dates_readings_hint">Give one of them these dates, or add another reading.</string>
+    <string name="calendar_dates_reading_now">Reading now</string>
+    <string name="calendar_dates_finished_on">Finished %1$s</string>
+    <string name="calendar_dates_gave_up_on">Gave up %1$s</string>
+    <string name="calendar_dates_skimmed_on">Skimmed %1$s</string>
+    <string name="calendar_dates_finished_no_date">Finished, no date</string>
+    <string name="calendar_dates_gave_up_no_date">Gave up, no date</string>
+    <string name="calendar_dates_skimmed_no_date">Skimmed, no date</string>
+    <string name="calendar_dates_started_on">Started %1$s</string>
+    <string name="calendar_dates_no_start">No start date</string>
+    <!-- Started 1 Aug 2024 · 12 sessions -->
+    <string name="calendar_dates_detail">%1$s · %2$s</string>
+    <string name="calendar_dates_new">Add another reading</string>
+    <string name="calendar_dates_new_reread">A reread</string>
+    <string name="calendar_dates_new_first">A new reading</string>
+    <string name="calendar_dates_how">How did it go?</string>
+    <string name="calendar_dates_outcome_finished">Finished</string>
+    <string name="calendar_dates_outcome_gave_up">Gave up</string>
+    <string name="calendar_dates_outcome_skimmed">Skimmed</string>
+    <string name="calendar_dates_outcome_reading">Still reading</string>
+    <string name="calendar_dates_started_optional">Started (optional)</string>
+    <string name="calendar_dates_not_set">Not set</string>
+    <string name="calendar_dates_clear_start">Clear the start date</string>
+    <string name="calendar_dates_end_finished">Finished</string>
+    <string name="calendar_dates_end_gave_up">Gave up</string>
+    <string name="calendar_dates_end_skimmed">Skimmed</string>
+    <string name="calendar_dates_start_future">The start can\'t be after today.</string>
+    <string name="calendar_dates_end_future">The end can\'t be after today.</string>
+    <string name="calendar_dates_start_after_end">The start can\'t be after the end.</string>
+    <string name="calendar_dates_reading_gone">This reading isn\'t there any more: it may have been changed on another device.</string>
+    <!-- The book's status after the save, when it changes: "Read", "Gave up"... -->
+    <string name="calendar_dates_status_change">Saving marks it as %1$s.</string>
+    <!-- A book on Want to read keeps that status after the save; History and the calendar list only books with another status. -->
+    <string name="calendar_dates_stays_wanted">It stays on Want to read, so this reading won\'t show in the calendar or History.</string>
+    <string name="calendar_dates_saving">Saving…</string>
+    <string name="calendar_dates_save_failed">Couldn\'t save the dates.</string>
+    <string name="calendar_dates_save_failed_because">Couldn\'t save the dates: %1$s</string>
+    <string name="calendar_ok">OK</string>
+
+    <!-- The Settings entry -->
+    <string name="calendar_settings_group">Reading</string>
+    <string name="calendar_settings_goals_summary">Yearly books and daily minutes</string>
+</resources>

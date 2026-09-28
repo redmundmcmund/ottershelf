@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Debug builds install as the dev package (app/build.gradle.kts, devApplicationId) next to a release build. -->
+    <string name="app_name">Ottershelf (dev)</string>
+</resources>

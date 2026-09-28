@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Window and splash colours only (what shows before Compose draws). Owned by ui.theme: the theme
+  work replaces these with the BookOrbit web tokens (its background token).
+-->
+<resources>
+    <color name="window_background">#FAFCFF</color>
+    <!-- The launcher icon's background layer: the water around the otter (tools/brand/make-icons.ps1). -->
+    <color name="ic_launcher_background">#3E6776</color>
+</resources>

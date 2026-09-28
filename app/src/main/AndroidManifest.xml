@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared file: see ARCHITECTURE.md ("Shared files") before changing it. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- To notice when the connection comes back and send progress saved offline. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Download progress (with Cancel) and results in the background; the reading timer (chronometer,
+         Pause/Stop) and its countdown alert. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Downloads run in a WorkManager worker promoted to a dataSync foreground service. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- A reading timer's notification and countdown alarm come back after a reboot. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Quotes: photograph a page to read its text on the phone (asked when the user taps Scan a page). -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <!-- The reader's Look up: the installed apps that take a selection (Translate, DeepL, a
+         dictionary), one button each; none installed, none shown. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT" />
+            <data android:mimeType="text/plain" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.TRANSLATE" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.TRANSLATE" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".OttershelfApp"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Ottershelf">
+
+        <!-- configChanges: rotating, resizing or a light/dark switch (uiMode) re-lays out Compose in
+             place instead of recreating the activity, so the reader's WebView keeps the open book
+             (and its position). OttershelfTheme follows isSystemInDarkTheme() in place, bar icons
+             included. -->
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode"
+            android:exported="true"
+            android:theme="@style/Theme.Ottershelf.Starting"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- The reading timer notification's Pause/Resume/Stop buttons and the countdown alarm. -->
+        <receiver
+            android:name=".core.tracking.TimerActionReceiver"
+            android:exported="false" />
+
+        <!-- Starts the app after a reboot or an update, so a timer's notification and alarm return. -->
+        <receiver
+            android:name=".core.tracking.TimerRestoreReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Highlights and notes: a quote card image or a book's highlights (Markdown) handed to the share
+             sheet from the cache (res/xml/notes_share_paths.xml). -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.notes.share"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/notes_share_paths" />
+        </provider>
+
+        <!-- WorkManager's foreground service, typed for the download worker's setForeground(). -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
+
+        <!-- The reader's WebView sends Google no usage metrics (Android System WebView otherwise may,
+             when the phone's owner agreed to usage and diagnostics). -->
+        <meta-data
+            android:name="android.webkit.WebView.MetricsOptOut"
+            android:value="true" />
+
+        <!-- Content providers start on the main thread before Application.onCreate, in every process
+             (those started for a worker, an alarm or boot too), and androidx.startup's initializers
+             with them. WorkManager starts at its first use instead (OttershelfApp is its Configuration.Provider). EmojiCompat (which Compose brings)
+             doesn't start at all: after every first resume it would fetch Play services' emoji font
+             where that is a system app, keep its metadata in memory and lay out every text again,
+             for emoji the phone's own font already draws (only one newer than it shows as a box).
+             The others stay. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                tools:node="remove" />
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                tools:node="remove" />
+        </provider>
+    </application>
+</manifest>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- feature.scan: the ISBN barcode scanner. -->
+<resources>
+    <!-- Entry points -->
+    <string name="scan_action">Scan a book\'s barcode</string>
+    <string name="scan_for_timer">Scan a book</string>
+    <string name="scan_for_timer_description">Scan a paper book\'s barcode to time your reading</string>
+
+    <!-- The camera -->
+    <string name="scan_title">Scan a book</string>
+    <string name="scan_subtitle_timer">For the reading timer</string>
+    <string name="scan_subtitle_pick">To add its dates</string>
+    <string name="scan_close">Close</string>
+    <string name="scan_hint">Line up the barcode on the back cover</string>
+    <string name="scan_torch_on">Turn on the light</string>
+    <string name="scan_torch_off">Turn off the light</string>
+    <string name="scan_type_isbn">Type the ISBN</string>
+    <string name="scan_viewfinder">Camera view. Tap to focus.</string>
+
+    <!-- Camera permission -->
+    <string name="scan_camera_title">Scan the barcode</string>
+    <string name="scan_camera_rationale">The camera is used only while this screen is open, to read the barcode on the back of a book. It\'s read here on the phone: no picture is taken or kept.</string>
+    <string name="scan_camera_allow">Allow camera</string>
+    <string name="scan_camera_denied_title">Camera not allowed</string>
+    <string name="scan_camera_denied">Ottershelf can\'t use the camera, so it can\'t read barcodes. Allow it in Settings, or type the ISBN instead.</string>
+    <string name="scan_open_settings">Open settings</string>
+    <string name="scan_type_instead">Type the ISBN instead</string>
+    <string name="scan_camera_failed">The camera couldn\'t start.</string>
+
+    <!-- Typing the ISBN -->
+    <string name="scan_manual_title">Type the ISBN</string>
+    <string name="scan_manual_detail">10 or 13 digits, from the back cover or the copyright page. Hyphens and spaces are fine.</string>
+    <string name="scan_manual_placeholder">978-0-306-40615-7</string>
+    <string name="scan_manual_x">X</string>
+    <string name="scan_manual_x_description">Type X, the last character of some ISBN-10s</string>
+    <string name="scan_manual_find">Find</string>
+    <string name="scan_manual_cancel">Cancel</string>
+    <string name="scan_manual_valid_13">ISBN-13 %1$s</string>
+    <string name="scan_manual_valid">A valid ISBN</string>
+    <string name="scan_problem_incomplete">Enter all 10 or 13 digits.</string>
+    <string name="scan_problem_too_long">That\'s more than 13 digits.</string>
+    <string name="scan_problem_character">Use digits only. Hyphens and spaces are fine.</string>
+    <string name="scan_problem_x">Only an ISBN-10 can end in X.</string>
+    <string name="scan_problem_not_book">An ISBN-13 starts with 978 or 979.</string>
+    <string name="scan_problem_check">The last digit doesn\'t match the others. Check for a typo.</string>
+
+    <!-- Results -->
+    <string name="scan_isbn">ISBN %1$s</string>
+    <string name="scan_looking">Looking in your library…</string>
+    <string name="scan_opening">Opening…</string>
+    <plurals name="scan_copies">
+        <item quantity="one">%1$d copy in your library</item>
+        <item quantity="other">%1$d copies in your library</item>
+    </plurals>
+    <string name="scan_choose">Which one is it?</string>
+    <string name="scan_choose_timer">Which one are you reading?</string>
+    <string name="scan_choose_pick">Which one did you read?</string>
+    <string name="scan_again">Scan again</string>
+    <string name="scan_retry">Retry</string>
+    <string name="scan_failed">Couldn\'t search your library</string>
+    <string name="scan_untitled">Untitled</string>
+
+    <string name="scan_missing_title">Not in your library</string>
+    <string name="scan_missing_timer">The reading timer needs the book in your library.</string>
+    <string name="scan_missing_pick">Only a book in your library can have its dates added.</string>
+    <string name="scan_looking_up">Looking it up…</string>
+    <string name="scan_unknown">No metadata provider knows this ISBN.</string>
+    <string name="scan_lookup_failed">Couldn\'t ask the metadata providers.</string>
+    <string name="scan_editions">In your library as another edition?</string>
+    <string name="scan_request">Request it</string>
+    <string name="scan_open_requests">Book requests</string>
+</resources>
