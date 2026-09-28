@@ -31,10 +31,10 @@ app works with and that the app is unofficial, as BookOrbit's additional terms r
 
 | Field | Value |
 |---|---|
-| Email (required, shown publicly) | [contact email] |
+| Email (required, shown publicly) | redmund.mcmund+otter@gmail.com |
 | Website | https://github.com/redmundmcmund/ottershelf |
 | Phone (optional) | leave empty |
-| Privacy policy URL (required) | [privacy policy URL on GitHub Pages, e.g. https://redmundmcmund.github.io/ottershelf/PRIVACY] |
+| Privacy policy URL (required) | https://redmundmcmund.github.io/ottershelf/PRIVACY |
 
 The email address is required by Play; use a project address, not a personal one. The privacy
 policy URL must serve PRIVACY.md as a public web page (GitHub Pages from the repository), without

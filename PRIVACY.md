@@ -1,6 +1,6 @@
 # Ottershelf privacy policy
 
-Effective date: [effective date]
+Effective date: 2026-09-28
 
 This policy describes how the Ottershelf Android app (package `io.github.ottershelf`) handles
 information. Ottershelf is an open-source reading app for self-hosted BookOrbit servers, published

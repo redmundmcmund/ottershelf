@@ -21,7 +21,7 @@ itself contains and presents, not for what a user might keep on their own server
 
 | Question | Answer |
 |---|---|
-| Email address for rating communications | [contact email] |
+| Email address for rating communications | redmund.mcmund+otter@gmail.com |
 | Category | **Reference, News, or Educational** (an ebook reader and reading tracker). If the questionnaire's description of that category does not fit, use **Utility, Productivity, Communication, or Other**; the content answers below are the same. |
 | Does the app contain violence (realistic, fantasy, blood, gore)? | No |
 | Does the app contain fear or horror content? | No |
