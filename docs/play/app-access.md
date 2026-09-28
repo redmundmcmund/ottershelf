@@ -25,22 +25,48 @@ Before submitting, set up a BookOrbit server dedicated to review:
   ISBNs. Do not use copyrighted books or any real user's data.
 - Nothing personal on the server: no real names, reading history or addresses.
 
+## The demo server
+
+`https://bookdemo.redmund.net`, a BookOrbit 3.1.0 instance run only for app review. It shares
+nothing with any real library: its own database, and a library of nine public-domain or CC0 files.
+
+| Title | Format | Notes |
+|---|---|---|
+| A Study in Scarlet | EPUB | Sherlock Holmes #1 (Standard Ebooks) |
+| The Sign of the Four | EPUB | Sherlock Holmes #2 |
+| The Adventures of Sherlock Holmes | EPUB | Sherlock Holmes #3 |
+| Pride and Prejudice | EPUB | |
+| Frankenstein | EPUB | |
+| Alice's Adventures in Wonderland | PDF, 2.2 MB | Internet Archive scan, via Wikimedia Commons |
+| Alice's adventures in Wonderland | PDF, 33 MB | Illustrated scan. Large enough to film the download for the foreground-service video |
+| Little Nemo in Slumberland #1, #2 | CBZ | Winsor McCay's 1905 Sunday pages, a two-issue series |
+
+The review account is `reviewer`. It has download, metadata-editing, book-request and
+notification access, and BookOrbit's **demo restricted** flag, so a reviewer cannot change its
+password and lock later reviews out; the same flag hides ratings and the appearance-storage
+switch. The books carry no ISBNs, so an ISBN lookup always goes to the server's metadata
+providers (Open Library, Goodreads and iTunes answered without API keys when this was set up). Requests can be submitted but are never
+fulfilled: the server has no download sources.
+
+**The password is not in this repository.** It is kept with the server's other credentials;
+paste it into Play Console directly.
+
 ## Instructions to enter
 
 **Instruction name:** Demo BookOrbit server
 
-**Username:** [demo username]
+**Username:** reviewer
 
-**Password:** [demo password]
+**Password:** (paste from the demo server's credentials; never commit it)
 
 **Any other information required to access your app:**
 
 ```
 Ottershelf is a client for self-hosted BookOrbit servers. On the sign-in screen enter:
 
-Server:   [demo server URL, e.g. https://demo.example.org]
-Username: [demo username]
-Password: [demo password]
+Server:   https://bookdemo.redmund.net
+Username: reviewer
+Password: (the password above)
 
 The account is on a demo server run for app review and holds only public-domain books.
 No other setup is needed.
@@ -49,19 +75,24 @@ What you can test:
 - Dashboard: open the app after signing in.
 - Library: menu > All books, Authors, Series; sort, filter, grid or list; long-press a cover for
   a quick view.
-- Reading: open a book and tap Read. EPUB: "[EPUB title]". PDF: "[PDF title]".
-  Comic: "[CBZ title]". Select text in the EPUB to highlight, add a note or tap Look up.
+- Reading: open a book and tap Read. EPUB: "A Study in Scarlet". PDF: "Alice's Adventures in
+  Wonderland". Comic: "Little Nemo in Slumberland #1". Select text in the EPUB to highlight, add
+  a note or tap Look up.
+- Series: "Sherlock Holmes" has three books; finishing "Little Nemo in Slumberland #1" offers #2.
 - Offline reading and the foreground service: on a book page tap Download. The download continues
-  with a progress notification (with Cancel) when you leave the app.
+  with a progress notification (with Cancel) when you leave the app. The 33 MB illustrated
+  "Alice's adventures in Wonderland" PDF takes long enough to watch.
 - Reading timer: on a book page tap Start timer; the notification offers Pause and Stop.
 - Tracking: menu > Tracking > Calendar, History, Statistics, Achievements, Notes.
 - ISBN scanning: tap the barcode icon in the toolbar, then "Type the ISBN" and enter
-  [demo ISBN], or scan that ISBN's barcode. The camera is requested only for scanning, page
-  photos for quotes and cover photos.
+  9780142437247 (Moby-Dick), or scan that ISBN's barcode. It is not in the demo library, so the app shows
+  what metadata providers know about it and offers a book request. The camera is requested only
+  for scanning, page photos for quotes and cover photos.
 - Quotes: on a book page tap "Scan a page" to photograph printed English text, or "Add quote" to
   type one.
-- [Book requests: menu > Book requests. Metadata editing: the pencil on a book page.]
-  [or: Book requests and metadata editing are disabled for this account.]
+- Book requests: menu > Book requests (requests are accepted but not fulfilled on this server).
+  Metadata editing: the pencil on a book page.
+- Ratings are not available to this demo account.
 
 Please do not change the account's password.
 ```
