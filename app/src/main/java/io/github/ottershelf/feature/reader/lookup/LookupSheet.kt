@@ -57,6 +57,7 @@ import io.github.ottershelf.ui.components.SecondaryButton
 import io.github.ottershelf.ui.components.SkeletonBox
 import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfTheme
+import io.github.ottershelf.ui.components.belowStatusBar
 
 /** What the Look up sheet can do. */
 class LookupActions(
@@ -79,6 +80,7 @@ fun LookupSheet(state: LookupUiState, viewModel: LookupViewModel) {
         onApp = { app -> TextApps.launch(context, app, state.text) },
     )
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = viewModel::close,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = OttershelfTheme.colors.card,

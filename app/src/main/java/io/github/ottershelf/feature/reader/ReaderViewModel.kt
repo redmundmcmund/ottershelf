@@ -106,6 +106,9 @@ class ReaderViewModel(
 ) : ViewModel() {
 
     private val progress = container.progress
+
+    /** The WebView's version when it is too old for the reader (an error then says to update it). */
+    private val oldWebView: String? = WebViewVersion.outdated(appContext)
     private val api = container.api
     private val appScope = container.appScope
     private val prefsStore = ReaderPrefsStore(container.settings)
@@ -650,7 +653,11 @@ class ReaderViewModel(
 
         @JavascriptInterface
         fun onError(message: String) = post {
-            val error = if (requests.local == null && !container.online.value) ReaderError.Offline else ReaderError.Failed(message)
+            val error = when {
+                requests.local == null && !container.online.value -> ReaderError.Offline
+                oldWebView != null -> ReaderError.OldWebView(oldWebView)
+                else -> ReaderError.Failed(message)
+            }
             _state.update { it.copy(loading = false, error = error, chromeVisible = true) }
         }
 

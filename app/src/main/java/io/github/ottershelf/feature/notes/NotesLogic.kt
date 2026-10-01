@@ -32,7 +32,7 @@ object NotesLogic {
         "books/$bookId/annotations?page=$page&pageSize=$pageSize&" +
             if (newestFirst) "sortBy=createdAt&sortDir=desc" else "sortBy=position&sortDir=asc"
 
-    private fun encode(value: String): String = URLEncoder.encode(value, Charsets.UTF_8).replace("+", "%20")
+    private fun encode(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
 
     /**
      * [items] (in reading order) by chapter, in the order each chapter first appears. Counts come

@@ -75,6 +75,7 @@ import io.github.ottershelf.ui.components.AccentButton
 import io.github.ottershelf.ui.components.SecondaryButton
 import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfTheme
+import io.github.ottershelf.ui.components.belowStatusBar
 
 typealias DraftEdit = ((CustomiseDraft) -> CustomiseDraft) -> Unit
 
@@ -88,6 +89,7 @@ typealias DraftEdit = ((CustomiseDraft) -> CustomiseDraft) -> Unit
 internal fun CustomiseSheet(state: CustomiseState, onEdit: DraftEdit, onSave: () -> Unit, onClose: () -> Unit, onRetryLibraries: () -> Unit = {}) {
     val saving by rememberUpdatedState(state.saving)
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = onClose,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden || !saving }),
         sheetGesturesEnabled = !state.saving,

@@ -88,6 +88,7 @@ import io.github.ottershelf.ui.theme.OttershelfTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import io.github.ottershelf.ui.components.belowStatusBar
 
 /**
  * The picker and the dates sheet of [viewModel], over the screen that owns it (Calendar, Day,
@@ -110,6 +111,7 @@ fun ReadingDatesHost(viewModel: ReadingDatesViewModel, navigator: AppNavigator, 
     val picker = state.picker
     if (picker != null && !state.scanning) {
         ModalBottomSheet(
+            modifier = Modifier.belowStatusBar(),
             onDismissRequest = viewModel::closePicker,
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = colors.card,
@@ -131,6 +133,7 @@ fun ReadingDatesHost(viewModel: ReadingDatesViewModel, navigator: AppNavigator, 
     if (dates != null) {
         val saving by rememberUpdatedState(dates.saving)
         ModalBottomSheet(
+            modifier = Modifier.belowStatusBar(),
             onDismissRequest = viewModel::closeDates,
             // Not while saving: the sheet stays until the save is in (or failed).
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden || !saving }),

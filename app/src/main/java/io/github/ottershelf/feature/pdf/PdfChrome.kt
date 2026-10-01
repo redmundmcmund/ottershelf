@@ -113,6 +113,7 @@ import io.github.ottershelf.ui.icons.AppIcons
 import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfTheme
 import kotlin.math.roundToInt
+import io.github.ottershelf.ui.components.belowStatusBar
 
 /** What the PDF reader's chrome can do. */
 class PdfActions(
@@ -276,7 +277,7 @@ private fun PdfTopBar(state: PdfUiState, actions: PdfActions) {
                 overflow = TextOverflow.Ellipsis,
             )
             BarIcon("TableOfContents", stringResource(R.string.pdf_contents), open, actions.onContents)
-            BarIcon("Search", stringResource(R.string.pdf_search), open, actions.onSearch)
+            if (state.searchable) BarIcon("Search", stringResource(R.string.pdf_search), open, actions.onSearch)
             BarIcon("Settings2", stringResource(R.string.pdf_settings), enabled = true, actions.onSettings)
         }
         HorizontalDivider(thickness = 1.dp, color = colors.border)
@@ -394,6 +395,7 @@ private fun PdfErrorCard(error: PdfPhase.Failed, onRetry: () -> Unit, modifier: 
         border = BorderStroke(1.dp, colors.border),
     ) {
         if (error.offline) ErrorState(onRetry = onRetry, message = stringResource(R.string.pdf_offline_not_downloaded))
+        else if (error.locked) ErrorState(onRetry = onRetry, message = stringResource(R.string.pdf_locked_unsupported))
         else ErrorState(onRetry = onRetry, message = stringResource(R.string.pdf_open_failed), detail = error.message)
     }
 }
@@ -418,6 +420,7 @@ private fun SheetTitle(text: String, modifier: Modifier = Modifier) {
 @Composable
 fun PdfContentsSheet(state: PdfUiState, onPage: (Int) -> Unit, onDismiss: () -> Unit) {
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = OttershelfTheme.colors.card,
@@ -545,6 +548,7 @@ private fun ThumbnailGrid(state: PdfUiState, onPage: (Int) -> Unit) {
 @Composable
 fun PdfSearchSheet(search: PdfSearch, pageCount: Int, onSearch: (String) -> Unit, onPick: (Int) -> Unit, onDismiss: () -> Unit) {
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = OttershelfTheme.colors.card,
@@ -639,6 +643,7 @@ class PdfSettingsActions(
 @Composable
 fun PdfSettingsSheet(view: PdfView, customized: Boolean, actions: PdfSettingsActions, onDismiss: () -> Unit) {
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = OttershelfTheme.colors.card,

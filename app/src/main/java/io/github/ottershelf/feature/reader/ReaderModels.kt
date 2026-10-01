@@ -234,6 +234,9 @@ sealed interface ReaderError {
 
     /** What reader.js reported (English, from the page or the server). */
     data class Failed(val message: String) : ReaderError
+
+    /** The phone's WebView is too old for the reader ([version], below [WebViewVersion.MIN_MAJOR]). */
+    data class OldWebView(val version: String) : ReaderError
 }
 
 /** One-off messages for a snackbar. */

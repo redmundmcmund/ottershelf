@@ -45,6 +45,7 @@ import io.github.ottershelf.R
 import io.github.ottershelf.ui.components.AccentButton
 import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfTheme
+import io.github.ottershelf.ui.components.belowStatusBar
 
 // --- labels ----------------------------------------------------------------------------------
 
@@ -171,6 +172,7 @@ private fun SortChip(label: String, icon: String, active: Boolean, onClick: () -
 @Composable
 fun SortSheet(sort: ListSort, kind: ListKind, onChange: (ListSort) -> Unit, onDismiss: () -> Unit) {
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = OttershelfTheme.colors.card,

@@ -84,6 +84,7 @@ import io.github.ottershelf.ui.nav.AppNavigator
 import io.github.ottershelf.ui.nav.Route
 import io.github.ottershelf.ui.nav.appViewModel
 import io.github.ottershelf.ui.theme.OttershelfTheme
+import io.github.ottershelf.ui.components.belowStatusBar
 
 /** The form's callbacks, grouped so previews and screenshot tests pass none. */
 internal class AddQuoteActions(
@@ -403,6 +404,7 @@ internal fun ColourRow(picked: String, onColor: (String) -> Unit, modifier: Modi
 @Composable
 internal fun BookPickerSheet(state: PickerState, onQuery: (String) -> Unit, onPick: (QuoteBook) -> Unit, onDismiss: () -> Unit) {
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = OttershelfTheme.colors.card,

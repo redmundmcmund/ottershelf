@@ -119,8 +119,11 @@ sealed interface PdfPhase {
     data object Opening : PdfPhase
     /** The document is encrypted; [wrong] after a password that didn't open it. */
     data class Password(val wrong: Boolean) : PdfPhase
-    /** [offline]: no connection and no copy on the phone; else [message] (null: no detail). */
-    data class Failed(val offline: Boolean, val message: String? = null) : PdfPhase
+    /**
+     * [offline]: no connection and no copy on the phone; [locked]: a protected PDF this phone's
+     * renderer can't open; else [message] (null: no detail).
+     */
+    data class Failed(val offline: Boolean, val message: String? = null, val locked: Boolean = false) : PdfPhase
     data object Ready : PdfPhase
 }
 
@@ -138,6 +141,8 @@ data class PdfUiState(
     /** The document's outline (bookmarks), empty when it has none. */
     val outline: List<OutlineEntry> = emptyList(),
     val search: PdfSearch = PdfSearch(),
+    /** The phone can search this PDF's text (not on Android 12 to 14 without the PDF module's update). */
+    val searchable: Boolean = true,
     /** Two reading positions: the prompt is showing. */
     val choice: PositionChoice? = null,
     /** Draws the pages (null until the document is open). */

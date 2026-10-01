@@ -170,6 +170,10 @@ class PdfViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: PdfPasswordException) {
+            if (!e.canUnlock) {
+                _state.update { it.copy(phase = PdfPhase.Failed(offline = false, locked = true)) }
+                return
+            }
             _state.update { it.copy(phase = PdfPhase.Password(wrong = password != null)) }
             return
         } catch (e: Exception) {
@@ -201,6 +205,7 @@ class PdfViewModel(
                 page = start,
                 chromeVisible = false,
                 source = EnginePageSource(doc, cache),
+                searchable = doc.searchable,
             )
         }
         decided.freshStart?.let { _messages.trySend(PdfMessage.FreshStart(it.label)) }

@@ -45,6 +45,7 @@ import io.github.ottershelf.core.readerprefs.CbxReaderSettings
 import io.github.ottershelf.ui.components.SecondaryButton
 import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfTheme
+import io.github.ottershelf.ui.components.belowStatusBar
 
 /** What the settings sheet can do. */
 class ComicsSettingsActions(
@@ -57,6 +58,7 @@ class ComicsSettingsActions(
 @Composable
 fun ComicsSettingsSheet(settings: CbxReaderSettings, customized: Boolean, actions: ComicsSettingsActions, onDismiss: () -> Unit) {
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = OttershelfTheme.colors.card,

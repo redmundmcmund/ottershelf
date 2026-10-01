@@ -37,6 +37,7 @@ import io.github.ottershelf.core.settings.ProgressUnit
 import io.github.ottershelf.ui.components.AccentButton
 import io.github.ottershelf.ui.components.SecondaryButton
 import io.github.ottershelf.ui.theme.OttershelfTheme
+import io.github.ottershelf.ui.components.belowStatusBar
 
 /** The save form in a bottom sheet (the timer screen's Save). */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +51,7 @@ internal fun SaveSessionSheet(
     onDiscard: () -> Unit,
 ) {
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = { if (!saving) onDismiss() },
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = OttershelfTheme.colors.card,

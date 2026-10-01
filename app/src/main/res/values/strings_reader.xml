@@ -13,6 +13,9 @@
     <string name="reader_offline_not_downloaded">No connection, and this book isn\'t downloaded. Download it from its page to read it offline.</string>
     <string name="reader_open_failed">Couldn\'t open the book.</string>
     <string name="reader_stopped">The reader stopped unexpectedly.</string>
+    <string name="reader_webview_outdated">This phone\'s Android System WebView is too old for the reader. Update it from Google Play, then try again.</string>
+    <!-- %1$s: the installed WebView version, e.g. 91.0.4472.114. -->
+    <string name="reader_webview_version">Installed WebView: %1$s</string>
     <!-- %1$s: the read status (Read, Unread). -->
     <string name="reader_fresh_start">Marked %1$s, so starting from the beginning</string>
 

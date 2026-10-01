@@ -56,10 +56,10 @@ android {
     defaultConfig {
         // The release package. The dev and debug builds take devApplicationId (androidComponents below).
         applicationId = "io.github.ottershelf"
-        minSdk = 35
+        minSdk = 31
         targetSdk = 36
-        versionCode = 13
-        versionName = "0.1.12"
+        versionCode = 15
+        versionName = "0.1.14"
         // On-device tests (src/androidTest): run them by hand with `am instrument`, never with
         // connectedAndroidTest, which uninstalls the app afterwards (ARCHITECTURE.md, "Device tests").
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

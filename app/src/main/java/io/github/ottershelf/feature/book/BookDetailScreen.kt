@@ -63,7 +63,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -107,6 +106,7 @@ import io.github.ottershelf.feature.seriesnext.NextInSeriesCard
 import io.github.ottershelf.feature.seriesnext.NextInSeriesRow
 import io.github.ottershelf.feature.seriesnext.rememberSeriesNext
 import io.github.ottershelf.ui.components.BookCoverPlaceholder
+import io.github.ottershelf.ui.components.FittedCoverImage
 import io.github.ottershelf.ui.components.DetailTopBar
 import io.github.ottershelf.ui.components.ErrorState
 import io.github.ottershelf.ui.components.FormatChip
@@ -484,21 +484,19 @@ private fun DetailCoverBox(state: BookDetailUiState, cover: DetailCover, modifie
             )
         }
         if (state.thumb != null && !thumbFailed) {
-            AsyncImage(
+            FittedCoverImage(
                 model = state.thumb,
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
                 onSuccess = { cover.thumbTooSmall = thumbTooSmall(it.painter.intrinsicSize.height, boxHeightPx) },
                 onError = { cover.thumbFailed = true },
             )
         }
         if (state.cover != null && !coverFailed && cover.wantsFull(state)) {
-            AsyncImage(
+            FittedCoverImage(
                 model = state.cover,
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
                 onError = { coverFailed = true },
             )
         }

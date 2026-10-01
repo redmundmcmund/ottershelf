@@ -1,0 +1,4 @@
+- Runs on Android 12, 13 and 14, as well as Android 15 and later
+- Book covers that aren't the usual shape now show in full instead of being cropped
+- Fixed the cover search shaking after a hard flick to the end of the list
+- On Android 12 to 14, PDF search, links and password-protected PDFs need an up-to-date Google Play system update

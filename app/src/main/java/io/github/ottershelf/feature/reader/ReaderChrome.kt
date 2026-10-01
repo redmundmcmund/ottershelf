@@ -91,6 +91,7 @@ import io.github.ottershelf.ui.theme.OttershelfTheme
 import java.text.DateFormat
 import java.util.Date
 import kotlin.math.roundToInt
+import io.github.ottershelf.ui.components.belowStatusBar
 
 /** What the reader's chrome can do. */
 class ReaderActions(
@@ -420,6 +421,7 @@ private fun ReaderErrorCard(error: ReaderError, onRetry: () -> Unit, modifier: M
         ReaderError.Offline -> stringResource(R.string.reader_offline_not_downloaded) to null
         ReaderError.Stopped -> stringResource(R.string.reader_stopped) to null
         is ReaderError.Failed -> stringResource(R.string.reader_open_failed) to error.message
+        is ReaderError.OldWebView -> stringResource(R.string.reader_webview_outdated) to stringResource(R.string.reader_webview_version, error.version)
     }
     Surface(
         modifier = modifier.padding(24.dp).widthIn(max = 420.dp),
@@ -439,6 +441,7 @@ private fun ReaderErrorCard(error: ReaderError, onRetry: () -> Unit, modifier: M
 fun TocSheet(toc: List<TocEntry>, currentHref: String?, onPick: (String) -> Unit, onDismiss: () -> Unit) {
     val colors = OttershelfTheme.colors
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(),
         containerColor = colors.card,

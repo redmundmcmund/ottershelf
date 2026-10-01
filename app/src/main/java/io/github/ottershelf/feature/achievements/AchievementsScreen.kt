@@ -59,6 +59,7 @@ import io.github.ottershelf.ui.nav.Route
 import io.github.ottershelf.ui.nav.TopBarActions
 import io.github.ottershelf.ui.nav.appViewModel
 import io.github.ottershelf.ui.theme.OttershelfTheme
+import io.github.ottershelf.ui.components.belowStatusBar
 
 /** Achievements: a root list (the drawer's Tracking > Achievements) under the shell's toolbar. */
 @Composable
@@ -170,6 +171,7 @@ fun AchievementsContent(
     }
     if (detail != null) {
         ModalBottomSheet(
+            modifier = Modifier.belowStatusBar(),
             onDismissRequest = { detailKey = null },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = colors.card,

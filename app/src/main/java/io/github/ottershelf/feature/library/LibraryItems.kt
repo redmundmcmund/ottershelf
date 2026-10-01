@@ -46,6 +46,7 @@ import io.github.ottershelf.R
 import io.github.ottershelf.core.model.AuthorSummary
 import io.github.ottershelf.core.model.SeriesSummary
 import io.github.ottershelf.ui.components.PillProgressBar
+import io.github.ottershelf.ui.components.FittedCoverImage
 import io.github.ottershelf.ui.theme.OttershelfTheme
 import kotlin.math.ceil
 import kotlin.math.sin
@@ -261,7 +262,7 @@ private fun FanCover(model: Any?, modifier: Modifier) {
                 val key = "$model#" + System.currentTimeMillis() / DAY_MS
                 ImageRequest.Builder(context).data(model).memoryCacheKey(key).diskCacheKey(key).build()
             }
-            AsyncImage(model = request, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+            FittedCoverImage(model = request, contentDescription = null, modifier = Modifier.fillMaxSize())
         }
     }
 }

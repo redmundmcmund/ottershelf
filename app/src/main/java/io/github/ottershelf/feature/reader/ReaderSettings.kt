@@ -53,6 +53,7 @@ import io.github.ottershelf.ui.theme.OttershelfTheme
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import io.github.ottershelf.ui.components.belowStatusBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +62,7 @@ fun ReaderSettingsSheet(prefs: ReaderPrefs, onChange: (ReaderPrefs) -> Unit, onD
     val density = LocalDensity.current
     val widthDp = with(density) { window.containerSize.width.toDp().value.roundToInt() }
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = OttershelfTheme.colors.card,

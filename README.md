@@ -88,7 +88,7 @@ affiliated with, approved, sponsored or endorsed by the BookOrbit project.
 
 ## Requirements
 
-- An Android phone running **Android 15 or later** (API level 35).
+- An Android phone running **Android 12 or later** (API level 31).
 - A **BookOrbit server** reachable over **HTTPS** with a certificate trusted by Android's system
   certificate store, and an account on it. Plain `http://` addresses are refused, and certificates
   from user-installed certificate authorities are not trusted.

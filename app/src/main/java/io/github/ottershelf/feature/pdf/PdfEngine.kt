@@ -3,10 +3,20 @@ package io.github.ottershelf.feature.pdf
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.RectF
 import android.graphics.pdf.LoadParams
 import android.graphics.pdf.PdfRenderer
+import android.graphics.pdf.PdfRendererPreV
+import android.graphics.pdf.RenderParams
+import android.graphics.pdf.content.PdfPageGotoLinkContent
+import android.graphics.pdf.content.PdfPageLinkContent
+import android.graphics.pdf.models.PageMatchBounds
+import android.os.Build
 import android.os.ParcelFileDescriptor
+import android.os.ext.SdkExtensions
 import android.util.LruCache
+import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresExtension
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -38,20 +48,30 @@ interface PdfPageSource {
     fun linkAt(index: Int, x: Float, y: Float): PdfLink?
 }
 
-/** The document needs a password, or the one given didn't open it. */
-class PdfPasswordException : Exception("Password required")
+/**
+ * The document needs a password, or the one given didn't open it. [canUnlock] false: this phone's
+ * renderer can't open protected PDFs at all (asking for the password would be no use).
+ */
+class PdfPasswordException(val canUnlock: Boolean = true) : Exception("Password required")
 
 /**
- * One open PDF: the platform [PdfRenderer] (pdfium). It isn't thread-safe and only one page may be
- * open at a time, so every call runs on this document's own single-threaded dispatcher, in order;
- * a call whose caller has gone (a page scrolled away) never starts. API 35's text, search and link
- * APIs back the search and the tappable links.
+ * One open PDF, drawn by pdfium through the platform's renderer. It isn't thread-safe and only one
+ * page may be open at a time, so every call runs on this document's own single-threaded
+ * dispatcher, in order; a call whose caller has gone (a page scrolled away) never starts.
+ *
+ * Which renderer depends on the phone ([Document.open]): Android 15's PdfRenderer; on Android 12
+ * to 14, the same features as PdfRendererPreV when the phone's PDF module has them (Google Play
+ * system updates, S extension 13); otherwise the original PdfRenderer, which only draws pages:
+ * no search ([searchable] false), no links, and protected PDFs don't open.
  */
 class PdfEngine private constructor(
-    private val renderer: PdfRenderer,
+    private val document: Document,
     private val thread: CoroutineDispatcher,
 ) {
-    val pageCount: Int = renderer.pageCount
+    val pageCount: Int = document.pageCount
+
+    /** Search (and the page text it needs) works on this phone. */
+    val searchable: Boolean = document.hasText
 
     private val links = ConcurrentHashMap<Int, List<PdfLink>>()
 
@@ -60,22 +80,21 @@ class PdfEngine private constructor(
 
     /** Page [index]'s size in points. */
     suspend fun pageSize(index: Int): Pair<Float, Float>? = onThread {
-        renderer.openPage(index).use { it.width.toFloat() to it.height.toFloat() }
+        document.openPage(index).use { it.width.toFloat() to it.height.toFloat() }
     }
 
     /** The sizes of pages [from] until [to]. */
     suspend fun pageSizes(from: Int, to: Int): List<Pair<Float, Float>> = onThread {
-        (from until to.coerceAtMost(pageCount)).map { i -> renderer.openPage(i).use { it.width.toFloat() to it.height.toFloat() } }
+        (from until to.coerceAtMost(pageCount)).map { i -> document.openPage(i).use { it.width.toFloat() to it.height.toFloat() } }
     } ?: emptyList()
 
     /** The whole page at [width] x [height] px, on white (pages are transparent where nothing is drawn). */
     suspend fun render(index: Int, width: Int, height: Int): Bitmap? = onThread {
-        renderer.openPage(index).use { page ->
-            if (!links.containsKey(index)) links[index] = readLinks(page)
+        document.openPage(index).use { page ->
+            if (!links.containsKey(index)) links[index] = runCatching { page.links() }.getOrDefault(emptyList())
             val bitmap = Bitmap.createBitmap(width.coerceAtLeast(1), height.coerceAtLeast(1), Bitmap.Config.ARGB_8888)
             bitmap.eraseColor(Color.WHITE)
-            val matrix = Matrix().apply { setScale(bitmap.width / page.width.toFloat(), bitmap.height / page.height.toFloat()) }
-            page.render(bitmap, null, matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+            page.render(bitmap, Matrix().apply { setScale(bitmap.width / page.width.toFloat(), bitmap.height / page.height.toFloat()) })
             bitmap
         }
     }
@@ -83,29 +102,30 @@ class PdfEngine private constructor(
     /** [region] (px of the page drawn at [fullWidth] x [fullHeight]) as its own bitmap, for sharp zoomed text. */
     suspend fun renderRegion(index: Int, fullWidth: Int, fullHeight: Int, region: IntRect): Bitmap? = onThread {
         if (region.width <= 0 || region.height <= 0) return@onThread null
-        renderer.openPage(index).use { page ->
+        document.openPage(index).use { page ->
             val bitmap = Bitmap.createBitmap(region.width, region.height, Bitmap.Config.ARGB_8888)
             bitmap.eraseColor(Color.WHITE)
             val matrix = Matrix().apply {
                 setScale(fullWidth / page.width.toFloat(), fullHeight / page.height.toFloat())
                 postTranslate(-region.left.toFloat(), -region.top.toFloat())
             }
-            page.render(bitmap, null, matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+            page.render(bitmap, matrix)
             bitmap
         }
     }
 
     /** The matches for [query] on page [index] with a line of context each (pdfium's search: case-insensitive). */
     suspend fun search(index: Int, query: String): List<PdfHit> = onThread {
-        renderer.openPage(index).use { page ->
-            val matches = page.searchText(query)
+        if (!searchable) return@onThread emptyList()
+        document.openPage(index).use { page ->
+            val matches = page.search(query)
             if (matches.isEmpty()) return@use emptyList()
-            val text = runCatching { page.textContents.joinToString("") { it.text } }.getOrDefault("")
+            val text = runCatching { page.text() }.getOrDefault("")
             matches.map { match ->
-                val snippet = PdfMath.snippet(text, match.textStartIndex, query.length)
+                val snippet = PdfMath.snippet(text, match.start, query.length)
                 PdfHit(
                     page = index,
-                    rects = match.bounds.map { PdfRect(it.left, it.top, it.right, it.bottom) },
+                    rects = match.rects,
                     snippet = snippet.text,
                     matchStart = snippet.matchStart,
                     matchLength = snippet.matchLength,
@@ -117,21 +137,11 @@ class PdfEngine private constructor(
     /** The links of a page already rendered (null: not read yet). */
     fun links(index: Int): List<PdfLink>? = links[index]
 
-    private fun readLinks(page: PdfRenderer.Page): List<PdfLink> = runCatching {
-        val web = page.linkContents.map { link ->
-            PdfLink(link.bounds.map { PdfRect(it.left, it.top, it.right, it.bottom) }, uri = link.uri.toString(), page = null)
-        }
-        val inside = page.gotoLinks.map { link ->
-            PdfLink(link.bounds.map { PdfRect(it.left, it.top, it.right, it.bottom) }, uri = null, page = link.destination.pageNumber)
-        }
-        inside + web
-    }.getOrDefault(emptyList())
-
     /** Closes the document once the calls already queued have run. */
     suspend fun close() = withContext(thread + NonCancellable) {
         if (closed) return@withContext
         closed = true
-        runCatching { renderer.close() }
+        runCatching { document.close() }
     }
 
     private suspend fun <T> onThread(block: () -> T): T? = withContext(thread) {
@@ -158,7 +168,7 @@ class PdfEngine private constructor(
             try {
                 withContext(Dispatchers.IO) { made = create(file, password) }
             } catch (e: CancellationException) {
-                made?.let { runCatching { it.renderer.close() } }
+                made?.let { runCatching { it.document.close() } }
                 throw e
             }
             return checkNotNull(made)
@@ -167,10 +177,11 @@ class PdfEngine private constructor(
         private fun create(file: File, password: String?): PdfEngine {
             val fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
             try {
-                val renderer = if (password == null) PdfRenderer(fd)
-                else PdfRenderer(fd, LoadParams.Builder().setPassword(password).build())
                 @Suppress("OPT_IN_USAGE")
-                return PdfEngine(renderer, Dispatchers.IO.limitedParallelism(1))
+                return PdfEngine(Document.open(fd, password), Dispatchers.IO.limitedParallelism(1))
+            } catch (e: PdfPasswordException) {
+                runCatching { fd.close() }
+                throw e
             } catch (e: SecurityException) {
                 runCatching { fd.close() }
                 throw PdfPasswordException()
@@ -181,6 +192,154 @@ class PdfEngine private constructor(
         }
     }
 }
+
+/** One match of a search: where it starts in the page's text, and its boxes in page points. */
+private class TextMatch(val start: Int, val rects: List<PdfRect>)
+
+/** An open document, whichever renderer draws it. Closing it closes its file descriptor. */
+private interface Document : AutoCloseable {
+    val pageCount: Int
+
+    /** Text, search and links are there ([Page.search], [Page.text] and [Page.links] work). */
+    val hasText: Boolean
+
+    fun openPage(index: Int): Page
+
+    companion object {
+        /** The best renderer this phone has (see [PdfEngine]). */
+        fun open(fd: ParcelFileDescriptor, password: String?): Document = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM -> PlatformDocument.open(fd, password)
+            SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 13 -> ModuleDocument.open(fd, password)
+            else -> BasicDocument.open(fd, password)
+        }
+    }
+}
+
+/** One open page. Only one may be open at a time. */
+private interface Page : AutoCloseable {
+    val width: Int
+    val height: Int
+
+    /** Draws the page into [bitmap], placed by [matrix] (page points to bitmap pixels). */
+    fun render(bitmap: Bitmap, matrix: Matrix)
+
+    fun search(query: String): List<TextMatch>
+
+    fun text(): String
+
+    /** The page's links: those inside the document first, then web links. */
+    fun links(): List<PdfLink>
+}
+
+/** Android 15 and later: the platform's PdfRenderer, with text, search, links and passwords. */
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+private class PlatformDocument(private val renderer: PdfRenderer) : Document {
+    override val pageCount: Int get() = renderer.pageCount
+    override val hasText = true
+
+    override fun openPage(index: Int): Page {
+        val page = renderer.openPage(index)
+        return object : Page {
+            override val width get() = page.width
+            override val height get() = page.height
+            override fun render(bitmap: Bitmap, matrix: Matrix) = page.render(bitmap, null, matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+            override fun search(query: String) = page.searchText(query).map { TextMatch(it.textStartIndex, it.bounds.map(::pdfRect)) }
+            override fun text() = page.textContents.joinToString("") { it.text }
+            override fun links() = page.gotoLinks.map { PdfLink(it.bounds.map(::pdfRect), uri = null, page = it.destination.pageNumber) } +
+                page.linkContents.map { PdfLink(it.bounds.map(::pdfRect), uri = it.uri.toString(), page = null) }
+            override fun close() = page.close()
+        }
+    }
+
+    override fun close() = renderer.close()
+
+    companion object {
+        fun open(fd: ParcelFileDescriptor, password: String?) = PlatformDocument(
+            if (password == null) PdfRenderer(fd) else PdfRenderer(fd, LoadParams.Builder().setPassword(password).build()),
+        )
+    }
+}
+
+/**
+ * Android 12 to 14 with an up-to-date PDF module (Google Play system updates, S extension 13):
+ * PdfRendererPreV, the same features as Android 15's renderer.
+ */
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
+private class ModuleDocument(private val renderer: PdfRendererPreV) : Document {
+    override val pageCount: Int get() = renderer.pageCount
+    override val hasText = true
+
+    override fun openPage(index: Int): Page {
+        val page = renderer.openPage(index)
+        return object : Page {
+            override val width get() = page.width
+            override val height get() = page.height
+            override fun render(bitmap: Bitmap, matrix: Matrix) = page.render(bitmap, null, matrix, DISPLAY)
+            override fun search(query: String) = page.searchText(query).map { it.toMatch() }
+            override fun text() = page.textContents.joinToString("") { it.text }
+            override fun links() = page.gotoLinks.map { it.toLink() } + page.linkContents.map { it.toLink() }
+            override fun close() = page.close()
+        }
+    }
+
+    override fun close() = renderer.close()
+
+    companion object {
+        private val DISPLAY by lazy { RenderParams.Builder(RenderParams.RENDER_MODE_FOR_DISPLAY).build() }
+
+        fun open(fd: ParcelFileDescriptor, password: String?) = ModuleDocument(
+            if (password == null) PdfRendererPreV(fd) else PdfRendererPreV(fd, LoadParams.Builder().setPassword(password).build()),
+        )
+    }
+}
+
+/**
+ * Android 12 to 14 without the PDF module's update: the original PdfRenderer, which only draws
+ * pages. It can't open protected PDFs ([PdfPasswordException] with canUnlock false).
+ */
+private class BasicDocument(private val renderer: PdfRenderer) : Document {
+    override val pageCount: Int get() = renderer.pageCount
+    override val hasText = false
+
+    override fun openPage(index: Int): Page {
+        val page = renderer.openPage(index)
+        return object : Page {
+            override val width get() = page.width
+            override val height get() = page.height
+            override fun render(bitmap: Bitmap, matrix: Matrix) = page.render(bitmap, null, matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+            override fun search(query: String) = emptyList<TextMatch>()
+            override fun text() = ""
+            override fun links() = emptyList<PdfLink>()
+            override fun close() = page.close()
+        }
+    }
+
+    override fun close() = renderer.close()
+
+    companion object {
+        fun open(fd: ParcelFileDescriptor, password: String?): BasicDocument = try {
+            BasicDocument(PdfRenderer(fd))
+        } catch (e: SecurityException) {
+            throw PdfPasswordException(canUnlock = false)
+        }
+    }
+}
+
+// The model classes below come with both newer renderers (Android 15, or S extension 13). Android
+// 15's PlatformDocument converts them itself: lint doesn't count API 35 as having the extension.
+
+private fun pdfRect(r: RectF) = PdfRect(r.left, r.top, r.right, r.bottom)
+
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
+private fun PageMatchBounds.toMatch() = TextMatch(textStartIndex, bounds.map(::pdfRect))
+
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
+private fun PdfPageGotoLinkContent.toLink() =
+    PdfLink(bounds.map(::pdfRect), uri = null, page = destination.pageNumber)
+
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
+private fun PdfPageLinkContent.toLink() =
+    PdfLink(bounds.map(::pdfRect), uri = uri.toString(), page = null)
 
 /**
  * Whole-page bitmaps by page and width, bounded by their bytes (least recently used go first).

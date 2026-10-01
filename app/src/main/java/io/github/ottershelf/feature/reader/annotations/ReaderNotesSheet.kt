@@ -73,6 +73,7 @@ import io.github.ottershelf.ui.theme.OttershelfTheme
 import java.text.DateFormat
 import java.util.Date
 import kotlin.math.roundToInt
+import io.github.ottershelf.ui.components.belowStatusBar
 
 enum class NotesTab { Highlights, Bookmarks, Search }
 
@@ -90,6 +91,7 @@ class NotesSheetActions(
 fun ReaderNotesSheet(state: ReaderNotesUiState, initialTab: NotesTab, actions: NotesSheetActions, onDismiss: () -> Unit) {
     var tab by rememberSaveable { mutableStateOf(initialTab) }
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = OttershelfTheme.colors.card,

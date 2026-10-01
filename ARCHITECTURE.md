@@ -1,7 +1,7 @@
 # Ottershelf: architecture
 
 Ottershelf is a native Android client for self-hosted BookOrbit servers (`/api/v1`), for phones
-running Android 15+ (minSdk 35, targetSdk 36, compileSdk 37). The layouts are designed for a phone
+running Android 12+ (minSdk 31, targetSdk 36, compileSdk 37). The layouts are designed for a phone
 screen of about 411x891 dp. The app has been tested on a Pixel 8 Pro running GrapheneOS and a
 Nothing CMF Phone 2 Pro.
 
@@ -860,7 +860,10 @@ progress on the server's cards still follows its primary CBR.
 
 **The PDF reader (`feature.pdf`).**
 - **Engine: the platform `PdfRenderer`** (pdfium, in the OS; API 35 added text, search, links and
-  password loading), not androidx.pdf: that library is still beta, its viewer is a Fragment with its
+  password loading; on Android 12 to 14 the same features come as `PdfRendererPreV` with the PDF
+  module's S extension 13, a Google Play system update, and without it the original renderer only
+  draws pages: no search (the button is hidden), no links, and a protected PDF gets a message
+  instead of the password prompt), not androidx.pdf: that library is still beta, its viewer is a Fragment with its
   own toolbar, search and scroller (it can't take the EPUB reader's chrome), and its document
   service runs over IPC; it would also be a new dependency. `PdfEngine` wraps one open document: the
   renderer isn't thread-safe and opens one page at a time, so every call runs in order on the
@@ -1342,7 +1345,7 @@ MaterialTheme.typography.titleMedium     // 15sp semibold card titles; the table
 
 | Component | What it is (Nexus / web source) |
 |---|---|
-| `BookCover(model, title, modifier, authors, seed, shape, requestWidth, overlay = { })` | Coil cover in a 2:3 box, radius sm, cover surface while loading; the web's generated placeholder when there is no cover or it fails. `model` = `api.coverModel(book)` (versioned thumbnail URL, or null) or a downloaded book's File. `requestWidth` (optional): asked for at that size at once, any bigger cached copy serving and shown while a bigger one loads (`sizedCoverRequest`). |
+| `BookCover(model, title, modifier, authors, seed, shape, requestWidth, overlay = { })` | Coil cover in a 2:3 box, radius sm, cover surface while loading; drawn by `FittedCoverImage` (below), so a cover of another shape is never cropped; the web's generated placeholder when there is no cover or it fails. `model` = `api.coverModel(book)` (versioned thumbnail URL, or null) or a downloaded book's File. `requestWidth` (optional): asked for at that size at once, any bigger cached copy serving and shown while a bigger one loads (`sizedCoverRequest`). |
 | `BookCoverPlaceholder(title, authors, seed)` | The web's gradient cover (book-cover.ts palette, lattice, frame, title, author); initials below 64dp wide. The title shrinks so its widest word fits (`widestWord`: all the words in one unwrapped layout, a word a line; `PlaceholderMeasureTest`). |
 | `BookGridItem(book, cover, onClick, status, showFormat, onLongClick, coverWidth)` | A grid cell (item_book.xml): 6dp padding, series top right, status disc bottom right (30% of the width), progress on the bottom edge, title 13sp medium, authors 12sp dim. `BOOK_GRID_MIN_CELL` is 120dp (the book grids' default size: three columns on a phone; see "Grid, list and the quick view"), `BOOK_GRID_SPACING` 6dp. Pass the ReadingChanges override as `status`; `onLongClick` (optional) for the quick view; `coverWidth` (optional) is passed on as `BookCover(requestWidth)`. |
 | `ShelfCover(book, cover, onClick, width = 120.dp, onLongClick)` | A shelf cover (item_shelf_book.xml): status top left, series top right, format bottom right, progress; `onLongClick` (optional) for the quick view. |
@@ -1357,6 +1360,8 @@ MaterialTheme.typography.titleMedium     // 15sp semibold card titles; the table
 | `DetailTopBar(title, onBack, subtitle, actions)` | A pushed screen's Nexus toolbar: Back, 19sp title with an optional dim subtitle, 56dp on the shell surface, a 1dp divider; takes the status bar inset (put it in a Scaffold's `topBar`). |
 | `ImmersiveSystemBars(barsVisible)` | A reader's immersive mode: the system bars hide while `barsVisible` is false (swipe shows them for a moment) and come back when the last immersive screen leaves; the newest on the window decides, so a reader replaced by another (Read next) doesn't show them over the new one as it fades out (`ImmersiveOwners`, `ImmersiveSystemBarsTest`). |
 | `KeepScreenOn(on)`, `KeepScreenOnWhileReading(vararg activity)` | The screen stays on while `on` (the timer while it runs, if the user wants it). The readers': for 10 minutes (`READING_SCREEN_ON_MS`) after the last change in `activity` (the page or position, the bars shown or hidden) or the reader's last return on screen (its `ON_START` event, counted as an event rather than read from the lifecycle's state: back from the lock screen or another app, before any page is turned); then the phone's own timeout applies. Each screen holds the window view's keepScreenOn for itself (`ScreenOnHolders`), so the one leaving during the crossfade (Read next, the timer opened over a reader from its notification, Back from it) never turns it off for the one arriving (`ReadingScreenOnTest`). |
+| `FittedCoverImage(model, contentDescription, modifier, onSuccess, onError)` | A cover image filling its box as the web shows covers by default ("blurred fit", BookCoverArtwork.vue): the whole cover, fitted, over the same image enlarged 10%, blurred 12dp and dimmed to 90% when its shape differs from the box's by more than 3% (a tall paperback, a square audiobook cover); within 3% it fills the box as a crop did. The backdrop reuses the decoded image (nothing more is fetched). Used by `BookCover`, the book page's cover, the cover search and the collection fans; author portraits still crop to their circle. `CoverFitDeviceTest`, `FittedCoverTest`. |
+| `Modifier.belowStatusBar()` | Every `ModalBottomSheet`'s `modifier` (pass it to new sheets too): keeps the sheet below the status bar. Without it a sheet tall enough to reach the bar pads its content by however much of the bar it covers, so its height follows its own offset, and a hard fling to the end of a long list (the cover search) left the sheet shaking up and down until the next touch. |
 
 Components read `OttershelfTheme` only, never the container, so screenshot tests render them
 directly. Their strings are in `strings_components.xml` (`components_*`).

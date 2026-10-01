@@ -71,6 +71,7 @@ import io.github.ottershelf.ui.nav.AppNavigator
 import io.github.ottershelf.ui.nav.Route
 import io.github.ottershelf.ui.theme.OttershelfTheme
 import kotlin.math.roundToInt
+import io.github.ottershelf.ui.components.belowStatusBar
 
 private val QUICK_COVER_WIDTH = 104.dp
 private const val DESCRIPTION_LINES = 4
@@ -92,6 +93,7 @@ fun BookQuickViewSheet(viewModel: BookQuickViewModel, navigator: AppNavigator) {
     LaunchedEffect(current == null) { if (current == null) dialog = null }
     if (current != null) {
         ModalBottomSheet(
+            modifier = Modifier.belowStatusBar(),
             onDismissRequest = viewModel::close,
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = OttershelfTheme.colors.card,

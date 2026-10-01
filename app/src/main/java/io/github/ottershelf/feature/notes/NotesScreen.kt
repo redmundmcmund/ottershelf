@@ -74,6 +74,7 @@ import io.github.ottershelf.ui.nav.Route
 import io.github.ottershelf.ui.nav.appViewModel
 import io.github.ottershelf.ui.theme.OttershelfTheme
 import java.io.File
+import io.github.ottershelf.ui.components.belowStatusBar
 
 /** Notes: a root list (the drawer's Tracking > Notes) under the shell's toolbar and its search. */
 @Composable
@@ -217,6 +218,7 @@ internal fun NotesContent(
     }
     if (state.randomOpen) {
         ModalBottomSheet(
+            modifier = Modifier.belowStatusBar(),
             onDismissRequest = onCloseRandom,
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = colors.card,

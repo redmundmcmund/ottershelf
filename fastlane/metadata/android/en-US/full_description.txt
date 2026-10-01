@@ -42,4 +42,4 @@ PRIVACY
 OPEN SOURCE
 Ottershelf is free software under the GNU Affero General Public License, version 3 only, with BookOrbit's additional terms. The source code is at https://github.com/redmundmcmund/ottershelf
 
-Requires Android 15 or later.
+Requires Android 12 or later.

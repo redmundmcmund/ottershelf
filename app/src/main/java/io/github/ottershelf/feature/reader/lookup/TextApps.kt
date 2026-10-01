@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
+import android.os.Build
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.graphics.drawable.toBitmap
 
@@ -30,14 +31,13 @@ internal object TextApps {
             val icon = runCatching { loadIcon(pm)?.toBitmap(size, size)?.asImageBitmap() }.getOrNull()
             return TextApp(info.packageName, info.name, label, icon, kind, typed)
         }
-        val flags = PackageManager.ResolveInfoFlags.of(0)
-        val process = runCatching { pm.queryIntentActivities(processTextIntent(), flags) }.getOrDefault(emptyList())
+        val process = runCatching { pm.activitiesFor(processTextIntent()) }.getOrDefault(emptyList())
             .mapNotNull { it.toApp(TextApp.Kind.ProcessText, typed = true) }
             .distinctBy { it.key }
             .sortedBy { it.label.lowercase() }
-        val translateTyped = runCatching { pm.queryIntentActivities(Intent(Intent.ACTION_TRANSLATE).setType(TEXT), flags) }.getOrDefault(emptyList())
+        val translateTyped = runCatching { pm.activitiesFor(Intent(Intent.ACTION_TRANSLATE).setType(TEXT)) }.getOrDefault(emptyList())
             .mapNotNull { it.toApp(TextApp.Kind.Translate, typed = true) }
-        val translatePlain = runCatching { pm.queryIntentActivities(Intent(Intent.ACTION_TRANSLATE), flags) }.getOrDefault(emptyList())
+        val translatePlain = runCatching { pm.activitiesFor(Intent(Intent.ACTION_TRANSLATE)) }.getOrDefault(emptyList())
             .mapNotNull { it.toApp(TextApp.Kind.Translate, typed = false) }
         val covered = process.map { it.packageName }.toSet()
         val translate = (translateTyped + translatePlain)
@@ -73,6 +73,11 @@ internal object TextApps {
         } catch (_: ActivityNotFoundException) {
         }
     }
+
+    /** The activities that take [intent] (the flags-object overload before Android 13 lacks). */
+    private fun PackageManager.activitiesFor(intent: Intent): List<ResolveInfo> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))
+        else @Suppress("DEPRECATION") queryIntentActivities(intent, 0)
 
     private fun processTextIntent() = Intent(Intent.ACTION_PROCESS_TEXT).setType(TEXT)
 

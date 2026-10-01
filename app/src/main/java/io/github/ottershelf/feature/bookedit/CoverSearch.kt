@@ -37,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -48,15 +47,16 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
 import io.github.ottershelf.R
 import io.github.ottershelf.ui.components.AccentButton
+import io.github.ottershelf.ui.components.FittedCoverImage
 import io.github.ottershelf.ui.components.COVER_ASPECT
 import io.github.ottershelf.ui.components.EmptyState
 import io.github.ottershelf.ui.components.ErrorState
 import io.github.ottershelf.ui.components.SkeletonBox
 import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfTheme
+import io.github.ottershelf.ui.components.belowStatusBar
 
 /** The online cover search (the web's CoverSearchDrawer) as a bottom sheet. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +71,7 @@ internal fun CoverSearchSheet(
     onDismiss: () -> Unit,
 ) {
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = OttershelfTheme.colors.card,
@@ -194,11 +195,10 @@ private fun FoundCover(result: CoverResult, onPick: (CoverResult) -> Unit) {
         if (result.preview == null || failed) {
             LucideIcon("ImageOff", contentDescription = null, tint = colors.mutedForeground, size = 22.dp, modifier = Modifier.align(Alignment.Center))
         } else {
-            AsyncImage(
+            FittedCoverImage(
                 model = result.preview,
                 contentDescription = null,
                 modifier = Modifier.matchParentSize(),
-                contentScale = ContentScale.Crop,
                 onError = { failed = true },
             )
         }

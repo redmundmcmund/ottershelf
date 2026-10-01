@@ -98,6 +98,7 @@ import io.github.ottershelf.ui.nav.appViewModel
 import io.github.ottershelf.ui.theme.OttershelfTheme
 import java.text.DateFormat
 import java.util.Date
+import io.github.ottershelf.ui.components.belowStatusBar
 
 /** What the Requests screen's controls do (all no-ops by default, for screenshot tests). */
 class RequestsActions(
@@ -627,6 +628,7 @@ private fun RequestDetailSheet(r: BookRequestItem, state: RequestsUiState, actio
     val colors = OttershelfTheme.colors
     val context = LocalContext.current
     ModalBottomSheet(
+        modifier = Modifier.belowStatusBar(),
         onDismissRequest = { actions.onOpenDetail(null) },
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = colors.card,
