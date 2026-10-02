@@ -58,8 +58,8 @@ android {
         applicationId = "io.github.ottershelf"
         minSdk = 31
         targetSdk = 36
-        versionCode = 15
-        versionName = "0.1.14"
+        versionCode = 16
+        versionName = "0.1.15"
         // On-device tests (src/androidTest): run them by hand with `am instrument`, never with
         // connectedAndroidTest, which uninstalls the app afterwards (ARCHITECTURE.md, "Device tests").
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
