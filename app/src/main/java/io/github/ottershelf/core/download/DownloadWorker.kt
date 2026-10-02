@@ -17,7 +17,8 @@ import java.io.IOException
 
 /**
  * Runs one download started by [Downloads.start], as a dataSync foreground service with a progress
- * notification (Cancel stops the work). Progress goes to WorkManager ([KEY_DONE], [KEY_TOTAL]),
+ * notification (Cancel stops the work); a quiet one (opening the book kept it) runs without either.
+ * Progress goes to WorkManager ([KEY_DONE], [KEY_TOTAL]),
  * which [Downloads.active] reads. A dropped connection, or the server briefly unable to answer, is
  * retried a couple of times with back-off ([isTransient]; WorkManager waits for the network);
  * anything else is reported once through [Downloads.events].
@@ -35,7 +36,9 @@ class DownloadWorker(context: Context, params: WorkerParameters) : CoroutineWork
         val notifications = DownloadNotifications(applicationContext)
         val title = request.book.title
 
-        var foreground = true
+        // A quiet download (the book was opened, see DownloadRequest.quiet) runs without the
+        // foreground service and its notification: an ebook takes seconds.
+        var foreground = !request.quiet
         suspend fun report(progress: Downloads.Progress) {
             setProgress(workDataOf(KEY_DONE to progress.done, KEY_TOTAL to progress.total))
             if (!foreground) return

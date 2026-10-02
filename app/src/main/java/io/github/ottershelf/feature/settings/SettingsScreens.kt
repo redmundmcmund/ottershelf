@@ -59,6 +59,7 @@ fun SettingsScreen(navigator: AppNavigator) {
         onOpenGoals = { navigator.navigate(Route.ReadingGoals) },
         onOpenAbout = { navigator.navigate(Route.About) },
         onNextInSeries = viewModel::setNextInSeries,
+        onKeepOnOpen = viewModel::setKeepOnOpen,
         onSignOut = viewModel::signOut,
     )
 }
@@ -66,7 +67,7 @@ fun SettingsScreen(navigator: AppNavigator) {
 /**
  * A pushed screen in the Nexus style (the toolbar of activity_books.xml over the page) with the
  * web's settings cards: who is signed in, Display > Appearance, Reading > goals and the next-in-series
- * switch, Account > Sign out, About (the notices BookOrbit requires: AboutScreen), and the app's
+ * switch, Offline > keep books on this device, Account > Sign out, About (the notices BookOrbit requires: AboutScreen), and the app's
  * badge, name, version and "Powered by BookOrbit" at the bottom.
  */
 @Composable
@@ -77,6 +78,7 @@ fun SettingsContent(
     onOpenGoals: () -> Unit = {},
     onOpenAbout: () -> Unit = {},
     onNextInSeries: (Boolean) -> Unit = {},
+    onKeepOnOpen: (Boolean) -> Unit = {},
     onSignOut: () -> Unit = {},
 ) {
     val colors = OttershelfTheme.colors
@@ -136,6 +138,19 @@ fun SettingsContent(
                             summary = stringResource(R.string.settings_next_in_series_hint),
                             checked = state.nextInSeries,
                             onChange = onNextInSeries,
+                        )
+                    }
+                }
+
+                Column {
+                    SettingsGroupLabel(stringResource(R.string.settings_group_offline))
+                    SettingsCard {
+                        SettingsSwitchRow(
+                            icon = "Download",
+                            title = stringResource(R.string.settings_keep_on_open),
+                            summary = stringResource(R.string.settings_keep_on_open_hint),
+                            checked = state.keepOnOpen,
+                            onChange = onKeepOnOpen,
                         )
                     }
                 }

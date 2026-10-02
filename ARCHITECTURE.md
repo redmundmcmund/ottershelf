@@ -744,6 +744,15 @@ CBZ is kept (current, and still on the server), Read opens it online too, on the
 (`BookDetailUiState.readTarget`) and the Dashboard's play buttons (`HomeViewModel.fileToRead`), so
 the user's place stays in one file (`BookFormats.readsKeptCopyInstead`; positions are per file). The book's
 progress on the server's cards still follows its primary CBR.
+- **Kept when opened** (`KeepOnOpen`, Settings > Offline "Keep books on this device", a device
+  setting `downloads.keepOnOpen`, on by default): the foliate reader opening an EPUB, KEPUB, MOBI,
+  AZW3, AZW or FB2 from the server (no local copy) starts a quiet download of that file
+  (`ReaderViewModel.keepOnOpen`, `Downloads.start(quiet = true)`, `DownloadRequest.quiet`): no
+  foreground service or notification, and no result reported (a failure is tried again at the next
+  open). The open itself still reads from the server, so the first open isn't slower; the next open
+  reads the copy, offline too, and its progress waits in the queue until a connection is back. Not
+  when the book already has a copy (another file, or an older one: the book page's Download
+  replaces it) or one on its way. PDFs and comics only stream, unless downloaded by hand.
 - Layout: `files/downloads/<account>/<bookId>/book.<format>` (`OfflineFiles.name`), plus
   `info.json` for an EPUB only, `detail.json`, the covers, and `meta.json` (`DownloadedBook`, which
   now records `format`). A `meta.json` without a format is an older download: an EPUB in exactly

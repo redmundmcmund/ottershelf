@@ -33,6 +33,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import io.github.ottershelf.AppContainer
 import io.github.ottershelf.core.format.BookFormats
+import io.github.ottershelf.core.download.KeepOnOpen
 import io.github.ottershelf.core.model.FileProgress
 import io.github.ottershelf.core.model.ReadStatus
 import io.github.ottershelf.core.model.ReadStatusInfo
@@ -708,6 +709,7 @@ class ReaderViewModel(
             prefsLoaded.await()
             // A downloaded book doesn't need the server to open: don't keep the user waiting for it.
             val local = requests.awaitLocal()
+            if (local == null) keepOnOpen()
             val wait = if (local != null) SERVER_WAIT_LOCAL_MS else SERVER_WAIT_MS
             val serverProgress = async { withTimeoutOrNull(wait) { runCatching { api.fileProgress(fileId) }.getOrNull() } }
             val status = async { withTimeoutOrNull(wait) { detail.get().await()?.readStatus } }
@@ -745,6 +747,23 @@ class ReaderViewModel(
                 val label = ReadStatus.of(status.await()?.status)?.label ?: ReadStatus.READ.label
                 _messages.trySend(ReaderMessage.FreshStart(label))
             }
+        }
+    }
+
+    /**
+     * Opened from the server: keep a copy on the device, so the next open needs no connection
+     * (KeepOnOpen, Settings > Offline). Quietly and in the background; this session keeps reading
+     * from the server. Not when the book already has a copy (another of its files, or an older one:
+     * the book page's Download replaces it) or one is on its way.
+     */
+    private fun keepOnOpen() {
+        val downloads = container.downloads
+        appScope.launch(Dispatchers.IO) {
+            if (!KeepOnOpen.enabled(container.settings).first()) return@launch
+            if (downloads.isDownloading(bookId) || downloads.get(bookId) != null) return@launch
+            val book = detail.get().await() ?: return@launch
+            val file = book.files.firstOrNull { it.id == fileId } ?: return@launch
+            if (KeepOnOpen.applies(file.format)) downloads.start(book, file, quiet = true)
         }
     }
 

@@ -93,6 +93,11 @@ internal data class DownloadRequest(
     val book: BookDetail,
     val file: BookFile,
     val target: String,
+    /**
+     * Started by opening the book (Downloads.keepOnOpen), not by the user: no notification, and its
+     * result isn't reported (a failure is tried again the next time the book is opened).
+     */
+    val quiet: Boolean = false,
 )
 
 /** A download that can't succeed by trying again (as opposed to a dropped connection). */
@@ -337,14 +342,15 @@ class Downloads(
      * Downloads [file] of [book] in the background; progress is published on [active], the result
      * on [events]. Does nothing if this book is already downloading. Any thread. [file] must be one
      * that can be kept offline (BookFormats.pickOfflineFile picks it; a CBR or CB7 is refused).
+     * [quiet]: kept because the book was opened (see [DownloadRequest.quiet]).
      */
-    fun start(book: BookDetail, file: BookFile) {
+    fun start(book: BookDetail, file: BookFile, quiet: Boolean = false) {
         if (!BookFormats.canKeepOffline(file.format)) {
             report(DownloadEvent.Failed(book.id, book.title, "${file.format?.uppercase() ?: "This"} files can't be kept offline"))
             return
         }
         val account = accountKey()
-        val request = DownloadRequest(account, book, file, dir(book.id).absolutePath)
+        val request = DownloadRequest(account, book, file, dir(book.id).absolutePath, quiet)
         scope.launch(Dispatchers.IO) {
             try {
                 writeRequest(request)
@@ -406,7 +412,7 @@ class Downloads(
     internal fun onCompleted(request: DownloadRequest) {
         deleteRequest(request)
         changed()
-        report(DownloadEvent.Completed(request.book.id, request.book.title))
+        if (!request.quiet) report(DownloadEvent.Completed(request.book.id, request.book.title))
         // So the book opens at the latest position even if the next open is offline. In the app
         // scope, as the Nexus did: the worker (and "Downloading" on the book page) ends now, not
         // after a full sync. If the process dies first, the periodic sync's baselines cover it.
@@ -418,7 +424,7 @@ class Downloads(
 
     internal fun onFailed(request: DownloadRequest, message: String) {
         deleteRequest(request)
-        report(DownloadEvent.Failed(request.book.id, request.book.title, message))
+        if (!request.quiet) report(DownloadEvent.Failed(request.book.id, request.book.title, message))
     }
 
     /**

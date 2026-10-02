@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import io.github.ottershelf.AppContainer
 import io.github.ottershelf.BuildConfig
+import io.github.ottershelf.core.download.KeepOnOpen
 import io.github.ottershelf.core.model.AuthUser
 import io.github.ottershelf.core.network.ApiException
 import io.github.ottershelf.core.settings.AppSettings
@@ -35,10 +36,12 @@ data class SettingsUiState(
     val signingOut: Boolean = false,
     /** Offer the next book of a series when the user finishes one (AppSettings.nextInSeries, on the account). */
     val nextInSeries: Boolean = true,
+    /** Download ebooks the first time they're opened (KeepOnOpen, on this device). */
+    val keepOnOpen: Boolean = true,
 )
 
 /**
- * Settings: who is signed in and where, the way into Appearance, the next-in-series switch,
+ * Settings: who is signed in and where, the way into Appearance, the next-in-series and offline switches,
  * sign-out and the app version.
  * Sign-out is the Nexus one (cancel downloads, `auth/logout`, forget the session) plus this app's
  * own clean-up, all in [AppContainer.signOut]; the shell then shows Login.
@@ -52,25 +55,32 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
         container.themePrefs,
         signingOut,
         container.appSettings.settings,
-    ) { user, prefs, busy, app ->
-        settingsState(user, prefs, busy, app)
+        KeepOnOpen.enabled(container.settings),
+    ) { user, prefs, busy, app, keep ->
+        settingsState(user, prefs, busy, app, keep)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        settingsState(container.auth.user.value, container.themePrefs.value, false, container.appSettings.settings.value),
+        settingsState(container.auth.user.value, container.themePrefs.value, false, container.appSettings.settings.value, keep = true),
     )
 
-    private fun settingsState(user: AuthUser?, prefs: ThemePrefs, busy: Boolean, app: AppSettings) = SettingsUiState(
+    private fun settingsState(user: AuthUser?, prefs: ThemePrefs, busy: Boolean, app: AppSettings, keep: Boolean) = SettingsUiState(
         username = user?.username ?: container.session.username.orEmpty(),
         name = user?.name?.takeIf { it.isNotBlank() && it != user.username },
         server = container.session.serverUrl.orEmpty().substringAfter("://").trimEnd('/'),
         prefs = prefs,
         signingOut = busy,
         nextInSeries = app.nextInSeries,
+        keepOnOpen = keep,
     )
 
     /** Saved to the account's app settings (sent a moment later, or when back online). */
     fun setNextInSeries(on: Boolean) = container.appSettings.update { it.copy(nextInSeries = on) }
+
+    /** On this device only: its storage is what the copies use. */
+    fun setKeepOnOpen(on: Boolean) {
+        container.appScope.launch { KeepOnOpen.set(container.settings, on) }
+    }
 
     fun signOut() {
         if (signingOut.value) return
