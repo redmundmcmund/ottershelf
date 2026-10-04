@@ -530,6 +530,38 @@ class ReadingDatesViewModelTest {
     }
 
     @Test
+    fun aReadingGivenUpByMistakeCanBeDeleted() = runTest(scheduler) {
+        val s = setup()
+        val gaveUp = ReadingAttempt(id = 5, bookId = 7, startedOn = "2025-01-02", endedOn = "2025-01-03", outcome = AttemptOutcome.ABANDONED)
+        s.library.attempts[7] = listOf(gaveUp)
+        s.vm.edit(lostWorld, gaveUp)
+        advanceUntilIdle()
+        assertTrue(s.vm.state.value.dates!!.canDelete)
+        // The server once it's deleted: no readings, and the status rebuilt to unread.
+        s.library.attempts[7] = emptyList()
+        s.library.books[7] = detail(7, status = null)
+        s.vm.deleteReading()
+        advanceUntilIdle()
+        runCurrent()
+        assertNull(s.vm.state.value.dates)
+        val saved = s.saved.single()
+        assertTrue(saved.attempts.isEmpty())
+        assertNull(saved.card.readStatus)
+    }
+
+    @Test
+    fun aNewReadingHasNothingToDelete() = runTest(scheduler) {
+        val s = setup()
+        s.vm.openPicker(day)
+        s.vm.pick(lostWorld)
+        advanceUntilIdle()
+        assertFalse(s.vm.state.value.dates!!.canDelete)
+        s.vm.deleteReading()
+        advanceUntilIdle()
+        assertNotNull(s.vm.state.value.dates)
+    }
+
+    @Test
     fun aReadingGoneFromTheServerIsntSavedAsANewOne() = runTest(scheduler) {
         val s = setup()
         val finished = ReadingAttempt(id = 4, bookId = 7, startedOn = "2025-01-02", endedOn = "2025-02-03", outcome = AttemptOutcome.COMPLETED)
@@ -741,6 +773,7 @@ class ReadingDatesViewModelTest {
             outcome: io.github.ottershelf.core.tracking.Patch<String>,
         ): ReadingAttempt = error("offline")
         override suspend fun setStatus(bookId: Long, status: String) = error("offline")
+        override suspend fun delete(bookId: Long, attemptId: Long) = error("offline")
         override fun statusChanged(bookId: Long, status: String) = Unit
     }
 }

@@ -185,6 +185,9 @@ data class BookDetail(
     val publishedYear: Int? = null,
     val pageCount: Int? = null,
     val language: String? = null,
+    /** The book's ISBNs, when its metadata has them (feature.book.PageCounts matches on them). */
+    val isbn10: String? = null,
+    val isbn13: String? = null,
     val coverSource: String? = null,
     val files: List<BookFile> = emptyList(),
     val readStatus: ReadStatusInfo? = null,

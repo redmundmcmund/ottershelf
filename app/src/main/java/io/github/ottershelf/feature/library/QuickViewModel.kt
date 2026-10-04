@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import io.github.ottershelf.AppContainer
+import io.github.ottershelf.feature.collections.CollectionPrompt
 import io.github.ottershelf.core.format.BookFormats
 import io.github.ottershelf.core.model.BookCard
 import io.github.ottershelf.core.model.BookDetail
@@ -183,6 +184,8 @@ class BookQuickViewModel(private val container: AppContainer) : ViewModel() {
             try {
                 val info = request.await()
                 updatePage(id) { it.copy(status = info.status ?: chosen.value, book = it.book?.copy(readStatus = info)) }
+                // Offer to add it to a collection too (the shell's sheet).
+                if ((info.status ?: chosen.value) == ReadStatus.WANT_TO_READ.value) CollectionPrompt.offer(id, current.card.title)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

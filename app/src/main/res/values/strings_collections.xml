@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The "add to a collection" sheet after marking a book Want to read (feature.collections). -->
+    <string name="collections_add_title">Add to a collection</string>
+    <!-- %1$s: the book's title. -->
+    <string name="collections_add_subtitle">%1$s is on your Want to read list. Add it to a collection too?</string>
+    <string name="collections_load_failed">Couldn\'t load your collections.</string>
+    <string name="collections_none">You don\'t have any collections yet. Make one below.</string>
+    <!-- %1$d: how many books the collection holds. -->
+    <string name="collections_count">%1$d books</string>
+    <string name="collections_new">New collection</string>
+    <string name="collections_new_name">Collection name</string>
+    <string name="collections_create">Create</string>
+    <string name="collections_cancel">Cancel</string>
+    <string name="collections_done">Done</string>
+    <string name="collections_change_failed">Couldn\'t change the collection.</string>
+    <!-- %1$s: the server's reason. -->
+    <string name="collections_change_failed_because">Couldn\'t change the collection: %1$s</string>
+</resources>

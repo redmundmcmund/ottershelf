@@ -38,6 +38,7 @@ import io.github.ottershelf.core.session.AuthState
 import io.github.ottershelf.core.theme.ThemeSyncEvent
 import io.github.ottershelf.core.tracking.TrackingEvent
 import io.github.ottershelf.feature.achievements.AchievementCelebrationHost
+import io.github.ottershelf.feature.collections.AddToCollectionHost
 import io.github.ottershelf.ui.theme.PatternBackground
 
 /**
@@ -162,6 +163,8 @@ private fun AppScaffold(container: AppContainer) {
                 onOpenAchievements = { navigator.navigate(Route.Achievements) },
                 modifier = Modifier.align(Alignment.TopCenter),
             )
+            // A book just marked Want to read: offer to add it to a collection.
+            AddToCollectionHost(onChanged = shell::load)
         }
     }
 }

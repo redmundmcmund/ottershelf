@@ -84,6 +84,9 @@ data class DatesUiState(
 
     /** Only once the readings are in: which reading the dates go to depends on them. */
     val canSave: Boolean get() = !loading && !loadFailed && !saving && !targetGone && problem == null
+
+    /** An existing reading is chosen (a new one has nothing to delete). */
+    val canDelete: Boolean get() = !loading && !loadFailed && !saving && !targetGone && target is DatesTarget.Existing
 }
 
 @Immutable
@@ -363,20 +366,58 @@ class ReadingDatesViewModel(
                 expected = null
             }
         }
+        return readAgain(bookId, expected)
+    }
+
+    /**
+     * The book and its readings read again after a write (null when that fails: the reload will
+     * bring them). The status read again, else [expected] (the one the write should leave), replaces
+     * any this process showed before ([ReadingDatesRemote.statusChanged]).
+     */
+    private suspend fun readAgain(bookId: Long, expected: String?): SavedReading? {
+        var fallback = expected
         return try {
             coroutineScope {
                 val book = async { remote.book(bookId) }
                 val attempts = async { remote.attempts(bookId) }
                 val detail = book.await()
                 remote.statusChanged(bookId, detail.readStatus?.status ?: ReadStatus.UNREAD.value)
-                expected = null // the server's own, even if the readings can't be read
+                fallback = null // the server's own, even if the readings can't be read
                 SavedReading(ReadingDates.cardOf(detail), attempts.await())
             }
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
-            expected?.let { remote.statusChanged(bookId, it) }
+            fallback?.let { remote.statusChanged(bookId, it) }
             null
+        }
+    }
+
+    /**
+     * Deletes the reading the sheet shows (one picked by mistake, a "given up" the user never meant).
+     * The server rebuilds the status from the readings left: with none, the book goes back to unread
+     * (want to read stays) and leaves History. Its reading sessions stay. In [writeScope], as [save].
+     */
+    fun deleteReading() {
+        val dates = _state.value.dates ?: return
+        if (!dates.canDelete) return
+        val bookId = dates.book.id
+        val attemptId = (dates.target as? DatesTarget.Existing)?.attemptId ?: return
+        updateDates(bookId) { it.copy(saving = true, error = null) }
+        val request = (writeScope ?: viewModelScope).async {
+            remote.delete(bookId, attemptId)
+            readAgain(bookId, expected = null)
+        }
+        viewModelScope.launch {
+            try {
+                val saved = request.await()
+                _state.update { s -> if (s.dates?.book?.id == bookId) s.copy(dates = null) else s }
+                if (saved != null) _saved.tryEmit(saved)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                updateDates(bookId) { it.copy(saving = false, error = e.message.orEmpty()) }
+            }
         }
     }
 

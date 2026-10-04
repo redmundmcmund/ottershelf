@@ -39,6 +39,7 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -149,6 +150,7 @@ fun ReadingDatesHost(viewModel: ReadingDatesViewModel, navigator: AppNavigator, 
                     onSave = viewModel::save,
                     onCancel = viewModel::closeDates,
                     onRetry = viewModel::retryLoad,
+                    onDelete = viewModel::deleteReading,
                 ),
             )
         }
@@ -287,6 +289,8 @@ class DatesActions(
     val onSave: () -> Unit = {},
     val onCancel: () -> Unit = {},
     val onRetry: () -> Unit = {},
+    /** Delete the chosen reading (asked first). */
+    val onDelete: () -> Unit = {},
 )
 
 private enum class Picking { Start, End }
@@ -294,12 +298,14 @@ private enum class Picking { Start, End }
 /**
  * The dates: the book; its readings, when it has some, to pick the one these dates are for (or
  * another reading); how it went; the start (optional) and the end, up to today in the user's zone; what
- * the save does to the user's status when it changes it; Cancel and Save.
+ * the save does to the user's status when it changes it; Cancel and Save; and, for an existing
+ * reading, Delete (asked first).
  */
 @Composable
 fun ReadingDatesContent(state: DatesUiState, actions: DatesActions = DatesActions()) {
     val colors = OttershelfTheme.colors
     var picking by rememberSaveable { mutableStateOf<Picking?>(null) }
+    var confirmDelete by rememberSaveable { mutableStateOf(false) }
     val form = state.form
     Column(
         Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
@@ -397,6 +403,31 @@ fun ReadingDatesContent(state: DatesUiState, actions: DatesActions = DatesAction
                 enabled = state.canSave,
             )
         }
+        if (state.canDelete || (state.saving && state.target is DatesTarget.Existing)) {
+            TextButton(
+                onClick = { confirmDelete = true },
+                enabled = state.canDelete,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            ) {
+                LucideIcon("Trash2", contentDescription = null, tint = colors.destructive, size = 16.dp)
+                Spacer(Modifier.width(6.dp))
+                Text(stringResource(R.string.calendar_dates_delete), color = colors.destructive)
+            }
+        }
+    }
+
+    if (confirmDelete) {
+        AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            title = { Text(stringResource(R.string.calendar_dates_delete_title)) },
+            text = { Text(stringResource(R.string.calendar_dates_delete_message)) },
+            confirmButton = {
+                TextButton(onClick = { confirmDelete = false; actions.onDelete() }) {
+                    Text(stringResource(R.string.calendar_dates_delete_confirm), color = colors.destructive)
+                }
+            },
+            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.calendar_cancel)) } },
+        )
     }
 
     when (picking) {

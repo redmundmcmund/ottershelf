@@ -102,6 +102,9 @@ interface ReadingDatesRemote {
     suspend fun update(bookId: Long, attemptId: Long, startedOn: Patch<LocalDate>, endedOn: Patch<LocalDate>, outcome: Patch<String>): ReadingAttempt
     suspend fun setStatus(bookId: Long, status: String)
 
+    /** Deletes the reading; the server then rebuilds the user's status from the ones left. */
+    suspend fun delete(bookId: Long, attemptId: Long)
+
     /**
      * The user's status for [bookId] is now [status] (the server rebuilt it after a reading changed): the
      * library's grids, Downloads and the picker show it over what they loaded
@@ -141,6 +144,8 @@ class ApiReadingDatesRemote(
     override suspend fun setStatus(bookId: Long, status: String) {
         tracking.setStatus(bookId, status)
     }
+
+    override suspend fun delete(bookId: Long, attemptId: Long) = tracking.deleteAttempt(bookId, attemptId)
 
     override fun statusChanged(bookId: Long, status: String) = overrideStatus(bookId, status)
 

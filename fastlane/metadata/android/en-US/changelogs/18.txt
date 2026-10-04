@@ -1,0 +1,3 @@
+- Marking a book Want to read offers to add it to one of your collections, or a new one
+- A reading marked as given up by mistake can now be deleted (History, the pencil on the row)
+- Books without a page count get one looked up automatically

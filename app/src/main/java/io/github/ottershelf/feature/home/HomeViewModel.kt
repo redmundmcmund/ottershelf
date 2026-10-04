@@ -23,6 +23,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import io.github.ottershelf.AppContainer
+import io.github.ottershelf.feature.collections.CollectionPrompt
 import io.github.ottershelf.core.download.DownloadedBook
 import io.github.ottershelf.core.format.BookFormats
 import io.github.ottershelf.core.model.AuthUser
@@ -407,6 +408,8 @@ class HomeViewModel(
                         val info = attempt { remote.setStatus(bookId, ReadStatus.WANT_TO_READ.value) } ?: return@launch
                         _state.update { it.copy(queued = it.queued + bookId) }
                         onStatusSet(bookId, info.status ?: ReadStatus.WANT_TO_READ.value)
+                        // Offer to add it to a collection too (the shell's sheet).
+                        CollectionPrompt.offer(bookId, title = null)
                     }
                     else -> _state.update { it.copy(unqueueable = it.unqueueable + bookId) }
                 }

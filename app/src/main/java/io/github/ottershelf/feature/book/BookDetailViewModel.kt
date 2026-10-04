@@ -23,9 +23,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import io.github.ottershelf.AppContainer
+import io.github.ottershelf.feature.collections.CollectionPrompt
 import io.github.ottershelf.core.download.DownloadedBook
 import io.github.ottershelf.core.download.Downloads
 import io.github.ottershelf.core.format.BookFormats
+import io.github.ottershelf.core.format.ReaderKind
 import io.github.ottershelf.core.model.BookCard
 import io.github.ottershelf.core.model.BookDetail
 import io.github.ottershelf.core.model.BookFile
@@ -248,6 +250,7 @@ class BookDetailViewModel(private val container: AppContainer, private val bookI
                 _state.update { it.copy(loaded = true, offlineCopy = false) }
                 show(book, fromServer = true)
                 saveDetail(book)
+                findPageCount(book)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -343,6 +346,8 @@ class BookDetailViewModel(private val container: AppContainer, private val bookI
                 val info = request.await()
                 showStatus(info.status ?: chosen.value, fromServer = true)
                 _state.update { it.copy(book = it.book?.copy(readStatus = info)) }
+                // Offer to add it to a collection too (the shell's sheet).
+                if ((info.status ?: chosen.value) == ReadStatus.WANT_TO_READ.value) CollectionPrompt.offer(id, _state.value.book?.title)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -350,6 +355,33 @@ class BookDetailViewModel(private val container: AppContainer, private val bookI
                 _messages.trySend(BookDetailMessage.StatusFailed(e.message.orEmpty()))
             } finally {
                 _state.update { it.copy(statusBusy = false) }
+            }
+        }
+    }
+
+    /**
+     * An ebook whose metadata has no page count, and no total the user set: looked up once from
+     * BookOrbit's metadata providers ([PageCounts]) and saved to its metadata when the account may
+     * edit it (then it shows everywhere, the web too), else as the user's own page total
+     * (AppSettings.pageTotals, kept on the account). PDFs and comics are left alone: their pages
+     * are the file's own. In the app scope: the lookup can take a few seconds.
+     */
+    private fun findPageCount(book: BookDetail) {
+        if (book.pageCount?.let { it > 0 } == true) return
+        val container = container
+        if (container.appSettings.settings.value.pageTotals[book.id]?.let { it > 0 } == true) return
+        if (book.files.none { BookFormats.readerFor(it.format) == ReaderKind.Foliate }) return
+        container.appScope.launch {
+            val lookup = PageCounts(container.api, container.settings, account)
+            if (!lookup.firstTry(book.id)) return@launch
+            val count = lookup.find(book) ?: return@launch
+            val onServer = canEditDetails(container.auth.user.value) && "pageCount" !in book.lockedFields &&
+                runCatching { lookup.save(book.id, count) }.isSuccess
+            if (onServer) {
+                _state.update { s -> s.copy(book = s.book?.let { if (it.id == book.id) it.copy(pageCount = count) else it }) }
+                container.tracking.changedElsewhere(book.id)
+            } else {
+                container.appSettings.update { s -> s.copy(pageTotals = s.pageTotals + (book.id to count)) }
             }
         }
     }

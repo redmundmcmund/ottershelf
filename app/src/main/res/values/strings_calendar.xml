@@ -173,6 +173,10 @@
     <string name="calendar_dates_end_future">The end can\'t be after today.</string>
     <string name="calendar_dates_start_after_end">The start can\'t be after the end.</string>
     <string name="calendar_dates_reading_gone">This reading isn\'t there any more: it may have been changed on another device.</string>
+    <string name="calendar_dates_delete">Delete this reading</string>
+    <string name="calendar_dates_delete_title">Delete this reading?</string>
+    <string name="calendar_dates_delete_message">Its dates and how it went are removed from your history. The book\'s status is worked out again from any other readings, so one given up by mistake goes back to unread. Reading sessions and progress stay.</string>
+    <string name="calendar_dates_delete_confirm">Delete</string>
     <!-- The book's status after the save, when it changes: "Read", "Gave up"... -->
     <string name="calendar_dates_status_change">Saving marks it as %1$s.</string>
     <!-- A book on Want to read keeps that status after the save; History and the calendar list only books with another status. -->

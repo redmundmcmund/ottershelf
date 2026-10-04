@@ -370,7 +370,7 @@ fun BookDetailContent(
                         DetailCoverBox(state, cover, Modifier.size(COVER_WIDTH, COVER_HEIGHT))
                         Spacer(Modifier.width(20.dp))
                         Column(Modifier.weight(1f)) {
-                            Header(state, onAuthor, onSeries)
+                            Header(state, onAuthor, onSeries, ownPageTotal = tracking?.settings?.pageTotals?.get(state.bookId))
                             if (wide && state.book != null) {
                                 Actions(
                                     state = state,
@@ -505,7 +505,7 @@ private fun DetailCoverBox(state: BookDetailUiState, cover: DetailCover, modifie
 
 /** Title, subtitle, authors (each opens their books), the series chip and the details. */
 @Composable
-private fun Header(state: BookDetailUiState, onAuthor: (AuthorRef) -> Unit, onSeries: (BookDetail) -> Unit) {
+private fun Header(state: BookDetailUiState, onAuthor: (AuthorRef) -> Unit, onSeries: (BookDetail) -> Unit, ownPageTotal: Int? = null) {
     val colors = OttershelfTheme.colors
     val book = state.book
     val title = state.title ?: if (book != null) stringResource(R.string.book_untitled) else ""
@@ -564,7 +564,8 @@ private fun Header(state: BookDetailUiState, onAuthor: (AuthorRef) -> Unit, onSe
     }
 
     if (book != null) {
-        val pages = book.pageCount?.let { stringResource(R.string.book_pages, it) }
+        // The metadata's count, else the user's own total (set by hand, or looked up: PageCounts).
+        val pages = (book.pageCount?.takeIf { it > 0 } ?: ownPageTotal?.takeIf { it > 0 })?.let { stringResource(R.string.book_pages, it) }
         val meta = listOfNotNull(
             book.publisher,
             book.publishedYear?.toString(),
