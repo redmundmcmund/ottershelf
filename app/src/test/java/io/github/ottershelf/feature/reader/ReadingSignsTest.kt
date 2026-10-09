@@ -51,6 +51,18 @@ class ReadingSignsTest {
     }
 
     @Test
+    fun openingPartwayIntoAChapterCountsFromWhereThePageLanded() {
+        signs.expect() // the book opens at its saved place, 25% in, partway into a long chapter
+        assertTrue(signs.onRelocate(Relocate(fraction = 0.026))) // foliate shows the chapter's start first
+        assertFalse(signs.onRelocate(Relocate(fraction = 0.25))) // then lands on the saved place
+        now += 3 * 60_000
+        assertTrue(signs.onRelocate(Relocate(fraction = 0.255, turned = true)))
+        assertTrue(signs.onRelocate(Relocate(fraction = 0.26, turned = true)))
+        visit.close()
+        assertEquals(1.0, sent.single().progressDelta!!, 1e-9)
+    }
+
+    @Test
     fun aVisitWithoutAMoveStillSendsNothing() {
         signs.expect()
         signs.onRelocate(Relocate(fraction = 0.40))

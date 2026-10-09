@@ -54,6 +54,36 @@ class ReadingVisitTest {
     }
 
     @Test
+    fun aBookOpenedPartwayIntoALongChapterCountsOnlyWhatWasRead() {
+        // The phone bug: the reader first shows the chapter's start (2.6%), then lands on the saved
+        // place (25%). The session counted 2.6% to 26% (+69 pages) for a page or two of reading.
+        visit.activity(2.6) // the relocate expected after opening: the chapter's start
+        visit.settle(25.0) // the page landing on the saved place by itself
+        now += 3 * 60_000
+        visit.activity(25.5)
+        visit.markMoved()
+        visit.activity(26.0)
+        visit.close()
+        val session = sent.single()
+        assertEquals(1.0, session.progressDelta!!, 1e-9)
+        assertEquals(26.0, session.endProgress!!, 1e-9)
+    }
+
+    @Test
+    fun thePageSettlingAfterReadingMovesOnlyTheEnd() {
+        visit.activity(10.0)
+        now += 60_000
+        visit.activity(12.0)
+        visit.markMoved()
+        visit.settle(12.4) // a chapter's images loaded and the page relaid out
+        now += 60_000
+        visit.close()
+        val session = sent.single()
+        assertEquals(2.4, session.progressDelta!!, 1e-9)
+        assertEquals(120, session.durationSeconds)
+    }
+
+    @Test
     fun aSessionEndedBeforeTheFirstMoveIsHeldUntilIt() {
         visit.activity(10.0)
         now += 2 * 60_000

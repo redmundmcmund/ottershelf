@@ -1,0 +1,1 @@
+- Fixed reading sessions on the phone counting the pages from the start of the chapter, instead of just the pages read in that session

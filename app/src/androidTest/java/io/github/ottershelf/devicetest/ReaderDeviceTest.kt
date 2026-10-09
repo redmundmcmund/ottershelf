@@ -164,6 +164,39 @@ class ReaderDeviceTest {
         }
     }
 
+    @Test
+    fun reopeningPartwayIntoAChapterCountsOnlyThePageReadThere() {
+        // The phone bug: reopened at a saved place partway into a chapter, the session counted from the
+        // chapter's start (foliate shows it first, then lands on the place), so "+69 pages" for one page.
+        val saved: Relocate
+        ReaderSession.open(book, PAGINATED).use { s ->
+            s.awaitOpened()
+            s.awaitQuiet()
+            repeat(12) {
+                s.swipeToNextPage()
+                SystemClock.sleep(500)
+            }
+            s.awaitQuiet(2_000)
+            saved = s.probe.locations.last()
+        }
+        assertNotNull(saved.cfi)
+        ReaderSession.open(book, PAGINATED, cfi = saved.cfi, percentage = saved.fraction * 100).use { s ->
+            s.awaitOpened()
+            s.awaitQuiet(2_000)
+            Device.report("reopened at ${saved.fraction}: relocates ${s.probe.relocates.map { "%.4f".format(it.fraction) }}")
+            val before = s.probe.relocates.last().fraction
+            s.swipeToNextPage()
+            Device.waitUntil("a turned relocate (${s.probe.summary()})", 5_000) { s.probe.turned().isNotEmpty() }
+            s.awaitQuiet()
+            val after = s.probe.relocates.last().fraction
+            SystemClock.sleep(11_000) // sessions under 10 s are dropped
+            Device.onMain { s.probe.visit.close() }
+            val delta = s.probe.sessions.single().progressDelta!!
+            Device.report("reopened session: progressDelta $delta%, the page turned ${(after - before) * 100}%")
+            assertTrue("counted $delta% for one page (${(after - before) * 100}%)", abs(delta - (after - before) * 100) < 0.5)
+        }
+    }
+
     // --- 2. scrolled ---------------------------------------------------------------------------
 
     @Test

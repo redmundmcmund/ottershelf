@@ -17,6 +17,9 @@ import io.github.ottershelf.core.sync.ReadingVisit
 internal class ReadingSigns(private val visit: ReadingVisit) {
     private var expected = false
 
+    /** The page is landing after an opening or a jump: its own relocates until the next turn place the session. */
+    private var landing = false
+
     /** The book is opening in a page, or the user picked a jump: the next relocate is the user's. */
     fun expect() {
         expected = true
@@ -25,8 +28,16 @@ internal class ReadingSigns(private val visit: ReadingVisit) {
     /** A relocate from the page. True when it was the user's reading: the session goes on at its place. */
     fun onRelocate(r: Relocate): Boolean {
         val theirs = r.turned || expected
+        val wasExpected = expected && !r.turned
         expected = false
-        if (!theirs) return false
+        if (!theirs) {
+            // Still landing after opening or a jump (foliate shows the chapter's start, then the saved
+            // place): where the page went, not reading. Later relocates by itself (a chapter animating
+            // its layout) don't move the session at all.
+            if (landing) visit.settle(r.fraction * 100)
+            return false
+        }
+        landing = wasExpected
         visit.activity(r.fraction * 100)
         if (r.turned) visit.markMoved()
         return true

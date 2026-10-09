@@ -36,6 +36,9 @@ class ReadingVisit(
     private var startPct = 0.0
     private var lastActivityWall = 0L
     private var latestPct = 0.0
+
+    /** The current session's place has moved on from where it started (reading, not the page settling). */
+    private var progressed = false
     private val held = ArrayList<ReadingSession>()
 
     /** Reading goes on at [percent] (0..100): starts a session, or keeps the current one from going idle. */
@@ -46,8 +49,22 @@ class ReadingVisit(
         if (startWall == 0L) {
             startWall = now
             startPct = latestPct
+        } else if (latestPct != startPct) {
+            progressed = true
         }
         lastActivityWall = now
+    }
+
+    /**
+     * The page moved by itself to [percent] (0..100): the reader landing on the saved place after
+     * first showing its chapter's start, or a section settling. It isn't reading, so it doesn't keep
+     * the session going; but it is where the reader is, so the session ends there, and a session
+     * that hasn't moved on yet starts there. Without this, a book opened partway into a long chapter
+     * counted the whole chapter up to that place as read in the first session.
+     */
+    fun settle(percent: Double) {
+        latestPct = percent
+        if (startWall != 0L && !progressed) startPct = percent
     }
 
     /** The user moved: whatever was held goes out now, and every session from here on. */
@@ -74,6 +91,7 @@ class ReadingVisit(
         val start = startWall
         if (start == 0L) return
         startWall = 0L
+        progressed = false
         val seconds = ((endWall - start) / 1000).toInt()
         if (seconds < MIN_SECONDS) return
         val body = ReadingSession(
