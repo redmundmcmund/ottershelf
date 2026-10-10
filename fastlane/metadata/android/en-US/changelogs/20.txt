@@ -1,0 +1,2 @@
+- Add any book to a collection from its page or the long-press menu
+- Select several books in the library (the tick icon in the toolbar) and add them to a collection at once

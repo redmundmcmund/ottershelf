@@ -15,7 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -30,8 +30,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -49,14 +51,14 @@ import io.github.ottershelf.ui.nav.appViewModel
 import io.github.ottershelf.ui.theme.OttershelfTheme
 
 /**
- * The shell's "add to a collection" sheet: opens by itself when [CollectionPrompt] offers a book
- * (just marked Want to read); dismiss it to skip. [onChanged]: a collection's books changed.
+ * The shell's "add to a collection" sheet: opens by itself when [CollectionPrompt] has books for it
+ * (one just marked Want to read, or books the user chose to add); dismiss it to skip. [onChanged]: a collection's books changed.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddToCollectionHost(onChanged: () -> Unit = {}) {
     val viewModel = appViewModel { c -> AddToCollectionViewModel(ApiCollectionsRemote(c.api), onChanged) }
-    val prompt by CollectionPrompt.book.collectAsStateWithLifecycle()
+    val prompt by CollectionPrompt.target.collectAsStateWithLifecycle()
     LaunchedEffect(prompt) {
         prompt?.let {
             viewModel.open(it)
@@ -76,8 +78,9 @@ fun AddToCollectionHost(onChanged: () -> Unit = {}) {
 }
 
 /**
- * The book's title, the user's collections (ticked where the book is; a tap adds or removes it),
- * "New collection" (a name, then Create: made with the book in it), and Done.
+ * What the books are (a title, or how many), the user's collections (ticked where they hold every
+ * book, a dash where some; a tap adds them or, from a tick, takes them out), "New collection" (a
+ * name, then Create: made with the books in it), and Done.
  */
 @Composable
 fun AddToCollectionContent(
@@ -88,8 +91,8 @@ fun AddToCollectionContent(
     onDone: () -> Unit = {},
 ) {
     val colors = OttershelfTheme.colors
-    var naming by rememberSaveable(state.book.id) { mutableStateOf(false) }
-    var name by rememberSaveable(state.book.id) { mutableStateOf("") }
+    var naming by rememberSaveable(state.target) { mutableStateOf(false) }
+    var name by rememberSaveable(state.target) { mutableStateOf("") }
     Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Column {
             Text(
@@ -97,9 +100,16 @@ fun AddToCollectionContent(
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = colors.foreground,
             )
-            state.book.title?.takeIf { it.isNotBlank() }?.let {
+            val target = state.target
+            val title = target.title?.takeIf { it.isNotBlank() }
+            val subtitle = when {
+                target.bookIds.size > 1 -> pluralStringResource(R.plurals.collections_add_books, target.bookIds.size, target.bookIds.size)
+                target.wantToRead && title != null -> stringResource(R.string.collections_add_subtitle, title)
+                else -> title
+            }
+            subtitle?.let {
                 Text(
-                    stringResource(R.string.collections_add_subtitle, it),
+                    it,
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.mutedForeground,
                     maxLines = 2,
@@ -130,7 +140,15 @@ fun AddToCollectionContent(
                                 color = colors.mutedForeground,
                             )
                         }
-                        Checkbox(checked = choice.contains, onCheckedChange = null, enabled = choice.id !in state.busy)
+                        TriStateCheckbox(
+                            state = when (state.membership(choice)) {
+                                Membership.All -> ToggleableState.On
+                                Membership.Some -> ToggleableState.Indeterminate
+                                Membership.None -> ToggleableState.Off
+                            },
+                            onClick = null,
+                            enabled = choice.id !in state.busy,
+                        )
                     }
                 }
             }

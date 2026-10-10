@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -28,24 +27,24 @@ class AddToCollectionViewModelTest {
     @After
     fun tearDown() = Dispatchers.resetMain()
 
+    /** The server's collections: id to the books in it (adding a book already in is skipped, as the server does). */
     private class FakeRemote : CollectionsRemote {
-        val members = mutableMapOf(1L to mutableSetOf<Long>(), 2L to mutableSetOf(7L))
-        val names = mutableMapOf(1L to "Holiday", 2L to "Favourites")
+        val members = mutableMapOf(1L to mutableSetOf<Long>(), 2L to mutableSetOf(7L), 3L to mutableSetOf(7L, 8L))
+        val names = mutableMapOf(1L to "Holiday", 2L to "Favourites", 3L to "Classics")
         var refuse = false
-        var changes = 0
 
-        override suspend fun choices(bookId: Long) = members.keys.sorted().map { id ->
-            CollectionChoice(id, names.getValue(id), bookCount = members.getValue(id).size, memberCount = if (bookId in members.getValue(id)) 1 else 0)
+        override suspend fun choices(bookIds: List<Long>) = members.keys.sorted().map { id ->
+            CollectionChoice(id, names.getValue(id), bookCount = members.getValue(id).size, memberCount = bookIds.count { it in members.getValue(id) })
         }
 
-        override suspend fun add(collectionId: Long, bookId: Long) {
+        override suspend fun add(collectionId: Long, bookIds: List<Long>) {
             if (refuse) throw IOException("offline")
-            members.getValue(collectionId) += bookId
+            members.getValue(collectionId) += bookIds
         }
 
-        override suspend fun remove(collectionId: Long, bookId: Long) {
+        override suspend fun remove(collectionId: Long, bookIds: List<Long>) {
             if (refuse) throw IOException("offline")
-            members.getValue(collectionId) -= bookId
+            members.getValue(collectionId) -= bookIds.toSet()
         }
 
         override suspend fun create(name: String): Long {
@@ -56,15 +55,16 @@ class AddToCollectionViewModelTest {
         }
     }
 
-    private val book = PromptBook(7, "The Lost World")
+    private val one = CollectionTarget(listOf(7), "The Lost World", wantToRead = true)
+    private val two = CollectionTarget(listOf(7, 8))
 
     @Test
     fun opensWithTheBooksCollectionsTicked() = runTest(scheduler) {
         val vm = AddToCollectionViewModel(FakeRemote())
-        vm.open(book)
+        vm.open(one)
         advanceUntilIdle()
-        val choices = vm.state.value!!.choices
-        assertEquals(listOf(false, true), choices.map { it.contains })
+        val s = vm.state.value!!
+        assertEquals(listOf(Membership.None, Membership.All, Membership.All), s.choices.map(s::membership))
     }
 
     @Test
@@ -72,40 +72,84 @@ class AddToCollectionViewModelTest {
         val remote = FakeRemote()
         var changed = 0
         val vm = AddToCollectionViewModel(remote) { changed++ }
-        vm.open(book)
+        vm.open(one)
         advanceUntilIdle()
         vm.toggle(vm.state.value!!.choices.first())
         advanceUntilIdle()
         assertTrue(7L in remote.members.getValue(1))
-        assertTrue(vm.state.value!!.choices.first().contains)
+        val s = vm.state.value!!
+        assertEquals(Membership.All, s.membership(s.choices.first()))
         assertEquals(1, changed)
+    }
+
+    @Test
+    fun severalBooksShowWhichCollectionsHoldSomeOfThem() = runTest(scheduler) {
+        val vm = AddToCollectionViewModel(FakeRemote())
+        vm.open(two)
+        advanceUntilIdle()
+        val s = vm.state.value!!
+        assertEquals(listOf(Membership.None, Membership.Some, Membership.All), s.choices.map(s::membership))
+    }
+
+    @Test
+    fun aTapOnACollectionHoldingSomeAddsTheRest() = runTest(scheduler) {
+        val remote = FakeRemote()
+        val vm = AddToCollectionViewModel(remote)
+        vm.open(two)
+        advanceUntilIdle()
+        vm.toggle(vm.state.value!!.choices[1]) // Favourites holds 7, not 8
+        advanceUntilIdle()
+        assertEquals(setOf(7L, 8L), remote.members.getValue(2))
+        val s = vm.state.value!!
+        assertEquals(Membership.All, s.membership(s.choices[1]))
+    }
+
+    @Test
+    fun aTapOnACollectionHoldingAllTakesThemOut() = runTest(scheduler) {
+        val remote = FakeRemote()
+        val vm = AddToCollectionViewModel(remote)
+        vm.open(two)
+        advanceUntilIdle()
+        vm.toggle(vm.state.value!!.choices[2]) // Classics holds both
+        advanceUntilIdle()
+        assertTrue(remote.members.getValue(3).isEmpty())
     }
 
     @Test
     fun aRefusedChangeIsPutBack() = runTest(scheduler) {
         val remote = FakeRemote().apply { refuse = true }
         val vm = AddToCollectionViewModel(remote)
-        vm.open(book)
+        vm.open(two)
         advanceUntilIdle()
-        vm.toggle(vm.state.value!!.choices.first())
+        vm.toggle(vm.state.value!!.choices[1])
         advanceUntilIdle()
         val s = vm.state.value!!
-        assertFalse(s.choices.first().contains)
+        assertEquals(Membership.Some, s.membership(s.choices[1]))
         assertNotNull(s.error)
         assertTrue(s.busy.isEmpty())
     }
 
     @Test
-    fun aNewCollectionIsMadeWithTheBookInIt() = runTest(scheduler) {
+    fun aNewCollectionIsMadeWithTheBooksInIt() = runTest(scheduler) {
         val remote = FakeRemote()
         val vm = AddToCollectionViewModel(remote)
-        vm.open(book)
+        vm.open(two)
         advanceUntilIdle()
         vm.create("  To buy  ")
         advanceUntilIdle()
-        val made = vm.state.value!!.choices.single { it.name == "To buy" }
-        assertTrue(made.contains)
+        val s = vm.state.value!!
+        val made = s.choices.single { it.name == "To buy" }
+        assertEquals(Membership.All, s.membership(made))
         vm.close()
         assertNull(vm.state.value)
+    }
+
+    @Test
+    fun aPickedSelectionGoesToTheSheetOnce() {
+        CollectionPrompt.add(listOf(3L, 3L, 4L))
+        assertEquals(CollectionTarget(listOf(3L, 4L)), CollectionPrompt.target.value)
+        CollectionPrompt.taken()
+        CollectionPrompt.add(emptyList())
+        assertNull(CollectionPrompt.target.value)
     }
 }

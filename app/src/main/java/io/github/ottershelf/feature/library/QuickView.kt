@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.ottershelf.R
+import io.github.ottershelf.feature.collections.CollectionPrompt
 import io.github.ottershelf.core.model.ReadStatus
 import io.github.ottershelf.core.model.formatSeriesIndex
 import io.github.ottershelf.feature.book.DownloadAction
@@ -122,6 +123,11 @@ fun BookQuickViewSheet(viewModel: BookQuickViewModel, navigator: AppNavigator) {
                     }
                 },
                 onStatus = viewModel::setStatus,
+                onAddToCollection = {
+                    // The collections sheet takes over (one sheet at a time).
+                    viewModel.close()
+                    CollectionPrompt.add(listOf(current.bookId), current.card.title)
+                },
                 onRetry = viewModel::retry,
                 modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
             )
@@ -158,6 +164,8 @@ fun BookQuickViewContent(
     onStatus: (ReadStatus) -> Unit = {},
     onRetry: () -> Unit = {},
     statusesOpen: Boolean = false,
+    /** Add the book to collections (null: no button, as in the screenshots). */
+    onAddToCollection: (() -> Unit)? = null,
 ) {
     val colors = OttershelfTheme.colors
     var picking by rememberSaveable(state.bookId) { mutableStateOf(statusesOpen) }
@@ -200,6 +208,15 @@ fun BookQuickViewContent(
             )
             val download = state.page.downloadButton
             if (download != DownloadButton.Hidden) DownloadQuickAction(download, onDownload, Modifier.weight(1f))
+        }
+        if (onAddToCollection != null) {
+            Spacer(Modifier.height(8.dp))
+            QuickAction(
+                text = stringResource(R.string.collections_add_action),
+                onClick = onAddToCollection,
+                modifier = Modifier.fillMaxWidth(),
+                leading = { LucideIcon("FolderPlus", contentDescription = null, tint = colors.foreground, size = 20.dp) },
+            )
         }
         state.statusError?.let {
             Text(

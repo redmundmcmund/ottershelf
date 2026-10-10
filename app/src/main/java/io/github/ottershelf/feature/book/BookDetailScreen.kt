@@ -100,6 +100,7 @@ import io.github.ottershelf.core.model.AuthorRef
 import io.github.ottershelf.core.model.BookDetail
 import io.github.ottershelf.core.model.ReadStatus
 import io.github.ottershelf.core.model.formatSeriesIndex
+import io.github.ottershelf.feature.collections.CollectionPrompt
 import io.github.ottershelf.feature.notes.BookHighlightsSection
 import io.github.ottershelf.feature.quotes.QuoteButtons
 import io.github.ottershelf.feature.seriesnext.NextInSeriesCard
@@ -257,6 +258,7 @@ fun BookDetailScreen(route: Route.BookDetail, navigator: AppNavigator) {
         },
         onRetry = viewModel::load,
         onEdit = { navigator.navigate(Route.BookEdit(route.bookId)) },
+        onAddToCollection = { CollectionPrompt.add(listOf(route.bookId), state.title) },
         tracking = tracking,
         trackingActions = trackingActions,
         highlights = {
@@ -322,6 +324,7 @@ fun BookDetailContent(
     onRetry: () -> Unit = {},
     /** Edit details (feature.bookedit): the toolbar's pencil, shown when [BookDetailUiState.canEdit]. */
     onEdit: () -> Unit = {},
+    onAddToCollection: () -> Unit = {},
     tracking: BookTrackingUiState? = null,
     trackingActions: BookTrackingActions = BookTrackingActions.None,
     /** The Highlights & notes card (feature.notes), under the files. */
@@ -342,6 +345,11 @@ fun BookDetailContent(
                 subtitle = if (state.offlineCopy) stringResource(R.string.book_offline_copy) else null,
                 onBack = onBack,
                 actions = {
+                    if (state.book != null && !state.offlineCopy) {
+                        IconButton(onClick = onAddToCollection) {
+                            LucideIcon("FolderPlus", contentDescription = stringResource(R.string.collections_add_action), size = 22.dp)
+                        }
+                    }
                     if (state.canEdit && state.book != null) {
                         IconButton(onClick = onEdit) {
                             LucideIcon("Pencil", contentDescription = stringResource(R.string.bookedit_edit_details), size = 22.dp)

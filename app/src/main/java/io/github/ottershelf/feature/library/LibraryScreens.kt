@@ -1,5 +1,9 @@
 package io.github.ottershelf.feature.library
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.material3.IconButton
+import io.github.ottershelf.ui.icons.LucideIcon
+import io.github.ottershelf.feature.collections.CollectionPrompt
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -96,9 +100,17 @@ fun BookListScreen(route: Route.BookList, navigator: AppNavigator, contentPaddin
         viewModel.resets.collect { gridState.scrollToItem(0) }
     }
     var sheetOpen by rememberSaveable { mutableStateOf(false) }
+    // Picking books to add to collections at once (the toolbar's Select): null while not picking.
+    var selected by rememberSaveable { mutableStateOf<ArrayList<Long>?>(null) }
+    BackHandler(enabled = selected != null) { selected = null }
     val current = sort
     val changed = current != null && current != viewModel.kind.default
     val actions: @Composable RowScope.() -> Unit = {
+        if (selected == null) {
+            IconButton(onClick = { selected = arrayListOf() }) {
+                LucideIcon("SquareCheck", contentDescription = stringResource(R.string.library_select), size = 22.dp)
+            }
+        }
         view?.let { ViewMenuButton(it, metrics, onChange = viewModel::setView) }
         SortButton(active = changed, onClick = { sheetOpen = true })
     }
@@ -129,17 +141,41 @@ fun BookListScreen(route: Route.BookList, navigator: AppNavigator, contentPaddin
                 view = view ?: ListView(),
                 onViewChange = viewModel::setView,
                 metrics = metrics,
+                selected = selected?.toSet(),
+                onToggleSelect = { book ->
+                    selected = selected?.let { ArrayList(if (book.id in it) it - book.id else it + book.id) }
+                },
             )
         }
     }
+    val body: @Composable (PaddingValues) -> Unit = { padding ->
+        Box(Modifier.fillMaxSize()) {
+            content(padding)
+            selected?.let { picked ->
+                SelectionBar(
+                    count = picked.size,
+                    onAddToCollection = {
+                        CollectionPrompt.add(picked)
+                        selected = null
+                    },
+                    onSelectAll = { selected = ArrayList((picked + state.items.map { it.id }).distinct()) },
+                    onDone = { selected = null },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = padding.calculateBottomPadding())
+                        .padding(16.dp),
+                )
+            }
+        }
+    }
     if (route.chrome == Chrome.Root) {
-        content(contentPadding)
+        body(contentPadding)
     } else {
         val subtitle = stringResource(
             if (route.sourceKey.startsWith("author:")) R.string.library_subtitle_author else R.string.library_subtitle_series,
         )
         Scaffold(topBar = { DetailTopBar(title = route.title, subtitle = subtitle, onBack = { navigator.back() }, actions = actions) }) { padding ->
-            content(padding)
+            body(padding)
         }
     }
     if (sheetOpen && current != null) {
@@ -261,6 +297,10 @@ fun BookGridContent(
     view: ListView = ListView(),
     onViewChange: (ListView) -> Unit = {},
     metrics: GridMetrics? = null,
+    // Picking books (the toolbar's Select): the books picked, or null while not picking. While
+    // picking, a tap or a long press picks or unpicks a book instead of opening it.
+    selected: Set<Long>? = null,
+    onToggleSelect: (BookCard) -> Unit = {},
 ) {
     val filtered = filters?.filtered == true
     val direction = LocalLayoutDirection.current
@@ -292,23 +332,33 @@ fun BookGridContent(
             snackbar = snackbar,
             gridModifier = gridModifier,
         ) { book ->
-            val longPress = onQuickView?.let { { it(book) } }
+            val picking = selected != null
+            val click = if (picking) ({ onToggleSelect(book) }) else ({ onOpen(book) })
+            val longPress = if (picking) ({ onToggleSelect(book) }) else onQuickView?.let { { it(book) } }
             // The same model instance on every pass: a new URL string each time (the cells take
             // it as Any?, compared by identity) would keep every cell from skipping whenever the
             // list's state changes (each page arriving). Keyed on the card alone: an edited book
             // is a new card (a new updatedAt, so a new URL).
             val cover = remember(book) { coverOf(book) }
-            if (layout.list) {
-                BookRow(book = book, cover = cover, onClick = { onOpen(book) }, status = statusOf(book), onLongClick = longPress)
-            } else {
-                BookGridItem(
-                    book = book,
-                    cover = cover,
-                    onClick = { onOpen(book) },
-                    status = statusOf(book),
-                    onLongClick = longPress,
-                    coverWidth = layout.coverWidth,
-                )
+            Box {
+                if (layout.list) {
+                    BookRow(book = book, cover = cover, onClick = click, status = statusOf(book), onLongClick = longPress)
+                } else {
+                    BookGridItem(
+                        book = book,
+                        cover = cover,
+                        onClick = click,
+                        status = statusOf(book),
+                        onLongClick = longPress,
+                        coverWidth = layout.coverWidth,
+                    )
+                }
+                if (picking) {
+                    SelectMark(
+                        selected = book.id in selected.orEmpty(),
+                        modifier = Modifier.align(if (layout.list) Alignment.CenterEnd else Alignment.TopStart).padding(if (layout.list) 12.dp else 10.dp),
+                    )
+                }
             }
         }
     }

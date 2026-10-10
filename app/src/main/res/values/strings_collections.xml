@@ -4,6 +4,12 @@
     <string name="collections_add_title">Add to a collection</string>
     <!-- %1$s: the book's title. -->
     <string name="collections_add_subtitle">%1$s is on your Want to read list. Add it to a collection too?</string>
+    <!-- %1$d: how many books were picked in the library. -->
+    <plurals name="collections_add_books">
+        <item quantity="one">%1$d book</item>
+        <item quantity="other">%1$d books</item>
+    </plurals>
+    <string name="collections_add_action">Add to collection</string>
     <string name="collections_load_failed">Couldn\'t load your collections.</string>
     <string name="collections_none">You don\'t have any collections yet. Make one below.</string>
     <!-- %1$d: how many books the collection holds. -->

@@ -62,6 +62,17 @@
     <string name="library_no_books_filtered">No books match these filters</string>
     <string name="library_no_books_both_hidden">Nothing left with Hide read and Hide unread both on: only books you\'re reading, want to read, have on hold, skimmed or abandoned show then.</string>
     <string name="library_clear_filters">Clear filters</string>
+    <!-- Picking books in a grid (the toolbar's Select), to add them to collections at once. -->
+    <string name="library_select">Select books</string>
+    <string name="library_select_done">Done selecting</string>
+    <string name="library_select_all">Select all</string>
+    <string name="library_selected_book">Selected</string>
+    <string name="library_not_selected_book">Not selected</string>
+    <!-- %1$d: how many books are picked. -->
+    <plurals name="library_selected">
+        <item quantity="one">%1$d selected</item>
+        <item quantity="other">%1$d selected</item>
+    </plurals>
 
     <!-- The view menu (the book grids' toolbar): grid or list, and the cover size. -->
     <string name="library_view_action">View options</string>
