@@ -45,6 +45,10 @@ data class Relocate(
 @Serializable
 data class TocEntry(val label: String, val href: String? = null, val depth: Int = 0)
 
+/** A footnote reference was tapped (reader.js openFootnote): the note's [text], and [href] to go to it after all. */
+@Serializable
+data class Footnote(val text: String, val href: String)
+
 @Serializable
 data class Opened(
     val title: String? = null,
@@ -281,4 +285,6 @@ data class ReaderUiState(
      * a while after the last. Not [fraction], which foliate also changes by itself.
      */
     val activity: Int = 0,
+    /** A footnote shown in its sheet over the page (null: none). */
+    val footnote: Footnote? = null,
 )

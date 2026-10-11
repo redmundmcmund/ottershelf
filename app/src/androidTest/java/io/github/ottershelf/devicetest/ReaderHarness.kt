@@ -61,7 +61,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * `window.Android` for the reader page in the device tests: the same ten methods as
+ * `window.Android` for the reader page in the device tests: the same eleven methods as
  * [ReaderViewModel.Bridge] (reader.js calls exactly these), recording what the page reports.
  *
  * "The user has moved since opening" is followed exactly as [ReaderViewModel] does it: the relocates go
@@ -143,6 +143,9 @@ class ReaderProbe {
 
     @JavascriptInterface
     fun onToggleUi() = record("onToggleUi", null)
+
+    @JavascriptInterface
+    fun onFootnote(payload: String) = record("onFootnote", payload)
 
     @JavascriptInterface
     fun onError(message: String) {

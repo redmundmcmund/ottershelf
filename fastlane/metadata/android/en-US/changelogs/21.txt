@@ -1,0 +1,1 @@
+- Footnotes now open in a small pop-up over the page, instead of jumping to the end of the book (and moving your reading position there)

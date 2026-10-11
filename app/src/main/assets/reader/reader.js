@@ -457,6 +457,73 @@ window.readerOpen = async (args) => {
   }
 }
 
+// --- footnotes ------------------------------------------------------------------------------
+// Followed, a footnote reference jumps to the notes (often at the back of the book) and the reading
+// position, saved and synced, goes there with it. So a link that is one shows its note in the app's
+// sheet (native.onFootnote) and the page stays put; "Open in book" there follows it after all.
+// A reference: one the book marks (EPUB 3 epub:type noteref, DPUB-ARIA doc-noteref) or, for books
+// that don't, a short link ("*", "†", "12", "[3]") or one in a superscript, whose target is a short
+// passage. Anything else (the contents, a cross-reference) is followed as before.
+
+const OPS_NS = 'http://www.idpf.org/2007/ops'
+const noteTypes = (el) =>
+  `${el.getAttributeNS?.(OPS_NS, 'type') || el.getAttribute?.('epub:type') || ''} ${el.getAttribute?.('role') || ''}`.toLowerCase()
+
+/** 'marked' (the book says it's a note reference), 'guess' (it looks like one), or null. */
+function noteRefKind(a) {
+  if (/\bnoteref\b|\bdoc-noteref\b/.test(noteTypes(a))) return 'marked'
+  if (a.closest('nav')) return null
+  const text = (a.textContent || '').trim()
+  if (!text || text.length > 6) return null
+  if (a.closest('sup') || a.querySelector('sup')) return 'guess'
+  return /^[[(]?(\d{1,3}|[*†‡§¶#]{1,3}|[a-z])[\])]?$/i.test(text) ? 'guess' : null
+}
+
+/** The note around a link's target: the element the book marks as one, else the block holding it. */
+function noteElement(target) {
+  const start = target?.nodeType === 1 ? target : (target?.startContainer ?? target)?.parentElement
+  for (let el = start; el && el.localName !== 'body'; el = el.parentElement) {
+    if (/\b(footnote|endnote|rearnote|note)\b|\bdoc-(footnote|endnote)\b/.test(noteTypes(el))) return el
+  }
+  // The nearest block around it: the target is often the marker itself, a link or a span inside
+  // the note (`<div class="fn"><a id="ft001"><sup>*1</sup></a> The note…</div>`).
+  return start?.closest?.('aside, li, dd, p, blockquote, div, section, article') ?? start
+}
+
+/**
+ * [el]'s text, a paragraph a block, without the links back to the text: marked ones, "↩"/"Back",
+ * one pointing at the reference tapped ([refId]), and a short marker opening the note ("* ", "12.").
+ */
+function noteText(el, refId) {
+  const copy = el.cloneNode(true)
+  const first = copy.querySelector('a')
+  for (const a of copy.querySelectorAll('a')) {
+    const label = (a.textContent || '').trim()
+    const back = /\bbacklink\b|\bdoc-backlink\b/.test(noteTypes(a)) || /^(↩|↑|\^|back|return)$/i.test(label) ||
+      (refId && (a.getAttribute('href') || '').endsWith(`#${refId}`)) ||
+      // A short link the note opens with (its marker, linking back): not a link later in the note.
+      (a === first && label.length <= 4 && (copy.textContent || '').trim().startsWith(label))
+    if (back) a.remove()
+  }
+  const blocks = copy.matches?.('p, li, dd, blockquote') ? [copy] : [...copy.querySelectorAll('p, li, dd, blockquote')]
+  const outer = blocks.filter((b) => !blocks.some((o) => o !== b && o.contains(b)))
+  const parts = (outer.length ? outer : [copy]).map((b) => (b.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean)
+  return parts.join('\n\n')
+}
+
+/** Reads the note [href] points to from its section (a separate copy: the page doesn't move) and hands it to the app. */
+async function openFootnote(href, kind, refId) {
+  const resolved = await view.resolveNavigation(href)
+  if (!resolved || typeof resolved.index !== 'number') throw new Error('no target')
+  const doc = await view.book.sections[resolved.index].createDocument()
+  const el = noteElement(resolved.anchor?.(doc))
+  if (!el || /^h[1-6]$/.test(el.localName) || el.localName === 'body') throw new Error('not a note')
+  const text = noteText(el, refId)
+  // A guess pointing at a long passage was a cross-reference after all: follow it.
+  if (!text || text.length > (kind === 'marked' ? 8000 : 1500)) throw new Error('not a note')
+  native.onFootnote(JSON.stringify({ text, href }))
+}
+
 let totalMinutes = 0
 
 /** Shows [book] in a new foliate-view at [cfi] (else [percentage]); also used to reopen it. */
@@ -471,6 +538,14 @@ async function showBook(book, cfi, percentage) {
   // from this page, which has the bridge; only the CSP and the app's refusal of any navigation of
   // this page stood in the way. Links out of books do nothing, as they always did here.
   view.addEventListener('external-link', (e) => e.preventDefault())
+  // A footnote reference shows its note in the app's sheet instead of going to it (see openFootnote).
+  view.addEventListener('link', (e) => {
+    const { a, href } = e.detail
+    const kind = noteRefKind(a)
+    if (!kind) return
+    e.preventDefault()
+    openFootnote(href, kind, a.id).catch(() => view?.goTo(href).catch(() => {}))
+  })
   view.addEventListener('relocate', (e) => {
     const d = e.detail
     schedulePrefetch(d.section?.current)

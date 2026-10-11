@@ -555,6 +555,16 @@ class ReaderViewModel(
         setChromeVisible(false)
     }
 
+    /** The footnote's sheet closed: the page never moved. */
+    fun closeFootnote() = _state.update { it.copy(footnote = null) }
+
+    /** "Open in book" in the footnote's sheet: follows the reference after all (a jump the user picked). */
+    fun openFootnoteInBook() {
+        val note = _state.value.footnote ?: return
+        closeFootnote()
+        goTo(note.href)
+    }
+
     fun next() = js("readerNext()")
 
     fun previous() = js("readerPrev()")
@@ -651,6 +661,12 @@ class ReaderViewModel(
 
         @JavascriptInterface
         fun onToggleUi() = post { toggleChrome() }
+
+        /** A footnote reference was tapped: its note shows in a sheet, the page stays where it is. */
+        @JavascriptInterface
+        fun onFootnote(payload: String) = post {
+            decode(Footnote.serializer(), payload)?.let { note -> _state.update { it.copy(footnote = note) } }
+        }
 
         @JavascriptInterface
         fun onError(message: String) = post {

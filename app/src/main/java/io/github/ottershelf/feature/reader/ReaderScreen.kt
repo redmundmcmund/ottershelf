@@ -195,6 +195,7 @@ fun ReaderScreen(route: Route.Reader, navigator: AppNavigator) {
     notes.noteDialog?.let { NoteDialog(it, onSave = viewModel::saveNote, onDismiss = viewModel::dismissNote) }
     notes.confirmDelete?.let { DeleteHighlightDialog(it, onConfirm = viewModel::confirmDelete, onDismiss = viewModel::cancelDelete) }
     lookupState?.let { LookupSheet(it, lookup) }
+    state.footnote?.let { FootnoteSheet(it, state.prefs, onOpenInBook = viewModel::openFootnoteInBook, onDismiss = viewModel::closeFootnote) }
     state.choice?.let { PositionChoiceDialog(it, onChoose = viewModel::choose) }
     // A reading timer on for this book would count the same time twice (feature.timer).
     ReaderTimerNotice(route.bookId)
