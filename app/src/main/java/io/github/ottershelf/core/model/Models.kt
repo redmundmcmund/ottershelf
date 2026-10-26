@@ -68,6 +68,19 @@ data class Library(
     val icon: String? = null,
     val displayOrder: Int = 0,
     val bookCount: Int? = null,
+    /**
+     * The account's role in the library: `viewer`, `editor` or `owner`; null for superusers (they
+     * hold every role). Since BookOrbit 3.5, editing a book's details needs editor or owner
+     * (feature.bookedit.LibraryRoles).
+     */
+    val accessLevel: String? = null,
+)
+
+/** `GET app-info`: what the app reads of the server's own description. */
+@Serializable
+data class AppInfo(
+    /** The server's release, e.g. `v3.5.0`, or `Local build`. */
+    val version: String? = null,
 )
 
 @Serializable
@@ -168,6 +181,8 @@ data class BookFile(
 @Serializable
 data class BookDetail(
     val id: Long,
+    /** The library the book is in: its role decides whether the account may edit it (LibraryRoles). */
+    val libraryId: Long? = null,
     val libraryName: String? = null,
     val title: String? = null,
     val subtitle: String? = null,

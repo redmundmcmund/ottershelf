@@ -44,6 +44,8 @@ import io.github.ottershelf.core.model.UserSettings
  *   object 1.5 s after the last change (`PUT user-preferences/theme`). A failed save is reported on
  *   [events] and not retried, as on the web. A save still waiting when the app leaves the screen is
  *   sent straight away ([flushPendingSave], the web's `pagehide`); signing out cancels it.
+ *   The keys only the web edits (BookOrbit 3.5's style, surface palette, glow reach) go back as
+ *   last read from the account, since the PUT replaces the whole stored object.
  * - **Switching modes** ([setStorageMode]): `PATCH users/me/theme-storage-mode`, then, when
  *   switching to sync, the server's preferences win if it has any; otherwise the device's are
  *   uploaded (with surfaceOpacity, which the web's seed leaves out by mistake). Switching to local
@@ -85,6 +87,8 @@ class ThemeRepository(
     private var changedBeforeLoad = false
     /** The account whose server preferences were already applied in this process. */
     private var hydratedFor: Long? = null
+    /** The stored keys only the web edits, as last read from the account; null until read. */
+    private var webOnly: WebOnlyTheme? = null
 
     /** Reads the device copy, then follows the account to hydrate from the server in sync mode. */
     fun start() {
@@ -108,10 +112,15 @@ class ThemeRepository(
                         key == null -> {
                             cancelPendingSave()
                             hydratedFor = null
+                            webOnly = null
                         }
-                        !key.second -> hydratedFor = null
+                        !key.second -> {
+                            hydratedFor = null
+                            webOnly = null
+                        }
                         hydratedFor != key.first -> {
                             hydratedFor = key.first
+                            webOnly = null
                             _loaded.first { it }
                             loadFromServer()
                         }
@@ -144,6 +153,7 @@ class ThemeRepository(
         if (!sync) return
         val server = remote.themePreferences()
         if (server == null) {
+            webOnly = WebOnlyTheme()
             try {
                 remote.saveThemePreferences(_prefs.value.toBody())
             } catch (e: CancellationException) {
@@ -183,6 +193,7 @@ class ThemeRepository(
     }
 
     private fun applyFromServer(server: JsonObject) {
+        webOnly = WebOnlyTheme.from(server)
         val next = _prefs.value.withServerFields(server)
         if (next == _prefs.value) return
         _prefs.value = next
@@ -202,7 +213,10 @@ class ThemeRepository(
     private suspend fun saveToServer() {
         if (!syncEnabled.value) return
         try {
-            remote.saveThemePreferences(_prefs.value.toBody())
+            // The whole object is replaced: the web-only keys are read first if they never were
+            // (the account's preferences couldn't be loaded earlier), so the save can't wipe them.
+            val keep = webOnly ?: (remote.themePreferences()?.let(WebOnlyTheme::from) ?: WebOnlyTheme()).also { webOnly = it }
+            remote.saveThemePreferences(_prefs.value.toBody(keep))
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {

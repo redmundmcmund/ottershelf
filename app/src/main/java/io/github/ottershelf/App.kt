@@ -16,6 +16,7 @@ import coil3.disk.DiskCache
 import coil3.network.DeDupeConcurrentRequestStrategy
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.crossfade
+import io.github.ottershelf.feature.bookedit.LibraryRoles
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -143,6 +144,9 @@ class AppContainer(private val app: Application, private val tokenCipher: TokenC
     val auth: AuthState by lazy { AuthState(session) }
 
     val api: Api by lazy { Api(session, deviceLabel()) { onRefreshRejected() } }
+
+    /** Whether the account may edit a book's details (BookOrbit 3.5's library roles). */
+    val libraryRoles: LibraryRoles by lazy { LibraryRoles(session::accountKey, { api.appInfo().version }, { api.libraries() }) }
 
     val connectivity: Connectivity by lazy { Connectivity(app) }
 

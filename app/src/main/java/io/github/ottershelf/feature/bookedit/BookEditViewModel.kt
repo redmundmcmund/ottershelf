@@ -25,7 +25,11 @@ import java.io.File
 /** BookOrbit's permission for `PATCH books/:id/metadata` and the cover routes (superusers hold it too). */
 const val EDIT_METADATA_PERMISSION = "library_edit_metadata"
 
-/** Whether [user] may edit book details: the web's `hasPermission('library_edit_metadata')`. */
+/**
+ * Whether [user] holds the permission to edit book details: the web's `hasPermission('library_edit_metadata')`.
+ * Since BookOrbit 3.5 the book's library role counts too; the book page checks that ([LibraryRoles])
+ * before it offers the editor.
+ */
 fun canEditDetails(user: AuthUser?): Boolean = user?.can(EDIT_METADATA_PERMISSION) == true
 
 /** How "Use the file's cover" works for the book's cover now. */

@@ -26,8 +26,8 @@ interface ThemeRemote {
 
 /**
  * The `PUT user-preferences/theme` body. The server's DTO allows only `settings`, and its zod schema
- * is strict: exactly these six keys (`surfaceOpacity` optional), ids from the enums, integers in
- * range. [ThemePrefs.toBody] always produces a valid one.
+ * is strict: these keys only (`surfaceOpacity` and the web-only three optional), ids from the enums,
+ * integers in range. [ThemePrefs.toBody] always produces a valid one.
  */
 @Serializable
 data class ThemePreferencesBody(val settings: ThemePreferencesDto)
@@ -40,13 +40,30 @@ data class ThemePreferencesDto(
     val background: String,
     val brightness: Int,
     val surfaceOpacity: Int,
+    /**
+     * BookOrbit 3.5's web-only settings (shell style, surface palette, glow reach): this app doesn't
+     * show or change them, but the PUT replaces the whole stored object, so they go back as the
+     * server last sent them ([WebOnlyTheme]). Left out when unknown (null), which older servers
+     * need: their schema refuses the keys.
+     */
+    val style: String? = null,
+    val surfacePalette: String? = null,
+    val glowReach: Int? = null,
 )
+
+/** The stored theme keys only the web edits, kept from the last `GET` to send back unchanged. */
+data class WebOnlyTheme(val style: String? = null, val surfacePalette: String? = null, val glowReach: Int? = null) {
+    companion object {
+        /** From the server's stored object: each key only if it has the type the schema wants. */
+        fun from(raw: JsonObject) = WebOnlyTheme(raw.string("style"), raw.string("surfacePalette"), raw.integer("glowReach"))
+    }
+}
 
 /** `UpdateThemeStorageModeDto`: `{ "sync": boolean }`. */
 @Serializable
 data class ThemeStorageModeBody(val sync: Boolean)
 
-fun ThemePrefs.toBody(): ThemePreferencesBody = clamped().let {
+fun ThemePrefs.toBody(webOnly: WebOnlyTheme = WebOnlyTheme()): ThemePreferencesBody = clamped().let {
     ThemePreferencesBody(
         ThemePreferencesDto(
             theme = it.theme.id,
@@ -55,6 +72,9 @@ fun ThemePrefs.toBody(): ThemePreferencesBody = clamped().let {
             background = it.background.id,
             brightness = it.brightness,
             surfaceOpacity = it.surfaceOpacity,
+            style = webOnly.style,
+            surfacePalette = webOnly.surfacePalette,
+            glowReach = webOnly.glowReach,
         )
     )
 }

@@ -87,6 +87,7 @@ class ShellViewModel(private val container: AppContainer) : ViewModel() {
                 val me = async { runCatching { api.me() }.getOrNull() }
                 val counts = async { runCatching { api.browseCounts() }.getOrNull() }
                 val libs = libraries.await().getOrThrow()
+                container.libraryRoles.noteLibraries(libs)
                 val user = me.await()?.also { container.auth.setUser(it) } ?: container.auth.user.value
 
                 val entries = mutableListOf<DrawerEntry>()

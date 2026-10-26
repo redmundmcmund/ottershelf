@@ -43,9 +43,11 @@ class ThemeRepositoryTest {
         val modes = mutableListOf<Boolean>()
         var gets = 0
         var failPut = false
+        var failGet = false
 
         override suspend fun themePreferences(): JsonObject? {
             gets++
+            if (failGet) throw IOException("offline")
             return stored
         }
 
@@ -79,9 +81,10 @@ class ThemeRepositoryTest {
         user: AuthUser? = user(sync = false),
         stored: Preferences = emptyPreferences(),
         server: JsonObject? = null,
+        offline: Boolean = false,
     ): Setup {
         val store = MemoryStore(stored)
-        val remote = FakeRemote().apply { this.stored = server }
+        val remote = FakeRemote().apply { this.stored = server; failGet = offline }
         val account = MutableStateFlow(user)
         val repo = ThemeRepository(store, remote, account, { account.value = it }, backgroundScope)
         repo.start()
@@ -143,6 +146,48 @@ class ThemeRepositoryTest {
         advanceTimeBy(200)
         runCurrent()
         assertEquals(listOf(ThemePreferencesDto("system", "iris", "default", "vinyl", 60, 92)), s.remote.puts)
+    }
+
+    @Test
+    fun theWebOnlyKeysGoBackAsTheServerSentThem() = runTest {
+        val server = buildJsonObject {
+            put("theme", "dark")
+            put("accent", "mint")
+            put("radius", "default")
+            put("background", "vinyl")
+            put("brightness", 35)
+            put("style", "glass")
+            put("surfacePalette", "slate")
+            put("glowReach", 40)
+        }
+        val s = setup(user = user(sync = true), server = server)
+        settle()
+        s.repo.update { it.copy(accent = Accent.SAGE) }
+        settle()
+        assertEquals(
+            listOf(ThemePreferencesDto("dark", "sage", "default", "vinyl", 35, 92, style = "glass", surfacePalette = "slate", glowReach = 40)),
+            s.remote.puts,
+        )
+    }
+
+    @Test
+    fun aSaveReadsTheWebOnlyKeysFirstWhenTheLoadFailed() = runTest {
+        val server = buildJsonObject {
+            put("theme", "dark")
+            put("accent", "mint")
+            put("radius", "default")
+            put("background", "vinyl")
+            put("brightness", 35)
+            put("glowReach", 70)
+        }
+        val s = setup(user = user(sync = true), server = server, offline = true)
+        settle() // hydrating failed: offline
+        assertEquals(1, s.remote.gets)
+        s.remote.failGet = false
+        s.repo.update { it.copy(accent = Accent.IRIS) }
+        settle()
+        assertEquals(70, s.remote.puts.single().glowReach)
+        assertEquals(null, s.remote.puts.single().style)
     }
 
     @Test

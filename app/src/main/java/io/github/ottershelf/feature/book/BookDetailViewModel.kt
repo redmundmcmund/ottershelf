@@ -32,7 +32,6 @@ import io.github.ottershelf.core.model.BookCard
 import io.github.ottershelf.core.model.BookDetail
 import io.github.ottershelf.core.model.BookFile
 import io.github.ottershelf.core.model.ReadStatus
-import io.github.ottershelf.feature.bookedit.canEditDetails
 import io.github.ottershelf.ui.components.coverModel
 
 /**
@@ -233,7 +232,8 @@ class BookDetailViewModel(private val container: AppContainer, private val bookI
             thumb = preview?.let { runCatching { api.coverModel(it) }.getOrNull() },
             // Downloading needs BookOrbit's "Download books" permission (superusers have it).
             downloadAllowed = container.auth.user.value?.can(DOWNLOAD_PERMISSION) ?: true,
-            canEdit = canEditDetails(container.auth.user.value),
+            // Superusers and accounts without the permission are known now; others once the book is (its library's role).
+            canEdit = container.libraryRoles.knownAnswer(container.auth.user.value) ?: false,
         )
     }
 
@@ -296,6 +296,12 @@ class BookDetailViewModel(private val container: AppContainer, private val bookI
                 offlineFile = BookFormats.pickOfflineFile(book),
                 thumb = it.thumb ?: book.coverSource?.let { runCatching { api.thumbnailUrl(book.id, book.updatedAt) }.getOrNull() },
             ).withCurrency()
+        }
+        if (container.libraryRoles.knownAnswer(container.auth.user.value) == null) {
+            viewModelScope.launch {
+                val allowed = container.libraryRoles.canEditMetadata(container.auth.user.value, book.libraryId)
+                _state.update { it.copy(canEdit = allowed) }
+            }
         }
         // The download (if any) and its cover are on disk: looked up off the main thread.
         val (copy, localCover) = withContext(Dispatchers.IO) { downloads.get(book.id) to downloads.cover(book.id) }
@@ -375,7 +381,8 @@ class BookDetailViewModel(private val container: AppContainer, private val bookI
             val lookup = PageCounts(container.api, container.settings, account)
             if (!lookup.firstTry(book.id)) return@launch
             val count = lookup.find(book) ?: return@launch
-            val onServer = canEditDetails(container.auth.user.value) && "pageCount" !in book.lockedFields &&
+            val onServer = "pageCount" !in book.lockedFields &&
+                container.libraryRoles.canEditMetadata(container.auth.user.value, book.libraryId) &&
                 runCatching { lookup.save(book.id, count) }.isSuccess
             if (onServer) {
                 _state.update { s -> s.copy(book = s.book?.let { if (it.id == book.id) it.copy(pageCount = count) else it }) }

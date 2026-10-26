@@ -1,0 +1,1 @@
+- Ready for BookOrbit 3.5: book editing follows each library's Editor role, and theme changes keep the web's new appearance settings

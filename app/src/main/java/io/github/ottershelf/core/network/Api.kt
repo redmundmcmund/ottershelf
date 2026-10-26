@@ -20,6 +20,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.serializer
+import io.github.ottershelf.core.model.AppInfo
 import io.github.ottershelf.core.model.AuthUser
 import io.github.ottershelf.core.model.AuthorsPage
 import io.github.ottershelf.core.model.AvailabilityItem
@@ -299,6 +300,8 @@ class Api(
     private val revokeClient: OkHttpClient by lazy { authClient.newBuilder().callTimeout(10, TimeUnit.SECONDS).build() }
 
     suspend fun me(): AuthUser = get("auth/me", AuthUser.serializer())
+
+    suspend fun appInfo(): AppInfo = get("app-info", AppInfo.serializer())
 
     // --- appearance (ThemeRepository) ----------------------------------------------------------
 

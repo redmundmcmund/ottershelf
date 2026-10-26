@@ -321,7 +321,10 @@ the KDoc explanations are kept. Only these things changed:
   a worker, an alarm or boot never starts the theme at all. Every valid field of a non-null answer
   replaces the device value, field by field, and is never sent back. `update { }` saves on the
   device at once and sends the whole object 1.5 s after the last change
-  (`PUT user-preferences/theme`, always with `surfaceOpacity`). A waiting save is sent when the app
+  (`PUT user-preferences/theme`, always with `surfaceOpacity`, and with the keys only the web edits,
+  BookOrbit 3.5's `style`, `surfacePalette` and `glowReach`, as last read: the PUT replaces the
+  whole object; read first if the load failed; left out when the server never had them, as older
+  servers refuse them). A waiting save is sent when the app
   leaves the screen (the web's `pagehide`) and dropped on sign-out. A failed save is not retried
   (as on the web); it is reported on `events` (`ThemeSyncEvent.SaveFailed`, string
   `components_theme_save_failed`) for the shell to show.
@@ -1118,8 +1121,13 @@ the authors, the series and its number, and the cover. Strings: `strings_bookedi
 - **Who:** the book page's toolbar pencil (`BookDetailUiState.canEdit`) shows only for an account
   with `library_edit_metadata` (`canEditDetails`: `AuthUser.can`, superusers too), the permission the
   server checks on `PATCH books/:id/metadata` and every cover route (the web's
-  `hasPermission('library_edit_metadata')`). It pushes BookEdit(bookId), which loads the book fresh
-  (values and locks as the server has them now; offline: a retry).
+  `hasPermission('library_edit_metadata')`), and, from BookOrbit 3.5, the editor or owner role on the
+  book's library (`LibraryRoles`, the web's `hasLibraryPermission(..., 'editor')`; superusers hold
+  every role). The rule follows the server's `app-info` version, so on older servers the permission
+  is still enough; only non-superusers with the permission ask, once per account and process (the
+  libraries' roles come with the drawer's load). PageCounts saves to the book on the same rule. It
+  pushes BookEdit(bookId), which loads the book fresh (values and locks as the server has them now;
+  offline: a retry).
 - **Fields:** the title (one line that wraps, trimmed, 1000 at most, can't be emptied); authors as
   chips in order (the first stays first; removable; added from the box below, which suggests the
   library's authors as the user types: `GET authors?q=&size=8&sort=relevance&order=desc`, best match
