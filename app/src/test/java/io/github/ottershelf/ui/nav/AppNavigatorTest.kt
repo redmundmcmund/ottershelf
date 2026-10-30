@@ -103,6 +103,59 @@ class AppNavigatorTest {
     }
 
     @Test
+    fun backFromAnotherRootListGoesToTheDashboard() {
+        assertFalse("the Dashboard: Back leaves the app", navigator.backGoesToDashboard)
+        navigator.pick(Route.Calendar)
+        assertTrue(navigator.backGoesToDashboard)
+        navigator.navigate(Route.BookDetail(5))
+        assertFalse("a pushed screen pops first", navigator.backGoesToDashboard)
+        assertTrue(navigator.back())
+        assertTrue(navigator.backGoesToDashboard)
+
+        navigator.backToDashboard()
+        assertEquals(listOf<Route>(Route.Home), shown())
+        assertFalse(navigator.backGoesToDashboard)
+    }
+
+    @Test
+    fun backFromSearchResultsOverAnotherListClosesTheSearchOnTheDashboard() {
+        navigator.pick(Route.History)
+        navigator.openSearch()
+        navigator.search("dune", allBooks)
+        assertTrue(navigator.backGoesToDashboard) // the search field's own Back closes it first, while open
+        navigator.backToDashboard()
+        assertEquals(listOf<Route>(Route.Home), shown())
+        assertNull(navigator.beforeSearch)
+        assertFalse(navigator.searchBar.open)
+    }
+
+    @Test
+    fun downloadedStandingInForTheDashboardLetsBackLeave() {
+        navigator.dashboardLoaded(hasContent = false)
+        navigator.drawerLoadFailed(true)
+        assertEquals(listOf<Route>(Route.Downloads()), shown())
+        assertFalse("put there by the app: Back leaves, rather than bouncing to the Dashboard", navigator.backGoesToDashboard)
+
+        navigator.pick(Route.Statistics)
+        assertTrue(navigator.backGoesToDashboard)
+        navigator.pick(Route.Downloads())
+        assertTrue("picked by the user: Back goes to the Dashboard", navigator.backGoesToDashboard)
+    }
+
+    @Test
+    fun anOfflineStartOnDownloadedLetsBackLeave() {
+        val offline = AppNavigatorState(
+            backStack = NavBackStack(Route.Downloads()),
+            beforeSearch = mutableStateOf(null),
+            searchBar = SearchBarState(mutableStateOf(false), mutableStateOf("")),
+            automaticRoot = mutableStateOf(true),
+        )
+        assertFalse(offline.backGoesToDashboard)
+        offline.pick(Route.Calendar)
+        assertTrue(offline.backGoesToDashboard)
+    }
+
+    @Test
     fun theDashboardFallsBackToDownloadedWhenItAndTheDrawerBothFailed() {
         navigator.dashboardLoaded(hasContent = false)
         assertEquals(listOf<Route>(Route.Home), shown()) // the drawer's lists are fine so far

@@ -118,7 +118,7 @@ private fun AppScaffold(container: AppContainer) {
     }
     val entries = navigator.rememberEntries { route -> RouteContent(route, navigator, chrome) }
 
-    DrawerBackHandler(drawerState, closeDrawer)
+    ShellBackHandlers(navigator, drawerState, closeDrawer)
     ModalNavigationDrawer(
         drawerState = drawerState,
         // Only over a root list; a drawer already open may still be swiped shut.
@@ -170,6 +170,18 @@ private fun AppScaffold(container: AppContainer) {
             AddToCollectionHost(onChanged = shell::load)
         }
     }
+}
+
+/**
+ * The shell's own Back, below everything a screen or the drawer registers (composed before them,
+ * so theirs win while enabled): from a root list other than the Dashboard, Back goes to the
+ * Dashboard ([AppNavigatorState.backGoesToDashboard]); then the drawer closes on Back
+ * ([DrawerBackHandler]), which an open drawer must win over the Dashboard handler.
+ */
+@Composable
+internal fun ShellBackHandlers(navigator: AppNavigatorState, drawerState: DrawerState, closeDrawer: () -> Unit) {
+    BackHandler(enabled = navigator.backGoesToDashboard, onBack = navigator::backToDashboard)
+    DrawerBackHandler(drawerState, closeDrawer)
 }
 
 /**

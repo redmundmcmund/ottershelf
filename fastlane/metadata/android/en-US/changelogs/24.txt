@@ -1,0 +1,1 @@
+- Back from Calendar, History, Statistics or any other list now goes to the Dashboard; only Back on the Dashboard leaves the app

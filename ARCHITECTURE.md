@@ -1417,8 +1417,13 @@ TimerResult(bookId, sessionId); Statistics and Achievements (roots, drawer keys 
 
 **The back stack** (`AppNavigatorState`) is one Navigation 3 stack: the bottom entry is the root
 list (`root`), the entries above it are pushed screens (`current` is the top).
-- A drawer pick REPLACES the root, as the Nexus fragment replace did, rather than stacking; Back
-  from a root list leaves the app. Picking the list already showing does nothing.
+- A drawer pick REPLACES the root, as the Nexus fragment replace did, rather than stacking.
+  Picking the list already showing does nothing.
+- Back with nothing pushed (`ShellBackHandlers`): an open drawer closes first; from any root list
+  but the Dashboard, Back goes to the Dashboard (`backGoesToDashboard`, `backToDashboard`); only
+  from the Dashboard does Back leave the app. Downloaded counts as the Dashboard when the app put
+  it there itself (an offline start, or in place of a Dashboard that brought nothing:
+  `automaticRoot`), so Back can't bounce between the two.
 - Root lists cross-fade into each other; pushed screens use NavDisplay's transitions, with
   predictive back (`enableOnBackInvokedCallback` is on, targetSdk 36).
 - The app starts on the Dashboard, or on Downloaded when the device is offline.

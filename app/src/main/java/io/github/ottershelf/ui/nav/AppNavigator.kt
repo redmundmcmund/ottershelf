@@ -90,6 +90,7 @@ class AppNavigatorState internal constructor(
     internal val backStack: NavBackStack<Route>,
     beforeSearch: MutableState<Route?>,
     val searchBar: SearchBarState,
+    automaticRoot: MutableState<Boolean> = mutableStateOf(false),
 ) : AppNavigator {
 
     /** What was showing before search results replaced it; closing the search goes back there. */
@@ -101,6 +102,24 @@ class AppNavigatorState internal constructor(
 
     /** The list the content area shows (under any pushed screens): the drawer's selection. */
     val root: Route get() = backStack.first()
+
+    /**
+     * The root list was put there by the app rather than picked: Downloaded on an offline start,
+     * or in place of a Dashboard that brought nothing ([showDownloadedInstead]). It stands in for
+     * the Dashboard, so Back leaves the app from it, as from the Dashboard.
+     */
+    private var automaticRoot: Boolean by automaticRoot
+
+    /**
+     * Back with nothing pushed goes to the Dashboard from any other root list (Calendar, History,
+     * a library, ...): picking one from the drawer replaces the Dashboard rather than stacking on
+     * it, so without this Back left the app from all of them. Only the Dashboard (or Downloaded
+     * standing in for it) lets Back leave the app. The shell's handler acts on it ([backToDashboard]).
+     */
+    val backGoesToDashboard: Boolean get() = backStack.size == 1 && root != Route.Home && !automaticRoot
+
+    /** Back from another root list: the Dashboard, as a drawer pick of it (any search closes). */
+    fun backToDashboard() = pick(Route.Home)
 
     /** The drawer's lists failed to load (set by the shell); see [dashboardLoaded]. */
     private var drawerFailed = false
@@ -193,7 +212,10 @@ class AppNavigatorState internal constructor(
      * screen (a book opened meanwhile) where it is.
      */
     private fun showDownloadedInstead() {
-        if (root == Route.Home) backStack[0] = Route.Downloads()
+        if (root == Route.Home) {
+            backStack[0] = Route.Downloads()
+            automaticRoot = true
+        }
     }
 
     /** MainActivity.select: shows [route] as the root list unless it's already showing. */
@@ -203,6 +225,7 @@ class AppNavigatorState internal constructor(
         if (!same) {
             if (route == Route.Home) dashboardHasContent = null
             backStack[0] = route
+            automaticRoot = false
         }
         popAbove(0)
     }
@@ -242,7 +265,8 @@ fun rememberAppNavigatorState(start: Route): AppNavigatorState {
     val beforeSearch = rememberSaveable(saver = RouteStateSaver) { mutableStateOf(null) }
     val searchOpen = rememberSaveable { mutableStateOf(false) }
     val searchText = rememberSaveable { mutableStateOf("") }
-    return remember { AppNavigatorState(backStack, beforeSearch, SearchBarState(searchOpen, searchText)) }
+    val automaticRoot = rememberSaveable { mutableStateOf(start != Route.Home) }
+    return remember { AppNavigatorState(backStack, beforeSearch, SearchBarState(searchOpen, searchText), automaticRoot) }
 }
 
 /**
