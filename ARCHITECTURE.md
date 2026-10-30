@@ -1426,7 +1426,7 @@ list (`root`), the entries above it are pushed screens (`current` is the top).
   when a pick replaces it, a pushed screen's when it's popped.
 
 **The drawer** (`AppDrawer.kt`, a Material 3 `ModalNavigationDrawer`, 300dp wide like the Nexus
-drawer, at most screen width - 56dp; swipe or the toggle opens it, the scrim (`DrawerScrimColor`, the Nexus DrawerLayout's 60% black) or Back closes it,
+drawer, at most screen width - 56dp; swipe or the toggle opens it, the scrim (`DrawerScrimColor`, the Nexus DrawerLayout's 60% black) or Back closes it (from the moment it heads open: `DrawerBackHandler`, since Material's own handler waits until the drawer has settled and Android decides at the start of a back gesture, so a quick Back over the Dashboard used to leave the app),
 with predictive back). It only opens over a root list.
 - Header: the Ottershelf badge, the "Ottershelf" wordmark ("shelf" in the accent),
   username and server. Footer: Settings (pushed) and Sign out.

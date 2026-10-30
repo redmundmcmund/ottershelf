@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.activity.compose.BackHandler
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.SnackbarHost
@@ -116,6 +118,7 @@ private fun AppScaffold(container: AppContainer) {
     }
     val entries = navigator.rememberEntries { route -> RouteContent(route, navigator, chrome) }
 
+    DrawerBackHandler(drawerState, closeDrawer)
     ModalNavigationDrawer(
         drawerState = drawerState,
         // Only over a root list; a drawer already open may still be swiped shut.
@@ -167,6 +170,23 @@ private fun AppScaffold(container: AppContainer) {
             AddToCollectionHost(onChanged = shell::load)
         }
     }
+}
+
+/**
+ * Back closes the drawer from the moment it heads open, not only once it has settled open.
+ *
+ * Material's own drawer handler (ModalDrawerSheet's predictive back) is enabled by
+ * `DrawerState.isOpen`, which turns true only when the opening animation has settled. Android 14+
+ * decides at the START of a back gesture whether the app takes it, so a Back while the drawer was
+ * still sliding in or settling (a quick swipe back after swiping it open: about half a second) found
+ * nothing enabled over the Dashboard, the bottom entry, and the system sent the app home
+ * (logged on a Pixel, Android 17, 2026-10-30: TYPE_RETURN_TO_HOME, then moveTaskToBack, with the
+ * drawer's callback registered 0.2 s later). Composed before the drawer, so once it has settled
+ * Material's handler, registered later, wins and keeps its predictive animation.
+ */
+@Composable
+internal fun DrawerBackHandler(drawerState: DrawerState, close: () -> Unit) {
+    BackHandler(enabled = drawerState.targetValue == DrawerValue.Open || drawerState.isOpen, onBack = close)
 }
 
 /**
