@@ -58,6 +58,11 @@ data class AppSettings(
      * Switched in Settings > Reading.
      */
     val nextInSeries: Boolean = true,
+    /**
+     * Import from Bookmory (feature.bookmory): the library the placeholder books for rows with no
+     * book were last uploaded to, offered first next time.
+     */
+    val bookmoryLibraryId: Long? = null,
 ) {
     fun pageTotal(bookId: Long, serverPageCount: Int?): Int? =
         pageTotals[bookId]?.takeIf { it > 0 } ?: serverPageCount?.takeIf { it > 0 }

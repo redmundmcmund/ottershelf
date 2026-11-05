@@ -58,6 +58,7 @@ fun SettingsScreen(navigator: AppNavigator) {
         onOpenAppearance = { navigator.navigate(Route.Appearance) },
         onOpenGoals = { navigator.navigate(Route.ReadingGoals) },
         onOpenAbout = { navigator.navigate(Route.About) },
+        onOpenBookmoryImport = { navigator.navigate(Route.BookmoryImport) },
         onNextInSeries = viewModel::setNextInSeries,
         onKeepOnOpen = viewModel::setKeepOnOpen,
         onSignOut = viewModel::signOut,
@@ -67,7 +68,7 @@ fun SettingsScreen(navigator: AppNavigator) {
 /**
  * A pushed screen in the Nexus style (the toolbar of activity_books.xml over the page) with the
  * web's settings cards: who is signed in, Display > Appearance, Reading > goals and the next-in-series
- * switch, Offline > keep books on this device, Account > Sign out, About (the notices BookOrbit requires: AboutScreen), and the app's
+ * switch, Offline > keep books on this device, Import > from Bookmory (feature.bookmory), Account > Sign out, About (the notices BookOrbit requires: AboutScreen), and the app's
  * badge, name, version and "Powered by BookOrbit" at the bottom.
  */
 @Composable
@@ -77,6 +78,7 @@ fun SettingsContent(
     onOpenAppearance: () -> Unit = {},
     onOpenGoals: () -> Unit = {},
     onOpenAbout: () -> Unit = {},
+    onOpenBookmoryImport: () -> Unit = {},
     onNextInSeries: (Boolean) -> Unit = {},
     onKeepOnOpen: (Boolean) -> Unit = {},
     onSignOut: () -> Unit = {},
@@ -151,6 +153,18 @@ fun SettingsContent(
                             summary = stringResource(R.string.settings_keep_on_open_hint),
                             checked = state.keepOnOpen,
                             onChange = onKeepOnOpen,
+                        )
+                    }
+                }
+
+                Column {
+                    SettingsGroupLabel(stringResource(R.string.bookmory_settings_group))
+                    SettingsCard {
+                        SettingsNavRow(
+                            icon = "Import",
+                            title = stringResource(R.string.bookmory_settings_row),
+                            summary = stringResource(R.string.bookmory_settings_row_summary),
+                            onClick = onOpenBookmoryImport,
                         )
                     }
                 }

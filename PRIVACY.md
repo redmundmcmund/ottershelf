@@ -1,6 +1,6 @@
 # Ottershelf privacy policy
 
-Effective date: 2026-09-28
+Effective date: 2026-11-05
 
 This policy describes how the Ottershelf Android app (package `io.github.ottershelf`) handles
 information. Ottershelf is an open-source reading app for self-hosted BookOrbit servers, published
@@ -53,6 +53,11 @@ The app sends your server what it needs to work, as a result of what you do in t
 - Changes you make to a book's details (title, authors, series, number) and a new cover, if your
   account is allowed to edit metadata. A cover photo you take or pick is reduced in size on the
   phone and uploaded only after you confirm it.
+- If you import a Bookmory export (Settings, Import from Bookmory): the file you pick is read on the
+  phone and is not uploaded. After you confirm the preview, the reading dates, read statuses and
+  ratings in it are sent to your server, and each book that is not in your library is added as a
+  small placeholder EPUB file, holding only the details from the export (title, authors, ISBN,
+  publisher, date, language, book type), to the library you choose.
 
 Your server may in turn contact metadata or cover providers that its operator has configured (for
 example when you search for a book request or a cover). The app does not contact those providers;

@@ -59,6 +59,7 @@ for changing it.
 | `feature.notes` | Highlights and notes (see "Highlights and notes"): `NotesScreen` + `NotesViewModel` (root, the drawer's Tracking > Notes), `BookHighlightsScreen` + `BookHighlightsViewModel` (BookHighlights(bookId, title)), `BookHighlightsSection` (the book page's card, its own `BookHighlightsSummaryViewModel`), `MemorizeScreen` (+ `MemorizeViewModel`), `QuoteCard.kt` (`QuoteCardDialog`: the share-as-image card, `CoverArt`, `CoverBlur`), `NotesShare` (FileProvider share, MediaStore save), `NotesRemote` / `ApiNotesRemote` + `NotesRepository` + `RandomNotes` + `NoteChanges`, `NotesLogic` (pure; `NotesLogicTest`), `NoteParts.kt` (cards, colour bar, style panel, note editor), `model/NoteModels.kt` | notes |
 | `feature.quotes` | Quotes typed or photographed (see "Quotes"): `AddQuoteScreen` (AddQuote(bookId?, title?, bookFixed, scan): the form, `BookPickerSheet`, the camera permission dialogs) + `AddQuoteViewModel` (form, picker, scan steps, save), `ScanContent.kt` (CameraX viewfinder and shutter, reading, the line picker over the photo), `PageReader` (decode upright, Tesseract through Tesseract4Android), `Tessdata` (the bundled English model, copied out for Tesseract), `OcrLayout` + `TessLine` (pure: Tesseract's lines as blocks and lines; `OcrLayoutTest`), `QuoteCleanup` + `OcrLine`/`OcrPage` (pure: hyphenation, line breaks), `QuotePosition` (the placeholder CFI, page labels), `QuotesRemote` / `ApiQuotesRemote` + `CreateQuoteBody`, `QuotePhotos` (kept source photos) + `QuotePhotoDialog` (shows one), `QuoteEntry.kt` (`QuoteButtons` for the book page, `AddQuoteAction` for the Notes toolbar); `QuoteLogicTest` | quotes |
 | `feature.bookedit` | Editing a book's title, authors, series, number and cover (see "Editing a book's details"): `BookEditScreen` (BookEdit(bookId), from the book page's pencil) + `BookEditContent` (stateless), `BookEditViewModel` (form, save, unlock, cover changes; `canEditDetails`), `BookEditModels.kt` (`EditForm`, `MetadataChanges` (the PATCH body), `problemsOf`, `EditRules`, `LockGroup`, `EditError`: pure, `BookEditModelsTest`), `Suggestions.kt` (`SuggestionSearch`: debounced, stale answers dropped; `authorRows`, `seriesRows`: pure, `SuggestionsTest`), `BookEditRemote` / `ApiBookEditRemote`, `CoverImage.kt` (`CoverImage` downscale and JPEG, `CoverScale`, `CameraCrop`: `CoverImageTest`), `CoverCamera.kt` (CameraX with a 2:3 guide), `CoverSearch.kt` (the online search sheet), `BookEditDialogs.kt`, `BookEdits.kt` (`BookEditPublisher`, `CoverCache`: `EditedBooksTest`; the lists: `BookListEditsTest`); `BookEditViewModelTest`, `BookEditScreenshotTest` | bookedit |
+| `feature.bookmory` | Import from Bookmory (Settings > Import; see "Importing from Bookmory"): `BookmoryImportScreen` (BookmoryImport) + `BookmoryImportContent` (stateless) + `BookmoryImportViewModel`, `BookmoryCsv` (the export, by column name), `BookmoryMatch.kt` (`BookmoryText`, `BookmoryMatcher`), `StubEpub` (`StubBook`, `DeterministicZip`), `ImportPlan.kt` (`ImportPlanner`: rows to readings, statuses and ratings, and the diff against a book), `ImportPreview.kt` (`ImportPreviews`, `analyse`), `BookmoryImporter` (+ `BookmoryImportGuard`), `BookmoryRemote` / `ApiBookmoryRemote`; tests against `FakeBookOrbit` | bookmory |
 | `feature.seriesnext` | The next book in a series (see "Next in series"): `SeriesNext` (pure: `SeriesNumber`, `pick`, the reader's end fractions; `SeriesNextTest`), `SeriesNextLoader` + `SeriesNextRemote` / `ApiSeriesNextRemote` (`SeriesNextState`, `NextBook`; `SeriesNextLoaderTest`), `SeriesNextViewModel` (+ `rememberSeriesNext` for the book page, `rememberSeriesNextAfterSession` for the timer's result), `SeriesNextCards.kt` (`NextInSeriesCard`, `NextInSeriesRow`, the reader's `EndOfBookCard` / `EndOfBookCardContent`) | series next |
 
 Assets (`app/src/main/assets`) come from the Nexus app. `foliate/` is vendored foliate-js with the
@@ -347,8 +348,8 @@ the KDoc explanations are kept. Only these things changed:
 
 Bookmory-style reading tracking on top of BookOrbit's own data. Decisions: paper reading is
 logged against the library's copy of the book; the server's midnight day split (in
-`users.settings.timezone`) is kept; app-only data lives in one users.settings key; no Bookmory
-import; highlights, notes and quotes are their own features (see "Highlights and notes" and
+`users.settings.timezone`) is kept; app-only data lives in one users.settings key; a one-way Bookmory
+import (see "Importing from Bookmory"); highlights, notes and quotes are their own features (see "Highlights and notes" and
 "Quotes"). Everything is in `AppContainer`:
 
 | Object | What it is |
@@ -936,6 +937,53 @@ progress on the server's cards still follows its primary CBR.
   the top, the last at the end) goes to `onPage`; gestures call `onActivity`; `onPause` on ON_PAUSE,
   `close()` in `onCleared`; `jumps` scroll the viewer.
 
+## Importing from Bookmory (`feature.bookmory`)
+
+Settings > Import > "Import from Bookmory" reads a Bookmory CSV export (picked with the system's
+file picker) and adds its history to BookOrbit. Nothing on the server is edited or deleted, and the
+whole import is idempotent: the same file imported again adds nothing, and an import cut off
+anywhere (connection lost, Back confirmed) finishes the rest when run again.
+- **Reading the file** (`BookmoryCsv`): columns by header name, RFC 4180 quoting, BOM dropped;
+  read periods "M/D/YYYY ~ M/D/YYYY" or open-ended, day-first only when some first part is over 12;
+  a row that can't be read is listed in the preview and left out. Comment and read time columns
+  are ignored (Bookmory leaves them empty), so no reading sessions are made.
+- **Matching** (`BookmoryMatcher`, against every book `POST books/query` lists, 200 a page): the
+  ISBN (10 as 13), else the normalised title (NFKD, ASCII, no punctuation, no "(Series, #n)",
+  U+FFFD as a wildcard, a "..."-cut title as a prefix) with an author's surname in common, else the
+  title without a trailing note in brackets on either side ("(Series Book 1)", "[...]"), then the
+  title without its subtitle, each with an author in common. Several books at one step: the user picks in
+  the preview. None: a placeholder book.
+- **What is written** (`ImportPlanner`): each reading log is one reading
+  (`POST books/:id/reading-attempts`, oldest first; the last given up for "Gave up"; one still going
+  for "Reading" is opened with `PATCH books/:id/status {status: reading, startedAt}`, since the
+  attempt route always closes one); "To read" and wishlist rows want to read, only over no status;
+  the rating (`bulk-set-rating`) only over none; a book held on unread or want to read is set to its
+  latest reading's outcome (no dates, so the server adds no reading). A reading is there already
+  when the book has one starting the same day (with no start: the same end and outcome); an open
+  one when the book has one open. A log the book has with other dates is left alone and counted
+  apart: an open log on a book with an open reading, a closed log on a book with a reading that
+  ended the same day with the same outcome. Each book's state is read again just before its
+  writes, and a reading counts as added only once the server shows a new one.
+- **Ratings** need library_edit_metadata and (3.5) the editor or owner role in the book's library
+  (`RatingAccess`: the cached user's permissions and `LibraryRoles`): without the permission the
+  preview says so and none is sent; in a library where the account isn't an editor the book's
+  rating is left out and named in the summary; an unexpected 403 stops the rest, reported once.
+- **Backlog days:** a day on which five or more rows' first reading starts can be imported without
+  dates (a switch per day); either way the reading is found again on the next import.
+- **Placeholder books** (`StubEpub`): BookOrbit has no books without a file, so a row with no book
+  becomes a small EPUB 3 uploaded (`POST uploads`, one chunk, `complete`, then `GET uploads/:id`
+  until completed) to a library the user picks (`GET uploads/capabilities`, EPUB allowed; the
+  choice is kept in `AppSettings.bookmoryLibraryId`). Its bytes depend only on the row (fixed
+  order and DOS times, stored deflate blocks written by `DeterministicZip`, no dates), and its
+  idempotency key is `ottershelf-bookmory-` + the first 32 hex characters of
+  sha256(normalised title | normalised authors), so a repeated upload gets the server's finished
+  session back with its book. One whose book was deleted since is reported, never uploaded again
+  under a new key. A later import normally finds placeholders by matching, before any upload.
+- **Running:** in the ViewModel's scope, one import at a time (`BookmoryImportGuard`), Back asks
+  first. A refusal is reported for its row; a lost connection or sign-out stops the run.
+- Screenshots: `bookmory/intro`, `preview`, `nothing_new`, `running`, `summary`, `interrupted`
+  (`BookmoryScreenshotTest`).
+
 ## Sorting and filtering the book grids (`feature.library`)
 
 Every book grid (All books, each library, smart scope and collection, an author's or a series' books)
@@ -1489,7 +1537,7 @@ needs a `sourceKey`/`query` case, a title in `rootTitle` and a drawer row.
 ## Strings and resources
 
 - Each feature owns `res/values/strings_<feature>.xml`: login, home, library, book, reader, comics, pdf,
-  downloads, requests, settings, timer, calendar, history, stats, achievements, notes, quotes, seriesnext, scan, bookedit. Every name is prefixed `<feature>_`, because resource names are
+  downloads, requests, settings, timer, calendar, history, stats, achievements, notes, quotes, seriesnext, scan, bookedit, bookmory. Every name is prefixed `<feature>_`, because resource names are
   global.
 - `strings.xml` holds the app name and the common strings (`common_*`). `strings_nav.xml` holds
   the shell's (`nav_*`: drawer, toolbar, search, Back).
@@ -1774,7 +1822,10 @@ Features are built in parallel branches. To merge cleanly:
 ## Security and privacy
 
 - **HTTPS only:** cleartext is not permitted and no roots are bundled
-  (`res/xml/network_security_config.xml`).
+  (`res/xml/network_security_config.xml`). The debug build alone (tests and devtools, never the
+  phones' dev build) has its own copy in `src/debug/res/xml` that also allows plain http to
+  10.0.2.2, localhost and 127.0.0.1, for a local test server from the emulator; login takes
+  `http://` only for those hosts and only when `BuildConfig.DEBUG` (`ServerAddress`).
 - **Tokens:** encrypted at rest with a Keystore key, sent only to the server itself
   (`Api.isOwnServer`), and paired only with a server where a sign-in worked (see "Data layer").
 - **No backups:** `allowBackup=false`, and `data_extraction_rules.xml` excludes everything.

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Settings row -->
+    <string name="bookmory_settings_group">Import</string>
+    <string name="bookmory_settings_row">Import from Bookmory</string>
+    <string name="bookmory_settings_row_summary">Readings, statuses and ratings from a Bookmory CSV export</string>
+
+    <string name="bookmory_title">Import from Bookmory</string>
+
+    <!-- Intro -->
+    <string name="bookmory_intro_title">Bring your Bookmory history</string>
+    <string name="bookmory_intro_body">Export your books from Bookmory as a CSV file, then choose it here. Each book is matched with your library, and its readings, status and rating are added. Nothing already in BookOrbit is changed or removed, and importing the same file again adds only what is new.</string>
+    <string name="bookmory_intro_stubs">Books you don\'t have in BookOrbit can be added as small placeholder books, so their history is kept.</string>
+    <string name="bookmory_choose_file">Choose CSV file</string>
+
+    <!-- Working -->
+    <string name="bookmory_reading_file">Reading the file…</string>
+    <string name="bookmory_matching">Matching with your library…</string>
+
+    <!-- Failures -->
+    <string name="bookmory_failed_not_bookmory">This file doesn\'t look like a Bookmory export (there is no Title column).</string>
+    <string name="bookmory_failed_unreadable">The file couldn\'t be read.</string>
+    <string name="bookmory_failed_too_large">The file is too large for a Bookmory export.</string>
+    <string name="bookmory_failed_server">Your library couldn\'t be loaded.</string>
+    <string name="bookmory_failed_empty">There are no books in this file.</string>
+    <string name="bookmory_choose_other">Choose another file</string>
+    <string name="bookmory_try_again">Try again</string>
+
+    <!-- Preview: totals -->
+    <string name="bookmory_group_summary">In this file</string>
+    <string name="bookmory_total_rows">Rows</string>
+    <string name="bookmory_total_matched">Found in your library</string>
+    <string name="bookmory_total_ambiguous">Need you to pick the book</string>
+    <string name="bookmory_total_stubs">New placeholder books</string>
+    <string name="bookmory_total_readings">Readings to add</string>
+    <string name="bookmory_total_present">Readings already in BookOrbit</string>
+    <string name="bookmory_total_left_alone">Left alone: BookOrbit has a reading for them with other dates</string>
+    <string name="bookmory_total_statuses">Statuses to set</string>
+    <string name="bookmory_total_ratings">Ratings to set</string>
+    <string name="bookmory_total_ratings_blocked">Ratings left out</string>
+    <string name="bookmory_ratings_not_permitted">Ratings can\'t be set: your account can\'t edit book details. Everything else is imported.</string>
+    <string name="bookmory_total_skipped">Skipped</string>
+    <string name="bookmory_nothing_new">Nothing new to import</string>
+    <string name="bookmory_nothing_new_hint">Everything in this file is already in BookOrbit.</string>
+    <string name="bookmory_import">Import</string>
+
+    <!-- Preview: placeholder library -->
+    <string name="bookmory_group_library">Placeholder books</string>
+    <string name="bookmory_library_hint">Books not found in your library are added to this library as small placeholder EPUBs that hold their details and history.</string>
+    <string name="bookmory_library_none">Your account can\'t upload books, so books not found in your library will be skipped.</string>
+    <string name="bookmory_library_pick">Pick a library above, or those books will be skipped.</string>
+
+    <!-- Preview: backlog dates -->
+    <string name="bookmory_group_backlog">Dates logged all at once</string>
+    <string name="bookmory_backlog_hint">Many books start on the same day, as when Bookmory was first set up with books read before. Switch a day off to import those readings as read, without dates.</string>
+    <plurals name="bookmory_backlog_count">
+        <item quantity="one">%d book · keep its dates</item>
+        <item quantity="other">%d books · keep their dates</item>
+    </plurals>
+    <plurals name="bookmory_backlog_count_undated">
+        <item quantity="one">%d book · read, without dates</item>
+        <item quantity="other">%d books · read, without dates</item>
+    </plurals>
+
+    <!-- Preview: rows -->
+    <string name="bookmory_group_rows">Books (%d)</string>
+    <string name="bookmory_show_rows">Show every book</string>
+    <string name="bookmory_hide_rows">Hide the list</string>
+    <string name="bookmory_kind_matched">In your library</string>
+    <string name="bookmory_kind_stub">New placeholder</string>
+    <string name="bookmory_kind_ambiguous">Pick the book</string>
+    <string name="bookmory_kind_excluded">Left out</string>
+    <string name="bookmory_kind_no_library">No library picked</string>
+    <plurals name="bookmory_row_readings">
+        <item quantity="one">%d reading to add</item>
+        <item quantity="other">%d readings to add</item>
+    </plurals>
+    <string name="bookmory_row_nothing">Already there</string>
+    <string name="bookmory_row_left_alone">Left alone: BookOrbit already has a reading for this</string>
+    <string name="bookmory_row_rating_not_editor">Rating left out: you can\'t edit books in %1$s</string>
+    <string name="bookmory_row_changes">Status or rating to set</string>
+    <string name="bookmory_matched_by_isbn">Matched by ISBN</string>
+    <string name="bookmory_matched_by_title">Matched by title and author</string>
+    <string name="bookmory_matched_by_short_title">Matched by title (without subtitle) and author</string>
+    <string name="bookmory_use_placeholder">Add a placeholder book instead</string>
+    <string name="bookmory_leave_out">Leave this book out</string>
+    <string name="bookmory_include">Include this book</string>
+    <string name="bookmory_candidate">%1$s · %2$s</string>
+    <string name="bookmory_unknown_author">Unknown author</string>
+
+    <!-- Preview: problems -->
+    <string name="bookmory_group_problems">Rows that couldn\'t be read (%d)</string>
+    <string name="bookmory_problem_line">Line %1$d: %2$s</string>
+    <string name="bookmory_problem_columns">the row has the wrong number of columns</string>
+    <string name="bookmory_problem_title">the row has no title</string>
+    <string name="bookmory_problem_date">a reading date can\'t be read</string>
+    <string name="bookmory_problem_untitled">(no title)</string>
+
+    <!-- Running -->
+    <string name="bookmory_running">Importing…</string>
+    <string name="bookmory_running_progress">%1$d of %2$d books</string>
+    <string name="bookmory_running_hint">Keep this screen open until it finishes. If it stops, importing again finishes the rest without adding anything twice.</string>
+    <string name="bookmory_stop_title">Stop the import?</string>
+    <string name="bookmory_stop_body">What is imported so far stays. Import the same file again later to finish the rest.</string>
+    <string name="bookmory_stop">Stop</string>
+    <string name="bookmory_keep_going">Keep going</string>
+
+    <!-- Summary -->
+    <string name="bookmory_group_done">Imported</string>
+    <string name="bookmory_done_stubs">Placeholder books added</string>
+    <string name="bookmory_done_stubs_found">Placeholder books already there</string>
+    <string name="bookmory_done_readings">Readings added</string>
+    <string name="bookmory_done_present">Readings already there</string>
+    <string name="bookmory_done_left_alone">Left alone: BookOrbit already had a reading for them</string>
+    <string name="bookmory_done_statuses">Statuses set</string>
+    <string name="bookmory_done_ratings">Ratings set</string>
+    <string name="bookmory_done_ratings_left_out">Ratings left out</string>
+    <string name="bookmory_done_nothing">Nothing new was imported: everything was already there.</string>
+    <string name="bookmory_interrupted">The import stopped before the end (the connection was lost). Import again to finish the rest; nothing is added twice.</string>
+    <string name="bookmory_import_again">Import again</string>
+    <string name="bookmory_done">Done</string>
+    <string name="bookmory_group_created">New placeholder books (%d)</string>
+    <string name="bookmory_group_errors">Problems (%d)</string>
+    <string name="bookmory_error_stub_deleted">its placeholder book was deleted, so it was left alone</string>
+    <string name="bookmory_error_book_gone">the book was deleted from your library</string>
+    <string name="bookmory_error_upload">the placeholder book couldn\'t be added</string>
+    <string name="bookmory_error_pending">the placeholder book is still being processed; import again later</string>
+    <string name="bookmory_error_write">BookOrbit refused a change</string>
+    <string name="bookmory_error_rating">your account can\'t rate books, so ratings were left out</string>
+    <string name="bookmory_error_rating_library">rating left out: you can\'t edit books in this library</string>
+    <string name="bookmory_error_line">%1$s: %2$s</string>
+</resources>

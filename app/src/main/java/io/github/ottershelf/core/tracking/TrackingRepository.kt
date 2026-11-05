@@ -139,6 +139,9 @@ class TrackingRepository(
     /** A book's readings, newest first as the server orders them (up to 100). */
     suspend fun attempts(bookId: Long): ReadingAttemptList = remote.attempts(bookId, page = 1, pageSize = 100)
 
+    /** Page [page] (from 1) of a book's readings, [pageSize] (1..100) at a time: for reading them all (feature.bookmory). */
+    suspend fun attempts(bookId: Long, page: Int, pageSize: Int = 100): ReadingAttemptList = remote.attempts(bookId, page, pageSize)
+
     suspend fun activityOverview(): ActivityOverview = remote.activityOverview()
 
     /** Every day of [year]; empty (no days) for a year before the first session. */

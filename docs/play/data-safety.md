@@ -96,6 +96,11 @@ Notes on the choices:
 - **Photos for quotes and ISBN camera frames** are processed only on the device: not collected.
   Only the ISBN (a search) and the saved quote text (user-generated content) are sent.
 - **Book files** are downloaded from the server, never uploaded: Files and docs is not collected.
+- **Bookmory import.** The CSV file the user picks is read on the device and not uploaded (Files and
+  docs is still not collected). What it sends is already declared: reading dates and read statuses
+  (Other actions) and ratings (Other user-generated content). Books not in the library become
+  placeholder EPUBs that the app generates from the export's title, authors and ISBN; they carry no
+  user file, so they fall under the same declared types, not Files and docs.
 - **Installed apps**: the app lists the dictionary and translation apps that accept selected text
   (`PROCESS_TEXT` queries) to show them as buttons, but this list never leaves the device: not
   collected.

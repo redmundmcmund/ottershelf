@@ -133,6 +133,10 @@ sealed interface Route : NavKey {
     @Serializable
     data object About : Route
 
+    /** Import from Bookmory (feature.bookmory): a CSV export's readings, statuses and ratings. */
+    @Serializable
+    data object BookmoryImport : Route
+
     // --- reading tracker (ARCHITECTURE.md, "Tracking") ---------------------------------------
 
     /** The reading calendar: the drawer's Tracking section. */

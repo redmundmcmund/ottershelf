@@ -614,11 +614,21 @@ class Api(
     }
 
     /**
-     * [send] with a body that isn't JSON (feature.bookedit's multipart cover upload): the same
-     * authenticated client, errors and cancellation.
+     * [send] with a body that isn't JSON (feature.bookedit's multipart cover upload, feature.bookmory's
+     * upload chunks with their `Upload-Offset` in [headers]): the same authenticated client, errors
+     * and cancellation.
      */
-    internal suspend fun <T> sendBody(method: String, pathAndQuery: String, body: RequestBody, parse: (String) -> T): T =
-        call(client, Request.Builder().url(api(pathAndQuery)).method(method, body).build(), parse)
+    internal suspend fun <T> sendBody(
+        method: String,
+        pathAndQuery: String,
+        body: RequestBody,
+        headers: Map<String, String> = emptyMap(),
+        parse: (String) -> T,
+    ): T {
+        val request = Request.Builder().url(api(pathAndQuery)).method(method, body)
+        headers.forEach { (name, value) -> request.header(name, value) }
+        return call(client, request.build(), parse)
+    }
 
     // --- plumbing ----------------------------------------------------------------------------
 

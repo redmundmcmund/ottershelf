@@ -65,7 +65,7 @@ class LoginViewModel(private val container: AppContainer) : ViewModel() {
         val username = input.username.trim()
         when {
             typed.isEmpty() || username.isEmpty() || input.password.isEmpty() -> return fail(LoginError.Missing)
-            !typed.startsWith("https://", ignoreCase = true) -> return fail(LoginError.Insecure)
+            ServerAddress.insecure(typed) -> return fail(LoginError.Insecure)
         }
         val server = ServerAddress.resolve(typed, stored = container.session.serverUrl)
             ?: return fail(LoginError.BadAddress)

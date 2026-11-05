@@ -1,0 +1,1 @@
+- Import from Bookmory (Settings): brings in your reading dates, statuses and ratings from a Bookmory CSV export; books not in your library are added as small placeholder books to a library you choose, and importing the same file again adds nothing twice

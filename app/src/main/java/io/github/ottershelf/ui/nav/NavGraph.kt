@@ -9,6 +9,7 @@ import io.github.ottershelf.feature.achievements.AchievementsScreen
 import io.github.ottershelf.feature.achievements.RewindScreen
 import io.github.ottershelf.feature.book.BookDetailScreen
 import io.github.ottershelf.feature.bookedit.BookEditScreen
+import io.github.ottershelf.feature.bookmory.BookmoryImportScreen
 import io.github.ottershelf.feature.calendar.CalendarScreen
 import io.github.ottershelf.feature.comics.ComicsScreen
 import io.github.ottershelf.feature.calendar.DayScreen
@@ -76,6 +77,7 @@ internal fun RouteContent(route: Route, navigator: AppNavigator, chrome: RootChr
         Route.Settings -> SettingsScreen(navigator)
         Route.Appearance -> AppearanceScreen(navigator)
         Route.About -> AboutScreen(navigator)
+        Route.BookmoryImport -> BookmoryImportScreen(navigator)
         Route.Calendar -> Root(route, chrome) { CalendarScreen(navigator, it) }
         Route.History -> Root(route, chrome) { HistoryScreen(navigator, it) }
         is Route.Day -> DayScreen(route, navigator)
