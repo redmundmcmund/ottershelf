@@ -188,8 +188,14 @@ class FakeTrackingRemote : TrackingRemote {
     /** An HTTP error for the acknowledge route. */
     var acknowledgeError: Int? = null
 
+    /** An error the claim route answers with (a BookOrbit 3.7+ server's App Attest, say). */
+    var claimError: ApiException? = null
+    var claimCalls = 0
+
     override suspend fun claimCelebration(): CelebrationClaim? {
         check()
+        claimCalls++
+        claimError?.let { throw it }
         return claims.removeFirstOrNull()
     }
 

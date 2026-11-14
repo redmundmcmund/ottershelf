@@ -12,6 +12,9 @@ import io.github.ottershelf.feature.stats.model.OverviewGoal
 import io.github.ottershelf.feature.stats.model.OverviewGoalPoint
 import io.github.ottershelf.feature.stats.model.Snapshot
 import io.github.ottershelf.feature.stats.model.ProgressFunnel
+import io.github.ottershelf.core.model.ReadingStreak
+import io.github.ottershelf.core.tracking.DailyReadingRow
+import io.github.ottershelf.feature.stats.model.PeakHourStat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -19,6 +22,42 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 class StatsMathTest {
+
+    @Test
+    fun theOverviewIsBuiltFromDailyReadingAsTheServerSumsIt() {
+        val today = LocalDate.of(2026, 11, 14) // a Saturday
+        val rows = listOf(
+            DailyReadingRow("2026-11-14", 600.0, 1.0),
+            DailyReadingRow("2026-11-07", 1_200.0, 2.0), // the Saturday before
+            DailyReadingRow("2026-11-02", 3_650.0 * 52, 1.0), // a Monday: the biggest single day
+        )
+        val hours = listOf(PeakHourStat(21, 900.0, 2.0), PeakHourStat(7, 5_000.0, 0.0), PeakHourStat(8, 300.0, 1.0))
+        val o = StatsMath.overview(rows, hours, ReadingStreak(1, 9), goalBooks = 20, zoneId = "Europe/Dublin", today = today)
+
+        assertEquals(600.0, o.snapshot.today.totalSeconds, 0.0)
+        assertEquals(600.0, o.snapshot.lastSevenDays.totalSeconds, 0.0)
+        assertEquals(1_200.0 + 3_650.0 * 52, o.snapshot.previousSevenDays.totalSeconds, 0.0)
+        assertEquals(1, o.snapshot.currentStreak)
+        assertEquals(9, o.snapshot.longestStreak)
+        assertEquals(84, o.dailyActivity.days.size)
+        assertEquals("2026-11-14", o.dailyActivity.days.last().day)
+        assertEquals(1, o.rhythm.favoriteDayOfWeek) // Monday's average beats Saturday's
+        assertEquals(6, o.rhythm.weekdays[6].dayOfWeek)
+        assertEquals(4, o.rhythm.sessionsCount)
+        assertEquals(21, o.rhythm.peakHour) // hour 7 has no sessions
+        assertEquals(20, o.goal!!.goalBooks)
+        assertEquals(2026, o.goal!!.year)
+        assertEquals("Europe/Dublin", o.timezone)
+    }
+
+    @Test
+    fun anOverviewWithNothingReadHasNoFavouriteOrPeak() {
+        val o = StatsMath.overview(emptyList(), null, null, goalBooks = null, zoneId = "UTC", today = LocalDate.of(2026, 11, 14))
+        assertNull(o.rhythm.favoriteDayOfWeek)
+        assertNull(o.rhythm.peakHour)
+        assertEquals(0, o.snapshot.longestStreak)
+        assertNull(o.goal!!.goalBooks)
+    }
 
     private val today = LocalDate.of(2026, 9, 25) // a Friday
 

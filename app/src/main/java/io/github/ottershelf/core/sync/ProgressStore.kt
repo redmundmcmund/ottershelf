@@ -13,6 +13,7 @@ import io.github.ottershelf.core.model.FileProgress
 import io.github.ottershelf.core.model.ReadingSession
 import io.github.ottershelf.core.model.SaveProgress
 import io.github.ottershelf.core.network.ApiException
+import io.github.ottershelf.core.network.isAppAttestRefusal
 import io.github.ottershelf.core.network.ApiJson
 import kotlin.math.abs
 
@@ -316,6 +317,9 @@ class ProgressStore(
                     reportSent()
                     return Push.FAILED
                 }
+                // BookOrbit 3.7.x kept the progress routes for its own apps (App Attest; 3.8 opened them
+                // again): not a refusal of this position, so it waits for a server that takes it.
+                if (e.isAppAttestRefusal) return Push.FAILED
                 if (e.code == 400 || e.code == 403 || e.code == 404) {
                     // Rejected for good (invalid, no access, or the file is gone): don't retry forever.
                     update(fileId, record.bookId) { if (it.pendingAt == record.pendingAt) it.copy(pending = null, pendingAt = 0) else it }
@@ -487,7 +491,8 @@ class ProgressStore(
                     val server = try {
                         api.fileProgress(fileId)
                     } catch (e: ApiException) {
-                        if (e.code == 403 || e.code == 404) dropPending(fileId) else finished = false
+                        // App Attest (a 3.7.x server): kept, as above.
+                        if (!e.isAppAttestRefusal && (e.code == 403 || e.code == 404)) dropPending(fileId) else finished = false
                         continue
                     }
                     if (reconcile(fileId, record, server) == Check.CLEAN) clean += fileId

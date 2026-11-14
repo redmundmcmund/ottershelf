@@ -1,0 +1,1 @@
+- Ready for BookOrbit 3.8: the calendar, day view, statistics overview, reading goals and year in review keep working

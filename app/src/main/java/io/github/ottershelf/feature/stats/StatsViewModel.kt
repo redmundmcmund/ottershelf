@@ -106,7 +106,7 @@ enum class StatsChart {
  * screen kept while another shows, or the app left overnight) every chart that counts days reloads
  * with the new today, and so does showing the screen again ([onResume]).
  */
-class StatsViewModel(private val container: AppContainer, private val remote: StatsRemote = ApiStatsRemote(container.api)) : ViewModel() {
+class StatsViewModel(private val container: AppContainer, private val remote: StatsRemote = ApiStatsRemote(container.api) { container.auth.user.value }) : ViewModel() {
 
     private val _state = MutableStateFlow(StatsUiState(today = today()))
     val state: StateFlow<StatsUiState> = _state.asStateFlow()

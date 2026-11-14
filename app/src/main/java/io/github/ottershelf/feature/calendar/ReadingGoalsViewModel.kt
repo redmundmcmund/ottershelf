@@ -59,7 +59,7 @@ enum class GoalsMessage { YearlySaved, YearlyFailed }
  */
 class ReadingGoalsViewModel(
     private val container: AppContainer,
-    private val stats: StatsRemote = ApiStatsRemote(container.api),
+    private val stats: StatsRemote = ApiStatsRemote(container.api) { container.auth.user.value },
 ) : ViewModel() {
 
     private val tracking = container.tracking

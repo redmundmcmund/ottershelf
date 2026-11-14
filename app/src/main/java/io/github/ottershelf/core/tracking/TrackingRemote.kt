@@ -2,6 +2,7 @@ package io.github.ottershelf.core.tracking
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -14,6 +15,9 @@ import io.github.ottershelf.core.model.BookDetail
 import io.github.ottershelf.core.network.Api
 import io.github.ottershelf.core.network.ApiJson
 import java.net.URLEncoder
+import java.time.LocalDate
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 /**
  * Every server call the reading tracker makes, behind an interface so TrackingRepository and
@@ -118,7 +122,11 @@ internal object TrackingBodies {
 }
 
 /** [TrackingRemote] over the app's authenticated [Api] client. */
-class ApiTrackingRemote(private val api: Api) : TrackingRemote {
+class ApiTrackingRemote(
+    private val api: Api,
+    /** The signed-in user: the zone reading days are split in, and the reading goal (OpenActivity). */
+    private val user: () -> AuthUser? = { null },
+) : TrackingRemote {
 
     private val json = ApiJson
 
@@ -147,16 +155,17 @@ class ApiTrackingRemote(private val api: Api) : TrackingRemote {
         get("books/$bookId/sessions?${query.toQueryString()}", BookSessionList.serializer())
 
     override suspend fun saveTimedSession(fileId: Long, body: TimedSessionBody) =
-        sendNoContent("POST", "books/files/$fileId/sessions", encode(TimedSessionBody.serializer(), body))
+        sendNoContent("POST", "books/files/$fileId/sessions", encode(TimedSessionBody.serializer(), body)).also { weeks.clear() }
 
     override suspend fun createManualSession(bookId: Long, body: ManualSessionBody): BookSession =
-        send("POST", "books/$bookId/sessions", encode(ManualSessionBody.serializer(), body), BookSession.serializer())
+        send("POST", "books/$bookId/sessions", encode(ManualSessionBody.serializer(), body), BookSession.serializer()).also { weeks.clear() }
 
     override suspend fun deleteSession(bookId: Long, sessionId: Long) =
-        sendNoContent("DELETE", "books/$bookId/sessions/$sessionId", null)
+        sendNoContent("DELETE", "books/$bookId/sessions/$sessionId", null).also { weeks.clear() }
 
     override suspend fun moveSession(sessionId: Long, body: MoveSessionBody): TimelineSession =
         send("PATCH", "user-statistics/session-timeline/$sessionId", encode(MoveSessionBody.serializer(), body), TimelineSession.serializer())
+            .also { weeks.clear() }
 
     override suspend fun setStatus(bookId: Long, body: JsonObject): BookStatus =
         send("PATCH", "books/$bookId/status", body, BookStatus.serializer())
@@ -184,16 +193,62 @@ class ApiTrackingRemote(private val api: Api) : TrackingRemote {
         sendNoContent("PATCH", "books/$bookId/personal-note", TrackingBodies.note(note))
     }
 
-    override suspend fun activityOverview(): ActivityOverview {
-        val raw = get("user-statistics/activity-overview", JsonObject.serializer())
-        return json.decodeFromJsonElement(ActivityOverview.serializer(), raw).copy(raw = raw)
+    // The activity views come from routes open to every client (OpenActivity): BookOrbit 3.7 keeps
+    // activity-overview, activity-calendar and activity-days for its own apps.
+
+    private suspend fun dailyReading(days: Int): List<DailyReadingRow> =
+        get("user-statistics/daily-reading?days=${days.coerceIn(1, OpenActivity.MAX_DAYS)}", ListSerializer(DailyReadingRow.serializer()))
+
+    private fun today(): LocalDate = LocalDate.now(OpenActivity.zone(user()))
+
+    override suspend fun activityOverview(): ActivityOverview = coroutineScope {
+        val u = user()
+        val zone = OpenActivity.zone(u)
+        val today = LocalDate.now(zone)
+        val rows = async { dailyReading(OpenActivity.MAX_DAYS) }
+        val months = async {
+            val days = OpenActivity.daysBack(LocalDate.of(today.year, 1, 1), today)
+            runCatching { get("user-statistics/completion-timeline?days=$days", ListSerializer(CompletionMonth.serializer())) }.getOrNull()
+        }
+        val streak = async { runCatching { api.dashboardWidgets().second }.getOrNull() }
+        val days = rows.await()
+        val perMonth = OpenActivity.finishedPerMonth(months.await().orEmpty(), today.year)
+        val s = streak.await()
+        ActivityOverview(
+            timezone = zone.id,
+            snapshot = OpenActivity.snapshot(days, today, s?.currentStreak, s?.longestStreak, perMonth.sum()),
+            calendar = OpenActivity.calendar(today.year, days, today),
+            goal = OpenActivity.goal(today.year, OpenActivity.goalBooks(u), perMonth, today),
+        )
     }
 
     override suspend fun activityCalendar(year: Int): ActivityCalendar =
-        get("user-statistics/activity-calendar/$year", ActivityCalendar.serializer())
+        OpenActivity.calendar(year, dailyReading(OpenActivity.MAX_DAYS), today())
 
-    override suspend fun activityDay(day: String): ActivityDayDetail =
-        get("user-statistics/activity-days/${enc(day)}", ActivityDayDetail.serializer())
+    override suspend fun activityDay(day: String): ActivityDayDetail {
+        val zone = OpenActivity.zone(user())
+        val date = LocalDate.parse(day)
+        val sessions = OpenActivity.weeksOf(date, zone).flatMap { (year, week) -> week(year, week).items }
+        return OpenActivity.day(date, zone, sessions)
+    }
+
+    /**
+     * Weeks of session-timeline fetched in the last [WEEK_MEMO_MS], for [activityDay]: the calendar
+     * loads a month's reading days one by one, and most share a week. Dropped on every session write
+     * here, so an edit shows at once.
+     */
+    private val weeks = java.util.concurrent.ConcurrentHashMap<String, Pair<Long, SessionTimeline>>()
+
+    private suspend fun week(year: Int, week: Int): SessionTimeline {
+        val key = "${user()?.id}:$year:$week"
+        val now = System.currentTimeMillis()
+        weeks[key]?.let { (at, timeline) -> if (now - at < WEEK_MEMO_MS) return timeline }
+        return sessionTimeline(year, week).also { weeks[key] = now to it }
+    }
+
+    private companion object {
+        const val WEEK_MEMO_MS = 30_000L
+    }
 
     override suspend fun sessionTimeline(year: Int, week: Int): SessionTimeline =
         get("user-statistics/session-timeline?year=$year&week=$week", SessionTimeline.serializer())

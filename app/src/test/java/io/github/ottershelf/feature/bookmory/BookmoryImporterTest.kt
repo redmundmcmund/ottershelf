@@ -80,6 +80,17 @@ class BookmoryImporterTest {
     }
 
     @Test
+    fun aServerKeepingUploadSessionsForItsOwnAppsGetsThePlaceholdersWhole() {
+        val sessions = server().also { importOnce(it) }
+        val server = server().apply { sessionsNeedAppAttest = true }
+        val (_, summary) = importOnce(server)
+        assertEquals(emptyList<ImportProblem>(), summary.problems)
+        assertEquals(13, summary.stubsCreated.size)
+        assertEquals(13, server.wholeUploads)
+        assertEquals(sessions.snapshot(), server.snapshot())
+    }
+
+    @Test
     fun theSecondRunCreatesNothing() {
         val server = server()
         importOnce(server)

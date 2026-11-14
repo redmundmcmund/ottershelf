@@ -1,5 +1,16 @@
 package io.github.ottershelf.feature.stats
 
+import io.github.ottershelf.feature.stats.model.Snapshot
+import io.github.ottershelf.feature.stats.model.RhythmWeekday
+import io.github.ottershelf.feature.stats.model.Rhythm
+import io.github.ottershelf.feature.stats.model.PeakHourStat
+import io.github.ottershelf.feature.stats.model.Duration
+import io.github.ottershelf.feature.stats.model.DayPoint
+import io.github.ottershelf.feature.stats.model.DailyActivity
+import io.github.ottershelf.core.tracking.OpenActivity
+import io.github.ottershelf.core.tracking.DailyReadingRow
+import io.github.ottershelf.core.tracking.ActivityDay
+import io.github.ottershelf.core.model.ReadingStreak
 import io.github.ottershelf.feature.stats.model.ArchetypePoint
 import io.github.ottershelf.feature.stats.model.DailyReadingStat
 import io.github.ottershelf.feature.stats.model.DecadeCount
@@ -8,6 +19,7 @@ import io.github.ottershelf.feature.stats.model.GoalTrajectory
 import io.github.ottershelf.feature.stats.model.GoalTrajectoryPoint
 import io.github.ottershelf.feature.stats.model.MonthCount
 import io.github.ottershelf.feature.stats.model.Overview
+import io.github.ottershelf.feature.stats.model.OverviewGoal
 import io.github.ottershelf.feature.stats.model.OverviewGoalPoint
 import io.github.ottershelf.feature.stats.model.PacePoint
 import io.github.ottershelf.feature.stats.model.ProgressFunnel
@@ -130,6 +142,51 @@ object StatsMath {
 
     /** The finish rate's comparison needs as many books started before as the funnel itself (the web's 10). */
     const val MIN_FUNNEL_STARTED = 10.0
+
+    /**
+     * The overview the server's `activity-overview` gave, from open routes (StatsRemote.overview):
+     * [rows] daily-reading for the last 365 days in the server's zone (only days with reading),
+     * [hours] peak-hours, [streak] the dashboard's reading-streak widget. As the server sums them: the
+     * snapshot's today and its two 7-day windows, the last 84 days for the daily chart, and each
+     * weekday's average over the year (favourite: the highest average, once anything was read). The
+     * goal carries [goalBooks] only; [withFinishedBooks] fills in its months.
+     */
+    fun overview(
+        rows: List<DailyReadingRow>,
+        hours: List<PeakHourStat>?,
+        streak: ReadingStreak?,
+        goalBooks: Int?,
+        zoneId: String,
+        today: LocalDate,
+    ): Overview {
+        val year = OpenActivity.days(today.minusDays(OpenActivity.YEAR_DAYS - 1L), today, rows)
+        fun duration(days: List<ActivityDay>) = days.sumOf { it.totalSeconds }.toDouble().let { Duration(totalSeconds = it, readingSeconds = it) }
+        val occurrences = IntArray(7)
+        val totals = DoubleArray(7)
+        val sessions = IntArray(7)
+        year.forEach { d ->
+            val weekday = LocalDate.parse(d.day).dayOfWeek.value % 7 // 0 = Sunday
+            occurrences[weekday]++
+            totals[weekday] += d.totalSeconds.toDouble()
+            sessions[weekday] += d.sessionsCount
+        }
+        val weekdays = (0..6).map { RhythmWeekday(it, (totals[it] / max(1, occurrences[it])).roundToInt().toDouble(), sessions[it]) }
+        val favourite = if (weekdays.any { it.sessionsCount > 0 }) weekdays.maxBy { it.averageReadingSeconds }.dayOfWeek else null
+        val peak = hours?.filter { it.eventsCount > 0 }?.maxByOrNull { it.readingSeconds }?.hour
+        return Overview(
+            timezone = zoneId,
+            snapshot = Snapshot(
+                today = duration(year.takeLast(1)),
+                lastSevenDays = duration(year.takeLast(7)),
+                previousSevenDays = duration(year.takeLast(14).take(7)),
+                currentStreak = streak?.currentStreak ?: 0,
+                longestStreak = streak?.longestStreak ?: 0,
+            ),
+            dailyActivity = DailyActivity(year.takeLast(OpenActivity.DAILY_DAYS).map { DayPoint(it.day, it.totalSeconds.toDouble(), it.readingSeconds.toDouble(), it.sessionsCount) }),
+            goal = OverviewGoal(year = today.year, goalBooks = goalBooks),
+            rhythm = Rhythm(windowDays = OpenActivity.YEAR_DAYS, sessionsCount = sessions.sum(), weekdays = weekdays, favoriteDayOfWeek = favourite, peakHour = peak),
+        )
+    }
 
     /**
      * [o] with the year's finished books from `completion-timeline` [months] (completed readings by

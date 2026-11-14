@@ -86,6 +86,15 @@ import kotlin.coroutines.resumeWithException
 class ApiException(val code: Int, message: String, val errorCode: String? = null) : IOException(message)
 
 /**
+ * A route BookOrbit (3.7 and later) keeps for its own iPhone and Android apps refused this one: App
+ * Attest, a 403 with an `APP_ATTEST_*` errorCode that no other app can pass and no server setting
+ * lifts. Never a sign-in or permission problem, so nothing is thrown away over it; the feature is
+ * left out instead (core.tracking.OpenActivity, TrackingRepository's celebrations, the dashboard
+ * refresh, the Bookmory import's uploads).
+ */
+val ApiException.isAppAttestRefusal: Boolean get() = code == 403 && errorCode?.startsWith("APP_ATTEST_") == true
+
+/**
  * BookOrbit REST client (`/api/v1`) using native-client auth: bearer access token, refresh token
  * in the request body, rotated on every refresh. No cookie jar, deliberately: the server rejects a
  * body refresh token that conflicts with a `refresh_token` cookie.
@@ -393,9 +402,24 @@ class Api(
         return call(client, request, ScrollerBatch.serializer()).items.firstOrNull()?.takeUnless { it.failed }?.books
     }
 
-    /** Drops the server's cached widgets for this user; otherwise they're kept for 2 minutes. */
+    /** The account whose server keeps `dashboard/refresh` for its own apps (BookOrbit 3.7+): not asked again. */
+    @Volatile
+    private var dashboardRefreshRefusedFor: String? = null
+
+    /**
+     * Drops the server's cached widgets for this user; otherwise they're kept for 2 minutes. A server
+     * that keeps the route for its own apps ([isAppAttestRefusal]) is asked once per account and
+     * process: the widgets then catch up within those 2 minutes.
+     */
     suspend fun refreshDashboard() {
-        call(client, Request.Builder().url(api("dashboard/refresh")).post(ByteArray(0).toRequestBody(null)).build()) { }
+        val account = session.accountKey()
+        if (dashboardRefreshRefusedFor == account) return
+        try {
+            call(client, Request.Builder().url(api("dashboard/refresh")).post(ByteArray(0).toRequestBody(null)).build()) { }
+        } catch (e: ApiException) {
+            if (!e.isAppAttestRefusal) throw e
+            dashboardRefreshRefusedFor = account
+        }
     }
 
     /**

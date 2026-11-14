@@ -39,6 +39,9 @@ class FakeBookOrbit(private val today: LocalDate = LocalDate.of(2024, 6, 1)) : B
     private val sessions = mutableMapOf<String, Session>()
     var libraries = listOf(UploadLibrary(1, "Books"), UploadLibrary(2, "Comics", listOf("cbz")))
     var canUpload = true
+    /** A BookOrbit 3.7+ server: upload sessions are kept for its own apps (App Attest); whole uploads still work. */
+    var sessionsNeedAppAttest = false
+    var wholeUploads = 0
     var mayRate = true
 
     /** What `ratingAccess` reports; `bulk-set-rating` also refuses (403) where it says no. */
@@ -197,6 +200,7 @@ class FakeBookOrbit(private val today: LocalDate = LocalDate.of(2024, 6, 1)) : B
     // --- uploads -----------------------------------------------------------------------------
 
     override suspend fun createUpload(body: CreateUploadBody): UploadSessionInfo = write {
+        if (sessionsNeedAppAttest) throw ApiException(403, "This route requires App Attest", "APP_ATTEST_REQUIRED")
         require(Regex("^[A-Za-z0-9._:-]{8,100}$").matches(body.idempotencyKey)) { "bad key" }
         require(body.target.kind == "library")
         val existing = sessions[body.idempotencyKey]
@@ -241,6 +245,22 @@ class FakeBookOrbit(private val today: LocalDate = LocalDate.of(2024, 6, 1)) : B
         s.bookId = book.id
         s.status = "processing"
         info(s)
+    }
+
+    override suspend fun uploadWhole(libraryId: Long, filename: String, contentType: String, bytes: ByteArray): Long = write {
+        if (!canUpload || libraries.none { it.id == libraryId }) throw ApiException(403, "Library upload permission is required")
+        if (bytes[0] != 0x50.toByte() || bytes[1] != 0x4b.toByte()) throw ApiException(400, "File contents do not match the .epub format")
+        val opf = readOpf(bytes)
+        val book = Book(
+            nextId++,
+            title = Regex("<dc:title>(.*?)</dc:title>").find(opf)!!.groupValues[1].unescape(),
+            authors = Regex("<dc:creator[^>]*>(.*?)</dc:creator>").findAll(opf).map { it.groupValues[1].unescape() }.toList(),
+            isbn13 = Regex("urn:isbn:(\\d{13})").find(opf)?.groupValues?.get(1),
+            libraryId = libraryId,
+        )
+        books += book
+        wholeUploads++
+        book.id
     }
 
     override suspend fun upload(sessionId: String): UploadSessionInfo {

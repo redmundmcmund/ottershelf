@@ -115,6 +115,18 @@ class ProgressStoreTest {
     }
 
     @Test
+    fun anAppAttestRefusalKeepsThePendingPosition() = runTest {
+        // BookOrbit 3.7.x kept the progress routes for its own apps; 3.8 opened them again.
+        store.setBaseline(FILE, BOOK, Position("a", 10.0))
+        store.savePending(FILE, BOOK, save("b", 20.0))
+        server.saveFailure = ApiException(403, "This route requires App Attest", "APP_ATTEST_REQUIRED")
+
+        assertEquals(Push.FAILED, store.push(FILE, checked = false))
+
+        assertEquals(20.0, store.get(FILE)!!.pending!!.percentage, 0.0)
+    }
+
+    @Test
     fun aServerErrorAfterPostingIsTreatedAsUnanswered() = runTest {
         store.setBaseline(FILE, BOOK, Position("a", 10.0))
         store.savePending(FILE, BOOK, save("b", 20.0))

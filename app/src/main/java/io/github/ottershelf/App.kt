@@ -255,7 +255,7 @@ class AppContainer(private val app: Application, private val tokenCipher: TokenC
 
     val trackingScheduler: TrackingScheduler by lazy { TrackingScheduler(app) }
 
-    private val trackingRemote: TrackingRemote by lazy { ApiTrackingRemote(api) }
+    private val trackingRemote: TrackingRemote by lazy { ApiTrackingRemote(api) { auth.user.value } }
 
     /** The app's own users.settings key (`bookorbitAndroid`): page totals, daily goal, timer prefs. */
     val appSettings: AppSettingsRepository by lazy {

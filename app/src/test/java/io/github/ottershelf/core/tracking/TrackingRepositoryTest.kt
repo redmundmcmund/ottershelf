@@ -15,6 +15,7 @@ import io.github.ottershelf.core.sync.ReadingChanges
 import io.github.ottershelf.core.util.IsoTime
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import io.github.ottershelf.core.network.ApiException
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -370,6 +371,26 @@ class TrackingRepositoryTest {
     }
 
     private fun claim(id: String) = CelebrationClaim(id, achievement = AchievementItem(key = "k-$id", name = "Badge $id"))
+
+    @Test
+    fun celebrationsAServerKeepsForItsOwnAppsAreLeftOutAfterOneTry() = runTest {
+        val s = setup()
+        s.remote.claimError = ApiException(403, "This route requires App Attest", "APP_ATTEST_REQUIRED")
+        assertNull(s.repo.claimCelebration())
+        assertNull(s.repo.claimCelebration())
+        assertEquals(1, s.remote.claimCalls)
+        s.repo.acknowledgeCelebration("c1") // not sent either
+        assertTrue(s.remote.acknowledged.isEmpty())
+    }
+
+    @Test
+    fun anOrdinaryClaimRefusalStillReachesTheCaller() = runTest {
+        val s = setup()
+        s.remote.claimError = ApiException(403, "Forbidden")
+        assertTrue(runCatching { s.repo.claimCelebration() }.isFailure)
+        assertTrue(runCatching { s.repo.claimCelebration() }.isFailure)
+        assertEquals(2, s.remote.claimCalls)
+    }
 
     @Test
     fun aFailedAcknowledgementGoesBeforeTheNextClaim() = runTest {

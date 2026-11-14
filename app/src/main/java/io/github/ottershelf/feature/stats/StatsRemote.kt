@@ -1,5 +1,11 @@
 package io.github.ottershelf.feature.stats
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import io.github.ottershelf.core.model.AuthUser
+import io.github.ottershelf.core.tracking.DailyReadingRow
+import io.github.ottershelf.core.tracking.OpenActivity
+import java.time.LocalDate
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.builtins.ListSerializer
 import io.github.ottershelf.core.model.Library
@@ -61,7 +67,11 @@ interface StatsRemote {
 }
 
 /** [StatsRemote] over the app's authenticated [Api] (its `send`, as core.tracking does). */
-class ApiStatsRemote(private val api: Api) : StatsRemote {
+class ApiStatsRemote(
+    private val api: Api,
+    /** The signed-in user: the zone reading days are split in, and the reading goal. */
+    private val user: () -> AuthUser? = { null },
+) : StatsRemote {
 
     private suspend fun <T> get(path: String, de: DeserializationStrategy<T>): T =
         api.send("GET", path, null) { ApiJson.decodeFromString(de, it) }
@@ -80,7 +90,22 @@ class ApiStatsRemote(private val api: Api) : StatsRemote {
 
     override suspend fun libraries(): List<Library> = api.libraries()
 
-    override suspend fun overview(libraryId: Long?): Overview = get(user("activity-overview", libraryId), Overview.serializer())
+    /**
+     * The overview from routes open to every client (core.tracking.OpenActivity): BookOrbit 3.7 keeps
+     * `activity-overview` for its own apps. daily-reading gives the snapshot, the daily chart and the
+     * weekday rhythm, peak-hours the peak hour, the dashboard's reading-streak widget the streaks (all
+     * libraries: the widget takes no filter); the goal's months are filled in by
+     * StatsMath.withFinishedBooks from completion-timeline, as before.
+     */
+    override suspend fun overview(libraryId: Long?): Overview = coroutineScope {
+        val u = user()
+        val zone = OpenActivity.zone(u)
+        val today = LocalDate.now(zone)
+        val rows = async { get(user("daily-reading", libraryId, "days" to OpenActivity.YEAR_DAYS), ListSerializer(DailyReadingRow.serializer())) }
+        val hours = async { runCatching { peakHours(OpenActivity.YEAR_DAYS, libraryId) }.getOrNull() }
+        val streak = async { runCatching { api.dashboardWidgets().second }.getOrNull() }
+        StatsMath.overview(rows.await(), hours.await(), streak.await(), OpenActivity.goalBooks(u), zone.id, today)
+    }
 
     override suspend fun dailyReading(days: Int, libraryId: Long?) =
         get(user("daily-reading", libraryId, "days" to days), ListSerializer(DailyReadingStat.serializer()))

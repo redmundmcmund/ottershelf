@@ -1,6 +1,7 @@
 package io.github.ottershelf.feature.bookmory
 
 import io.github.ottershelf.core.network.ApiException
+import io.github.ottershelf.core.network.isAppAttestRefusal
 import io.github.ottershelf.core.tracking.Patch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
@@ -276,13 +277,19 @@ class BookmoryImporter(
         data class Problem(val kind: ImportProblem.Kind, val detail: String? = null) : StubResult
     }
 
+    /** The server keeps upload sessions for its own apps (BookOrbit 3.7+, App Attest): placeholders go whole. */
+    @Volatile
+    private var sessionsRefused = false
+
     /**
      * Uploads [target]'s placeholder in an upload session, or picks up the one already made under its
      * key: a finished one gives its book at once, one cut off part-way goes on from the bytes the
-     * server has. A 4xx from `POST uploads` (the key used by a different file, say) is reported.
+     * server has. A 4xx from `POST uploads` (the key used by a different file, say) is reported. A
+     * server that keeps sessions for its own apps gets the file whole ([uploadWhole]).
      */
     private suspend fun uploadStub(target: ImportTarget.Stub): StubResult {
         val bytes = StubEpub.build(target.stub)
+        if (sessionsRefused) return uploadWhole(target, bytes)
         val body = CreateUploadBody(
             filename = target.stub.filename,
             sizeBytes = bytes.size.toLong(),
@@ -294,6 +301,10 @@ class BookmoryImporter(
         var session = try {
             remote.createUpload(body)
         } catch (e: ApiException) {
+            if (e.isAppAttestRefusal) {
+                sessionsRefused = true
+                return uploadWhole(target, bytes)
+            }
             if (e.code == 401 || e.code >= 500) throw e
             return StubResult.Problem(ImportProblem.Kind.UPLOAD_FAILED, e.message)
         }
@@ -321,6 +332,14 @@ class BookmoryImporter(
                 else -> return StubResult.Problem(ImportProblem.Kind.UPLOAD_FAILED, session.errorMessage ?: session.status)
             }
         }
+    }
+
+    /** [target]'s placeholder in one request (the web's upload): a new book every time, so only after sessions were refused. */
+    private suspend fun uploadWhole(target: ImportTarget.Stub, bytes: ByteArray): StubResult = try {
+        StubResult.Made(remote.uploadWhole(target.libraryId, target.stub.filename, StubEpub.CONTENT_TYPE, bytes), new = true)
+    } catch (e: ApiException) {
+        if (e.code == 401 || e.code >= 500) throw e
+        StubResult.Problem(ImportProblem.Kind.UPLOAD_FAILED, e.message)
     }
 
     companion object {

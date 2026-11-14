@@ -7,6 +7,7 @@ import io.github.ottershelf.core.model.ReadStatusInfo
 import io.github.ottershelf.core.model.SortSpec
 import io.github.ottershelf.core.network.Api
 import io.github.ottershelf.core.network.ApiException
+import io.github.ottershelf.core.network.isAppAttestRefusal
 import io.github.ottershelf.core.network.ApiJson
 import io.github.ottershelf.core.tracking.Patch
 import io.github.ottershelf.core.tracking.TrackingRepository
@@ -64,6 +65,13 @@ interface BookmoryRemote {
 
     /** `GET uploads/:id`. */
     suspend fun upload(sessionId: String): UploadSessionInfo
+
+    /**
+     * The whole file in one request (`POST libraries/:id/upload?folderId=`, the web's upload), for a
+     * server that keeps upload sessions for its own apps (BookOrbit 3.7+, App Attest). Answers the new
+     * book's id. It has no idempotency key, so the importer uses it only once sessions were refused.
+     */
+    suspend fun uploadWhole(libraryId: Long, filename: String, contentType: String, bytes: ByteArray): Long
 }
 
 /** A `books/query` card: only what matching reads (the server sends much more; it is ignored). */
@@ -180,8 +188,20 @@ class ApiBookmoryRemote(
         return api.send("POST", "books/query", body) { json.decodeFromString(ServerBookPage.serializer(), it) }
     }
 
-    override suspend fun uploadTargets(): UploadCapabilities =
+    /**
+     * Where placeholders may go. A server that keeps `uploads/capabilities` for its own apps answers
+     * from the library list instead: the account's `library_upload`, and every library it can see
+     * (their allowed formats aren't listed there; a library that refuses EPUB says so on upload).
+     */
+    override suspend fun uploadTargets(): UploadCapabilities = try {
         api.send("GET", "uploads/capabilities", null) { json.decodeFromString(UploadCapabilities.serializer(), it) }
+    } catch (e: ApiException) {
+        if (!e.isAppAttestRefusal) throw e
+        UploadCapabilities(
+            canUploadToLibrary = user()?.can(LIBRARY_UPLOAD) == true,
+            libraries = api.libraries().filter { it.type != "podcasts" }.map { UploadLibrary(it.id, it.name) },
+        )
+    }
 
     override suspend fun bookStatus(bookId: Long): BookStatusAndRating? = try {
         val book = api.book(bookId)
@@ -242,8 +262,25 @@ class ApiBookmoryRemote(
     override suspend fun upload(sessionId: String): UploadSessionInfo =
         api.send("GET", "uploads/$sessionId", null) { session(it) }
 
+    override suspend fun uploadWhole(libraryId: Long, filename: String, contentType: String, bytes: ByteArray): Long {
+        val multipart = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("file", filename, bytes.toRequestBody(contentType.toMediaType()))
+            .build()
+        return api.sendBody("POST", "libraries/$libraryId/upload", multipart) { json.decodeFromString(UploadResult.serializer(), it).bookId }
+    }
+
     private fun session(text: String) = json.decodeFromString(UploadSessionInfo.serializer(), text)
+
+    private companion object {
+        /** BookOrbit's permission for adding books to a library. */
+        const val LIBRARY_UPLOAD = "library_upload"
+    }
 }
+
+/** `POST libraries/:id/upload`'s answer: the fields the import reads. */
+@Serializable
+data class UploadResult(val bookId: Long)
 
 /** The request bodies, built here so a test can check them against the server's DTOs. */
 internal object BookmoryBodies {

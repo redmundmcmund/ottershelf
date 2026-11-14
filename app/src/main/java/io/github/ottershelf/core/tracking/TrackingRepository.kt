@@ -29,6 +29,7 @@ import io.github.ottershelf.core.model.AuthUser
 import io.github.ottershelf.core.model.ReadStatus
 import io.github.ottershelf.core.model.UserSettings
 import io.github.ottershelf.core.network.ApiException
+import io.github.ottershelf.core.network.isAppAttestRefusal
 import io.github.ottershelf.core.sync.ReadingChanges
 import io.github.ottershelf.core.util.IsoTime
 import java.io.IOException
@@ -177,9 +178,24 @@ class TrackingRepository(
      * that failed earlier go first, so the server doesn't offer those again.
      */
     suspend fun claimCelebration(): CelebrationClaim? {
+        if (celebrationsRefusedFor == accountKey()) return null
         retryAcknowledgements()
-        return remote.claimCelebration()?.also { _claimed.tryEmit(Unit) }
+        return try {
+            remote.claimCelebration()?.also { _claimed.tryEmit(Unit) }
+        } catch (e: ApiException) {
+            if (!e.isAppAttestRefusal) throw e
+            celebrationsRefusedFor = accountKey()
+            null
+        }
     }
+
+    /**
+     * The account whose server keeps the celebration routes for its own apps (BookOrbit 3.7+, App
+     * Attest): nothing is claimed or acknowledged again in this process. Earned achievements still
+     * show on the Achievements screen.
+     */
+    @Volatile
+    private var celebrationsRefusedFor: String? = null
 
     /**
      * Marks [claimId] celebrated. The server offers an unacknowledged claim again after 15 minutes,
@@ -187,6 +203,7 @@ class TrackingRepository(
      * claim; a refusal (4xx: already gone, or someone else's) isn't retried.
      */
     suspend fun acknowledgeCelebration(claimId: String) {
+        if (celebrationsRefusedFor == accountKey()) return
         try {
             remote.acknowledgeCelebration(claimId)
         } catch (e: CancellationException) {
