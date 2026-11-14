@@ -2,22 +2,24 @@ Ottershelf is an open-source Android app for reading, tracking and annotating th
 
 Ottershelf requires your own BookOrbit server, or an account on one, reachable over HTTPS. It contains no books, no store and no server of its own: it shows what your server holds.
 
-Ottershelf is an unofficial, independent app. It is a modified version of BookOrbit and is not an official BookOrbit release, and it is not affiliated with, approved, sponsored or endorsed by the BookOrbit project.
+Ottershelf is an unofficial, independent app. It is a modified version of BookOrbit and is not an official BookOrbit release, and it is not affiliated with, approved, sponsored or endorsed by the BookOrbit project. It is also not affiliated with Bookmory.
 
 READING
 - Ebooks: EPUB, KEPUB, MOBI, AZW3, AZW and FB2, in pages or continuous scrolling, with text size, line spacing, margins, fonts, justification, hyphenation and page colours
 - PDF: continuous or single page, fit to width or page, night mode, outline, search and password-protected files
 - Comics: CBZ, CBR and CB7, paged or vertical scrolling for webtoons, right-to-left, two-page spreads and zoom
 - Highlights in ten colours and four styles, notes, bookmarks and full-text search
+- Footnotes open in a small pop-up over the page, so your place in the book stays put
 - Look up a word or phrase in Wiktionary and Wikipedia, or send it to a dictionary or translation app
-- Download books to read offline; downloads continue in the background
+- Ebooks are kept on the phone the first time you open them, so they open without a connection; download any book to read offline, in the background
 - Reading position and sessions sync with your server, and wait on the phone while you are offline
 
 LIBRARY
 - Dashboard with BookOrbit's widgets and shelves, arranged the way you like
 - All books, libraries, smart scopes, collections, authors and series
 - Search, sorting and filters, in a grid or a list
-- Book pages with your status, rating, private review and reading log
+- Add books to collections one at a time or several at once, and file a book you mark Want to read straight into a collection
+- Book pages with your status, rating, private review and reading log; missing page counts are looked up automatically
 - A suggestion for the next unread book in a series
 - Scan a paper book's ISBN barcode to find it in your library
 - Book requests, and editing of titles, authors, series and covers, for accounts with those permissions
@@ -29,6 +31,7 @@ TRACKING
 - Achievements and a year in review
 - All your highlights and notes in one place: filter, random note, memorize, export as Markdown, share as an image
 - Quotes typed in, or read from a photo of the page on the phone
+- Import from Bookmory: bring in your reading dates, statuses and ratings from a Bookmory CSV export, with books not in your library added as small placeholder books; importing the same file again adds nothing twice
 
 APPEARANCE
 - Light, dark or system theme, accent colours, corner radius and background patterns, optionally synced with your account
@@ -37,6 +40,7 @@ PRIVACY
 - No analytics, ads, crash reporting or trackers
 - The app connects only to the server you enter, and to Wiktionary and Wikipedia when you tap Look up, without your account's token
 - The camera is used only for ISBN scanning, page photos and cover photos, and images are processed on the phone
+- A Bookmory export is read on the phone and not uploaded; only its reading dates, statuses and ratings, and the details of any placeholder books, are sent to your server
 - HTTPS only, and sign-in tokens are encrypted on the phone
 
 OPEN SOURCE
