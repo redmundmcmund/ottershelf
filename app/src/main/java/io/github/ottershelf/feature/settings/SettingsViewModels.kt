@@ -15,6 +15,8 @@ import kotlinx.coroutines.launch
 import io.github.ottershelf.AppContainer
 import io.github.ottershelf.BuildConfig
 import io.github.ottershelf.core.download.KeepOnOpen
+import io.github.ottershelf.feature.bookedit.FullEditing
+import io.github.ottershelf.feature.bookedit.canEditDetails
 import io.github.ottershelf.core.model.AuthUser
 import io.github.ottershelf.core.network.ApiException
 import io.github.ottershelf.core.settings.AppSettings
@@ -38,6 +40,10 @@ data class SettingsUiState(
     val nextInSeries: Boolean = true,
     /** Download ebooks the first time they're opened (KeepOnOpen, on this device). */
     val keepOnOpen: Boolean = true,
+    /** The account may edit book details: the Editing group shows. */
+    val canEditBooks: Boolean = false,
+    /** The edit screen shows every field (FullEditing, on this device). */
+    val fullEditing: Boolean = false,
 )
 
 /**
@@ -55,16 +61,16 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
         container.themePrefs,
         signingOut,
         container.appSettings.settings,
-        KeepOnOpen.enabled(container.settings),
-    ) { user, prefs, busy, app, keep ->
-        settingsState(user, prefs, busy, app, keep)
+        KeepOnOpen.enabled(container.settings).combine(FullEditing.enabled(container.settings)) { keep, full -> keep to full },
+    ) { user, prefs, busy, app, (keep, full) ->
+        settingsState(user, prefs, busy, app, keep, full)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        settingsState(container.auth.user.value, container.themePrefs.value, false, container.appSettings.settings.value, keep = true),
+        settingsState(container.auth.user.value, container.themePrefs.value, false, container.appSettings.settings.value, keep = true, full = false),
     )
 
-    private fun settingsState(user: AuthUser?, prefs: ThemePrefs, busy: Boolean, app: AppSettings, keep: Boolean) = SettingsUiState(
+    private fun settingsState(user: AuthUser?, prefs: ThemePrefs, busy: Boolean, app: AppSettings, keep: Boolean, full: Boolean) = SettingsUiState(
         username = user?.username ?: container.session.username.orEmpty(),
         name = user?.name?.takeIf { it.isNotBlank() && it != user.username },
         server = container.session.serverUrl.orEmpty().substringAfter("://").trimEnd('/'),
@@ -72,6 +78,8 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
         signingOut = busy,
         nextInSeries = app.nextInSeries,
         keepOnOpen = keep,
+        canEditBooks = canEditDetails(user),
+        fullEditing = full,
     )
 
     /** Saved to the account's app settings (sent a moment later, or when back online). */
@@ -80,6 +88,11 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
     /** On this device only: its storage is what the copies use. */
     fun setKeepOnOpen(on: Boolean) {
         container.appScope.launch { KeepOnOpen.set(container.settings, on) }
+    }
+
+    /** On this device only. */
+    fun setFullEditing(on: Boolean) {
+        container.appScope.launch { FullEditing.set(container.settings, on) }
     }
 
     fun signOut() {

@@ -1,0 +1,3 @@
+- Delete your own collections from their book list (⋮ menu); the books stay in your libraries
+- Full metadata editing (Settings > Editing): subtitle, description, publisher, date, language, pages, ISBNs, genres, tags, more series, comic credits and field locks
+- Steadier reading progress across devices: a two-page landscape spread saves the same place as a single page, and rotating no longer moves it

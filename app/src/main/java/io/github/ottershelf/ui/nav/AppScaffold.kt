@@ -41,6 +41,7 @@ import io.github.ottershelf.core.theme.ThemeSyncEvent
 import io.github.ottershelf.core.tracking.TrackingEvent
 import io.github.ottershelf.feature.achievements.AchievementCelebrationHost
 import io.github.ottershelf.feature.collections.AddToCollectionHost
+import io.github.ottershelf.feature.collections.DeleteCollectionHost
 import io.github.ottershelf.ui.theme.PatternBackground
 
 /**
@@ -168,6 +169,14 @@ private fun AppScaffold(container: AppContainer) {
             )
             // A book just marked Want to read: offer to add it to a collection.
             AddToCollectionHost(onChanged = shell::load)
+            // "Delete collection" from a collection's book list: confirmed here; once it is gone,
+            // the drawer reloads and its list goes back to the Dashboard.
+            val resources = LocalResources.current
+            DeleteCollectionHost(onDeleted = { gone ->
+                shell.load()
+                if (navigator.root.sourceKey == "collection:${gone.id}") navigator.backToDashboard()
+                scope.launch { snackbars.showSnackbar(resources.getString(R.string.collections_deleted, gone.name)) }
+            })
         }
     }
 }

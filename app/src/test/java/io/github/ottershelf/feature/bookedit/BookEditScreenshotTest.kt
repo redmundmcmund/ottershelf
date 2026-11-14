@@ -14,7 +14,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.ottershelf.core.model.AuthorRef
 import io.github.ottershelf.core.model.BookDetail
 import io.github.ottershelf.core.model.BookFile
+import io.github.ottershelf.core.model.ComicMetadata
 import io.github.ottershelf.core.model.ReadStatusInfo
+import io.github.ottershelf.core.model.SeriesMembership
 import io.github.ottershelf.feature.book.BookDetailContent
 import io.github.ottershelf.feature.book.BookDetailUiState
 import io.github.ottershelf.testing.WithFakeCovers
@@ -258,6 +260,41 @@ class BookEditScreenshotTest {
                     coverMessage = CoverMessage.Failed(EditError.Server("Metadata fields are locked: cover")),
                 ),
             )
+        }
+    }
+
+    /** Settings > Full metadata editing: every field, Lock beside the unlocked ones, the publisher locked, a bad date. */
+    @Test
+    fun fullForm() = captureLightAndDark("bookedit/full_form", heightDp = 2300) {
+        val full = book.copy(
+            description = "<p>The complete stories, with the original illustrations.</p><p>Edited and introduced.</p>",
+            publisher = "Strand",
+            publishedYear = 1927,
+            pageCount = 1122,
+            language = "en",
+            isbn13 = "9780000000002",
+            genres = listOf("Mystery", "Classics"),
+            tags = listOf("Detective"),
+            seriesMemberships = listOf(SeriesMembership(9, "Sherlock Holmes", "7"), SeriesMembership(3, "Penguin Classics", "112")),
+            lockedFields = listOf("publisher"),
+        )
+        val form = EditForm.of(full)
+        WithFakeCovers {
+            BookEditContent(loaded.copy(full = true, book = full, original = form, form = form.copy(published = "19x7")))
+        }
+    }
+
+    /** A comic in the full editor: its issue, volume and credits. */
+    @Test
+    fun fullComic() = captureLightAndDark("bookedit/full_comic", heightDp = 3300) {
+        val comic = book.copy(
+            title = "Watchmen #1",
+            files = listOf(BookFile(12, "cbz", "primary", 40_000_000, "Watchmen 01.cbz")),
+            comicMetadata = ComicMetadata(issueNumber = "1", volumeName = "Watchmen", pencillers = listOf("Dave Gibbons"), colorists = listOf("John Higgins")),
+        )
+        val form = EditForm.of(comic)
+        WithFakeCovers {
+            BookEditContent(loaded.copy(full = true, book = comic, original = form, form = form))
         }
     }
 

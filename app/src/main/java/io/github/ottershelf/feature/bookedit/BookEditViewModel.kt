@@ -9,9 +9,11 @@ import coil3.SingletonImageLoader
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -111,7 +113,11 @@ data class BookEditUiState(
     val camera: Boolean = false,
     val unlocking: LockGroup? = null,
     val unlockError: EditError? = null,
+    /** A lock being added on the server (the full editor's Lock). */
+    val locking: LockGroup? = null,
     val done: Boolean = false,
+    /** Every field shows (Settings > Full metadata editing), not only the light editor's four. */
+    val full: Boolean = false,
 ) {
     val title: String? get() = book?.title ?: original?.title?.takeIf { it.isNotBlank() }
 
@@ -143,6 +149,12 @@ data class BookEditUiState(
                 else -> null
             }
         }
+
+    /** A comic (its main file, or it has comic details): the full editor shows the comic's fields. */
+    val isComic: Boolean get() = book?.let { isComicBook(it) } == true
+
+    /** Whether [group]'s part of the form is as loaded (Lock is offered only then: locking puts it back). */
+    fun unchanged(group: LockGroup): Boolean = original?.let { group.keep(form, it) == form } ?: true
 
     /** Cover actions can run: loaded, not locked, nothing else under way. */
     val coverActionsEnabled: Boolean get() = canEdit && book != null && !isLocked(LockGroup.COVER) && !coverBusy
@@ -180,6 +192,7 @@ class BookEditViewModel(
     private val photos: CoverPhotos,
     private val saved: SavedStateHandle = SavedStateHandle(),
     debounceMs: Long = SuggestionSearch.DEBOUNCE_MS,
+    full: Flow<Boolean> = flowOf(false),
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BookEditUiState(bookId = bookId, canEdit = canEdit, loading = canEdit))
@@ -198,6 +211,7 @@ class BookEditViewModel(
     init {
         viewModelScope.launch { authorSearch.state.collect { s -> _state.update { it.copy(authorSuggestions = s) } } }
         viewModelScope.launch { seriesSearch.state.collect { s -> _state.update { it.copy(seriesSuggestions = s) } } }
+        viewModelScope.launch { full.collect { on -> _state.update { it.copy(full = on) } } }
         if (canEdit) load()
     }
 
@@ -278,6 +292,9 @@ class BookEditViewModel(
 
     fun setSeriesIndex(text: String) = edit { it.copy(seriesIndex = text.trim().take(EditRules.SERIES_INDEX_MAX)) }
 
+    /** The full editor's fields: [change] applied to the form as typed. */
+    fun editForm(change: (EditForm) -> EditForm) = edit(change)
+
     private fun edit(change: (EditForm) -> EditForm) {
         _state.update { it.copy(form = change(it.form), saveError = null) }
         persist()
@@ -336,7 +353,7 @@ class BookEditViewModel(
      */
     fun unlock(group: LockGroup) {
         val s = _state.value
-        if (s.unlocking != null || !s.isLocked(group)) return
+        if (s.unlocking != null || s.locking != null || !s.isLocked(group)) return
         _state.update { it.copy(unlocking = group, unlockError = null) }
         viewModelScope.launch {
             try {
@@ -354,6 +371,36 @@ class BookEditViewModel(
                 throw e
             } catch (e: Exception) {
                 _state.update { it.copy(unlocking = null, unlockError = EditError.of(e)) }
+            }
+        }
+    }
+
+    /**
+     * Locks [group] on the server at once (the full editor's Lock, offered while its part of the form
+     * is unchanged), as the web's lock toggle does: the lock list is read fresh and written back with
+     * these fields added.
+     */
+    fun lock(group: LockGroup) {
+        val s = _state.value
+        if (s.locking != null || s.unlocking != null || s.isLocked(group) || !s.canEdit) return
+        _state.update { it.copy(locking = group, unlockError = null) }
+        viewModelScope.launch {
+            try {
+                val fresh = remote.book(bookId)
+                val book = remote.setLocks(bookId, group.lock(fresh.lockedFields))
+                _state.update { st ->
+                    val original = st.original
+                    st.copy(
+                        locking = null,
+                        book = st.book?.copy(lockedFields = book.lockedFields) ?: book,
+                        form = if (original != null) st.form.keepingLocked(original, book.lockedFields) else st.form,
+                    )
+                }
+                persist()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _state.update { it.copy(locking = null, unlockError = EditError.of(e)) }
             }
         }
     }
@@ -598,6 +645,7 @@ class BookEditViewModel(
                 publish = publisher::publish,
                 photos = AndroidCoverPhotos(app),
                 saved = saved,
+                full = FullEditing.enabled(container.settings),
             )
         }
     }

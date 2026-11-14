@@ -56,6 +56,7 @@ internal fun UnlockDialog(group: LockGroup, onUnlock: () -> Unit, onCancel: () -
         LockGroup.AUTHORS -> R.string.bookedit_unlock_authors_title
         LockGroup.SERIES -> R.string.bookedit_unlock_series_title
         LockGroup.COVER -> R.string.bookedit_unlock_cover_title
+        else -> R.string.bookedit_unlock_field_title
     }
     AlertDialog(
         onDismissRequest = onCancel,

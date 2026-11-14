@@ -34,11 +34,11 @@ internal class ReadingSigns(private val visit: ReadingVisit) {
             // Still landing after opening or a jump (foliate shows the chapter's start, then the saved
             // place): where the page went, not reading. Later relocates by itself (a chapter animating
             // its layout) don't move the session at all.
-            if (landing) visit.settle(r.fraction * 100)
+            if (landing) visit.settle(r.position * 100)
             return false
         }
         landing = wasExpected
-        visit.activity(r.fraction * 100)
+        visit.activity(r.position * 100)
         if (r.turned) visit.markMoved()
         return true
     }

@@ -14,7 +14,13 @@ import io.github.ottershelf.core.sync.ProgressStore.Position
 @Serializable
 data class Relocate(
     val cfi: String? = null,
+    /** foliate's fraction through the book: where what's on screen ends. */
     val fraction: Double = 0.0,
+    /**
+     * Where what's on screen starts (foliate's progress.js startFraction); null from an older page.
+     * See [position].
+     */
+    val startFraction: Double? = null,
     val source: String? = null,
     val koboLocationType: JsonElement? = null,
     val koboLocationValue: JsonElement? = null,
@@ -39,7 +45,16 @@ data class Relocate(
      * half a percent of 1; scrolled, it falls short at the bottom; a spread reports its first page.
      */
     val bookEnd: Boolean = false,
-)
+) {
+    /**
+     * The place through the book (0..1) that is saved, shown and counted: where the screen starts, so
+     * a landscape spread (two columns) gives the same number as a portrait page, and the number
+     * agrees with KOReader's top-of-page percentage. [fraction], the end of the screen, ran a column
+     * or two ahead on a spread, and the book page's "p. N / M" with it. At the end of the book it is
+     * the end ([fraction]), so a finished book still reaches 100% (the server works out Read from it).
+     */
+    val position: Double get() = if (bookEnd || fraction >= 1.0) fraction else startFraction ?: fraction
+}
 
 /** A table-of-contents entry, flattened; [depth] 0 is the top level. */
 @Serializable

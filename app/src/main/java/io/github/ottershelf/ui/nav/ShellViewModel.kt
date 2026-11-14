@@ -21,6 +21,7 @@ import io.github.ottershelf.core.model.BookSource
 import io.github.ottershelf.core.session.AuthState
 import io.github.ottershelf.core.theme.ThemeSyncEvent
 import io.github.ottershelf.core.tracking.TrackingEvent
+import io.github.ottershelf.feature.collections.CollectionDeletion
 
 /**
  * The drawer: who's signed in where, its rows, and whether loading them failed.
@@ -124,6 +125,8 @@ class ShellViewModel(private val container: AppContainer) : ViewModel() {
                     }
                 }
                 val bookCollections = collections.await().filter { it.mediaType != "podcasts" }.sortedBy { it.displayOrder }
+                // Only the user's own can be deleted (a collection's book list offers it).
+                CollectionDeletion.noteOwned(bookCollections.filter { it.isOwner }.map { it.id }.toSet())
                 if (bookCollections.isNotEmpty()) {
                     entries += DrawerEntry.Header(R.string.nav_collections)
                     bookCollections.forEach {

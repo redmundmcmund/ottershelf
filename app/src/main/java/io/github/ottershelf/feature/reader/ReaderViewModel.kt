@@ -142,6 +142,9 @@ class ReaderViewModel(
 
     // Progress: debounced like the web reader (2 s after the last page turn), flushed on pause/exit.
     private var latest: Relocate? = null
+
+    /** The user moved ([ReadingSigns]) since the last full location was taken, so the next may be saved. */
+    private var userPlaced = false
     private var unsaved = false
     private val saveRunnable = Runnable { saveProgress() }
 
@@ -705,7 +708,7 @@ class ReaderViewModel(
     private fun onPageReady() {
         when {
             !decided && !deciding -> openBook()
-            decided -> openAt(latest?.let { Position(it.cfi, it.fraction * 100) } ?: start)
+            decided -> openAt(latest?.let { Position(it.cfi, it.position * 100) } ?: start)
             // Still deciding: openBook opens on this page when it's done.
         }
     }
@@ -859,7 +862,12 @@ class ReaderViewModel(
         // A full location for this position arrives shortly; until then nothing new to save.
         main.removeCallbacks(saveRunnable)
         // The user's reading keeps the session going and the screen on; foliate relocating by itself doesn't.
-        if (signs.onRelocate(r)) _state.update { it.copy(activity = it.activity + 1) }
+        val reading = signs.onRelocate(r)
+        if (reading) _state.update { it.copy(activity = it.activity + 1) }
+        // A relocate the user didn't make (the screen rotated or resized, a section settling) moves
+        // the screen's start a little: only a move of the user's makes the next full location worth
+        // saving (one settling after it still is: the move stays pending until a location is taken).
+        if (reading) userPlaced = true
         showPosition(r)
         showTimeLeft(r)
         if (r.chapterEnd != _state.value.chapterEnd || r.bookEnd != _state.value.bookEnd) {
@@ -873,10 +881,14 @@ class ReaderViewModel(
         showFullLocation(r)
         // Not moved since opening (or a fresh start not turned yet): where it opened stays as saved.
         if (freshStart || !visit.moved) return
+        // Relaid out, not moved by the user (rotated, resized): the place the user read to stays saved.
+        if (!userPlaced && latest != null) return
+        userPlaced = false
         // The same place pushed again (the page was hidden, or relaid out): nothing new to save.
         val same = latest != null && r.cfi == latest?.cfi
         if (!same) {
-            latest = r
+            // Full locations don't carry the book's end; the newest relocate does.
+            latest = r.copy(bookEnd = _state.value.bookEnd)
             unsaved = true
         }
         main.removeCallbacks(saveRunnable)
@@ -894,7 +906,9 @@ class ReaderViewModel(
     }
 
     private fun showPosition(r: Relocate) {
-        _state.update { it.copy(fraction = r.fraction.toFloat().coerceIn(0f, 1f), page = r.page, pages = r.pages) }
+        // A full location doesn't say it's at the book's end; the newest relocate did.
+        val at = if (r.bookEnd || _state.value.bookEnd) r.fraction else r.position
+        _state.update { it.copy(fraction = at.toFloat().coerceIn(0f, 1f), page = r.page, pages = r.pages) }
     }
 
     /** Asks the page for the current full location (computing the lazy fields now). */
@@ -916,7 +930,7 @@ class ReaderViewModel(
         unsaved = false
         val body = SaveProgress(
             cfi = r.cfi,
-            percentage = (r.fraction * 100).coerceIn(0.0, 100.0),
+            percentage = (r.position * 100).coerceIn(0.0, 100.0),
             koboLocationSource = r.source,
             koboLocationType = r.koboLocationType?.takeUnless { it is JsonNull },
             koboLocationValue = r.koboLocationValue?.takeUnless { it is JsonNull },
@@ -1016,8 +1030,9 @@ class ReaderViewModel(
         requestLocation { r ->
             answered = true
             main.removeCallbacks(fallback)
-            if (r?.cfi != null && r.cfi != latest?.cfi) {
-                latest = r
+            if (r?.cfi != null && r.cfi != latest?.cfi && (userPlaced || latest == null)) {
+                userPlaced = false
+                latest = r.copy(bookEnd = _state.value.bookEnd)
                 unsaved = true
             }
             saveProgress()

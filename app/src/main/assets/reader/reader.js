@@ -554,6 +554,7 @@ async function showBook(book, cfi, percentage) {
     // lazy getters in view.js #onRelocate). The full location follows once the page is idle.
     queueRelocate({
       fraction: d.fraction ?? 0,
+      startFraction: d.startFraction ?? d.fraction ?? 0,
       page: d.location?.current ?? null,
       pages: d.location?.total ?? null,
       // The user moved (a turn, swipe or scroll), as opposed to foliate settling a section (the first
@@ -627,6 +628,7 @@ function fullLocation() {
   return {
     cfi: d.cfi ?? null,
     fraction: d.fraction ?? 0,
+    startFraction: d.startFraction ?? d.fraction ?? 0,
     source: d.source ?? null,
     koboLocationType: d.koboLocationType ?? null,
     koboLocationValue: d.koboLocationValue ?? null,

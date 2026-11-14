@@ -102,6 +102,8 @@ data class BookCollection(
     val mediaType: String = "books",
     val bookCount: Int? = null,
     val displayOrder: Int = 0,
+    /** The signed-in user's own (others' public collections are listed too); only these can be deleted. */
+    val isOwner: Boolean = false,
 )
 
 @Serializable
@@ -197,9 +199,15 @@ data class BookDetail(
      */
     val seriesMemberships: List<SeriesMembership> = emptyList(),
     val publisher: String? = null,
+    /** "YYYY-MM-DD" when the full date is known (then [publishedYear] is its year). */
+    val publishedDate: String? = null,
     val publishedYear: Int? = null,
     val pageCount: Int? = null,
     val language: String? = null,
+    val genres: List<String> = emptyList(),
+    val tags: List<String> = emptyList(),
+    /** A comic's issue, volume and credits (ComicMetadataFields); null for other books. */
+    val comicMetadata: ComicMetadata? = null,
     /** The book's ISBNs, when its metadata has them (feature.book.PageCounts matches on them). */
     val isbn10: String? = null,
     val isbn13: String? = null,
@@ -216,6 +224,22 @@ data class BookDetail(
     val lockedFields: List<String> = emptyList(),
     /** The library's format priority (lower case, best first); empty: the web's default (core.format.BookFormats). */
     val formatPriority: List<String> = emptyList(),
+)
+
+/** A comic's own details (ComicMetadataFields): every field may be missing. */
+@Serializable
+data class ComicMetadata(
+    val issueNumber: String? = null,
+    val volumeName: String? = null,
+    val storyArcs: List<String>? = null,
+    val pencillers: List<String>? = null,
+    val inkers: List<String>? = null,
+    val colorists: List<String>? = null,
+    val letterers: List<String>? = null,
+    val coverArtists: List<String>? = null,
+    val characters: List<String>? = null,
+    val teams: List<String>? = null,
+    val locations: List<String>? = null,
 )
 
 /** A series a book is in, and its number there (BookSeriesMembership, the fields used here). */

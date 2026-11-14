@@ -76,6 +76,9 @@ export class SectionProgress {
     const remainingSection = (1 - fractionInSection) * sizeInSection
     return {
       fraction: nextSize / sizeTotal,
+      // [bookorbit-android] Where the screen starts (fraction is where it ends): the same in a
+      // portrait page and a landscape spread, and what KOReader means by its percentage.
+      startFraction: size / sizeTotal,
       section: {
         current: index,
         total: sizes.length,

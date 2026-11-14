@@ -24,8 +24,9 @@ data class CollectionChoice(
 /**
  * The user's collections for some books, as the web's AddToCollectionSheet uses them:
  * `POST collections/membership {bookIds}` (the user's own collections, each with how many of those
- * books it holds), `POST` / `DELETE collections/:id/books {bookIds}`, and `POST collections {name, icon}`
- * (the web's default icon, FolderOpen). Bodies are exactly the server's DTOs.
+ * books it holds), `POST` / `DELETE collections/:id/books {bookIds}`, `POST collections {name, icon}`
+ * (the web's default icon, FolderOpen), and `DELETE collections/:id` (the owner's or a superuser's;
+ * the books stay in their libraries). Bodies are exactly the server's DTOs.
  */
 interface CollectionsRemote {
     suspend fun choices(bookIds: List<Long>): List<CollectionChoice>
@@ -34,6 +35,9 @@ interface CollectionsRemote {
 
     /** Makes a collection named [name]; returns its id. */
     suspend fun create(name: String): Long
+
+    /** Deletes the collection itself; its books stay in their libraries. */
+    suspend fun delete(collectionId: Long)
 }
 
 class ApiCollectionsRemote(private val api: Api) : CollectionsRemote {
@@ -55,6 +59,10 @@ class ApiCollectionsRemote(private val api: Api) : CollectionsRemote {
         api.send("POST", "collections", buildJsonObject { put("name", name); put("icon", DEFAULT_ICON) }) {
             ApiJson.decodeFromString(CollectionChoice.serializer(), it).id
         }
+
+    override suspend fun delete(collectionId: Long) {
+        api.send("DELETE", "collections/$collectionId", null) { }
+    }
 
     private fun ids(bookIds: List<Long>): JsonObject = buildJsonObject { putJsonArray("bookIds") { bookIds.forEach { add(it) } } }
 

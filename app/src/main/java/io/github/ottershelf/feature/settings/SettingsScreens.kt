@@ -61,6 +61,7 @@ fun SettingsScreen(navigator: AppNavigator) {
         onOpenBookmoryImport = { navigator.navigate(Route.BookmoryImport) },
         onNextInSeries = viewModel::setNextInSeries,
         onKeepOnOpen = viewModel::setKeepOnOpen,
+        onFullEditing = viewModel::setFullEditing,
         onSignOut = viewModel::signOut,
     )
 }
@@ -81,6 +82,7 @@ fun SettingsContent(
     onOpenBookmoryImport: () -> Unit = {},
     onNextInSeries: (Boolean) -> Unit = {},
     onKeepOnOpen: (Boolean) -> Unit = {},
+    onFullEditing: (Boolean) -> Unit = {},
     onSignOut: () -> Unit = {},
 ) {
     val colors = OttershelfTheme.colors
@@ -154,6 +156,21 @@ fun SettingsContent(
                             checked = state.keepOnOpen,
                             onChange = onKeepOnOpen,
                         )
+                    }
+                }
+
+                if (state.canEditBooks) {
+                    Column {
+                        SettingsGroupLabel(stringResource(R.string.bookedit_settings_group))
+                        SettingsCard {
+                            SettingsSwitchRow(
+                                icon = "Pencil",
+                                title = stringResource(R.string.bookedit_settings_full),
+                                summary = stringResource(R.string.bookedit_settings_full_hint),
+                                checked = state.fullEditing,
+                                onChange = onFullEditing,
+                            )
+                        }
                     }
                 }
 

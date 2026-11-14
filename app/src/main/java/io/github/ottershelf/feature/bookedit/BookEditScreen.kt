@@ -112,6 +112,10 @@ internal class BookEditActions(
     val onTakePhoto: () -> Unit = {},
     val onFindOnline: () -> Unit = {},
     val onFileCover: () -> Unit = {},
+    /** The full editor's fields ([BookEditViewModel.editForm]). */
+    val onEdit: ((EditForm) -> EditForm) -> Unit = {},
+    /** The full editor's Lock ([BookEditViewModel.lock]). */
+    val onLock: (LockGroup) -> Unit = {},
 )
 
 /** Edit details (pushed from the book page's pencil). */
@@ -179,6 +183,8 @@ fun BookEditScreen(route: Route.BookEdit, navigator: AppNavigator) {
             onTakePhoto = takePhoto,
             onFindOnline = viewModel::openCoverSearch,
             onFileCover = viewModel::useFileCover,
+            onEdit = viewModel::editForm,
+            onLock = viewModel::lock,
         ),
     )
 
@@ -265,6 +271,12 @@ internal fun BookEditContent(
             ) {
                 CoverCard(state, actions)
                 DetailsCard(state, actions, focused, onFocus)
+                if (state.full) {
+                    DescriptionCard(state, actions)
+                    PublicationCard(state, actions)
+                    GenresTagsCard(state, actions)
+                    if (state.isComic) ComicCard(state, actions)
+                }
                 SaveArea(state, actions)
             }
         }
@@ -386,7 +398,7 @@ private fun DetailsCard(state: BookEditUiState, actions: BookEditActions, focuse
 
         // Title
         val titleLocked = state.isLocked(LockGroup.TITLE)
-        FieldLabel(stringResource(R.string.bookedit_field_title), state, LockGroup.TITLE, actions.onUnlock, Modifier.padding(top = 14.dp))
+        FieldLabel(stringResource(R.string.bookedit_field_title), state, LockGroup.TITLE, actions, Modifier.padding(top = 14.dp))
         val focusManager = LocalFocusManager.current
         OutlinedTextField(
             value = form.title,
@@ -410,9 +422,11 @@ private fun DetailsCard(state: BookEditUiState, actions: BookEditActions, focuse
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
         )
 
+        if (state.full) SubtitleField(state, actions)
+
         // Authors
         val authorsLocked = state.isLocked(LockGroup.AUTHORS)
-        FieldLabel(stringResource(R.string.bookedit_field_authors), state, LockGroup.AUTHORS, actions.onUnlock, Modifier.padding(top = 14.dp))
+        FieldLabel(stringResource(R.string.bookedit_field_authors), state, LockGroup.AUTHORS, actions, Modifier.padding(top = 14.dp))
         if (form.authors.isNotEmpty()) {
             FlowRow(
                 Modifier.fillMaxWidth().padding(bottom = 8.dp),
@@ -465,9 +479,9 @@ private fun DetailsCard(state: BookEditUiState, actions: BookEditActions, focuse
         // Series and its number
         val seriesLocked = state.isLocked(LockGroup.SERIES)
         Row(Modifier.fillMaxWidth().padding(top = 14.dp), verticalAlignment = Alignment.Bottom) {
-            FieldLabel(stringResource(R.string.bookedit_field_series), state, LockGroup.SERIES, actions.onUnlock, Modifier.weight(1f))
+            FieldLabel(stringResource(R.string.bookedit_field_series), state, LockGroup.SERIES, actions, Modifier.weight(1f))
             Spacer(Modifier.width(10.dp))
-            FieldLabel(stringResource(R.string.bookedit_field_number), state = null, group = null, onUnlock = {}, modifier = Modifier.width(NUMBER_WIDTH))
+            FieldLabel(stringResource(R.string.bookedit_field_number), state = null, group = null, actions = actions, modifier = Modifier.width(NUMBER_WIDTH))
         }
         val hasSeries = form.series.isNotBlank()
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
@@ -531,12 +545,16 @@ private fun DetailsCard(state: BookEditUiState, actions: BookEditActions, focuse
         ) {
             HelperLine(stringResource(R.string.bookedit_new_series), error = false)
         }
+        if (state.full) OtherSeriesField(state, actions)
     }
 }
 
-/** A field's label, with the lock and Unlock at the end when the server locked it. */
+/**
+ * A field's label, with the lock and Unlock at the end when the server locked it; in the full
+ * editor, Lock at the end of an unlocked field the user hasn't changed.
+ */
 @Composable
-private fun FieldLabel(text: String, state: BookEditUiState?, group: LockGroup?, onUnlock: (LockGroup) -> Unit, modifier: Modifier = Modifier) {
+internal fun FieldLabel(text: String, state: BookEditUiState?, group: LockGroup?, actions: BookEditActions, modifier: Modifier = Modifier) {
     val colors = OttershelfTheme.colors
     Row(modifier.heightIn(min = 28.dp).padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(
@@ -550,7 +568,9 @@ private fun FieldLabel(text: String, state: BookEditUiState?, group: LockGroup?,
         if (state != null && group != null && state.isLocked(group)) {
             LockPill()
             Spacer(Modifier.width(6.dp))
-            UnlockLink(state, group, onUnlock)
+            UnlockLink(state, group, actions.onUnlock)
+        } else if (state != null && group != null && state.full && state.unchanged(group)) {
+            LockLink(state, group, actions.onLock)
         }
     }
 }
@@ -586,6 +606,29 @@ private fun UnlockLink(state: BookEditUiState, group: LockGroup, onUnlock: (Lock
     )
 }
 
+/** The full editor's Lock: a small muted lock and word, the field stays as the server has it. */
+@Composable
+private fun LockLink(state: BookEditUiState, group: LockGroup, onLock: (LockGroup) -> Unit) {
+    val colors = OttershelfTheme.colors
+    val busy = state.locking == group
+    val enabled = state.locking == null && state.unlocking == null && state.canEdit
+    Row(
+        Modifier
+            .clip(RoundedCornerShape(OttershelfTheme.radii.sm))
+            .clickable(enabled = enabled, role = Role.Button) { onLock(group) }
+            .padding(horizontal = 6.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        LucideIcon("LockOpen", contentDescription = null, tint = colors.mutedForeground, size = 13.dp)
+        Spacer(Modifier.width(4.dp))
+        Text(
+            stringResource(if (busy) R.string.bookedit_locking else R.string.bookedit_lock),
+            style = MaterialTheme.typography.labelMedium,
+            color = colors.mutedForeground,
+        )
+    }
+}
+
 @Composable
 private fun UnlockButton(state: BookEditUiState, group: LockGroup, onUnlock: (LockGroup) -> Unit) {
     val busy = state.unlocking == group
@@ -598,7 +641,7 @@ private fun UnlockButton(state: BookEditUiState, group: LockGroup, onUnlock: (Lo
 }
 
 @Composable
-private fun AuthorChip(name: String, removable: Boolean, onRemove: () -> Unit) {
+internal fun AuthorChip(name: String, removable: Boolean, onRemove: () -> Unit) {
     val colors = OttershelfTheme.colors
     Row(
         Modifier
@@ -633,7 +676,7 @@ private fun AuthorChip(name: String, removable: Boolean, onRemove: () -> Unit) {
 }
 
 @Composable
-private fun ClearButton(label: String, onClick: () -> Unit) {
+internal fun ClearButton(label: String, onClick: () -> Unit) {
     Box(
         Modifier.size(36.dp).clip(CircleShape).clickable(role = Role.Button, onClickLabel = label, onClick = onClick),
         contentAlignment = Alignment.Center,
@@ -714,7 +757,7 @@ private fun SearchingRow() {
 }
 
 @Composable
-private fun HelperLine(text: String, error: Boolean) {
+internal fun HelperLine(text: String, error: Boolean) {
     val colors = OttershelfTheme.colors
     Text(
         text,

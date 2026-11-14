@@ -53,6 +53,11 @@ class AddToCollectionViewModelTest {
             names[id] = name
             return id
         }
+
+        override suspend fun delete(collectionId: Long) {
+            members -= collectionId
+            names -= collectionId
+        }
     }
 
     private val one = CollectionTarget(listOf(7), "The Lost World", wantToRead = true)

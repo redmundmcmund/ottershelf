@@ -22,4 +22,17 @@
     <string name="collections_change_failed">Couldn\'t change the collection.</string>
     <!-- %1$s: the server's reason. -->
     <string name="collections_change_failed_because">Couldn\'t change the collection: %1$s</string>
+    <!-- Deleting a whole collection (its book list's toolbar menu). -->
+    <string name="collections_more">More options</string>
+    <string name="collections_delete_collection">Delete collection</string>
+    <!-- %1$s: the collection's name. -->
+    <string name="collections_delete_title">Delete “%1$s”?</string>
+    <string name="collections_delete_message">The collection is deleted for good. Its books stay in your libraries.</string>
+    <string name="collections_delete">Delete</string>
+    <string name="collections_deleting">Deleting…</string>
+    <string name="collections_delete_failed">Couldn\'t delete the collection.</string>
+    <!-- %1$s: the server's reason. -->
+    <string name="collections_delete_failed_because">Couldn\'t delete the collection: %1$s</string>
+    <!-- %1$s: the collection's name. -->
+    <string name="collections_deleted">Deleted “%1$s”</string>
 </resources>

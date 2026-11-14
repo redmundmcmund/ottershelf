@@ -3,6 +3,7 @@ package io.github.ottershelf.feature.library
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.IconButton
 import io.github.ottershelf.ui.icons.LucideIcon
+import io.github.ottershelf.feature.collections.CollectionMenu
 import io.github.ottershelf.feature.collections.CollectionPrompt
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -113,6 +114,10 @@ fun BookListScreen(route: Route.BookList, navigator: AppNavigator, contentPaddin
         }
         view?.let { ViewMenuButton(it, metrics, onChange = viewModel::setView) }
         SortButton(active = changed, onClick = { sheetOpen = true })
+        // A collection of the user's own: ⋮ > Delete collection.
+        if (selected == null && route.sourceKey.startsWith("collection:")) {
+            route.sourceKey.substringAfter(':').toLongOrNull()?.let { CollectionMenu(it, route.title) }
+        }
     }
     if (route.chrome == Chrome.Root) TopBarActions(actions)
 

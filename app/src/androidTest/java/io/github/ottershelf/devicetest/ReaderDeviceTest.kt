@@ -164,6 +164,33 @@ class ReaderDeviceTest {
         }
     }
 
+    /**
+     * The page reports where the screen starts (progress.js startFraction) as well as where it ends,
+     * in relocates and full locations; the start is what is saved ([Relocate.position]), so a
+     * landscape spread saves the same place as a portrait page.
+     */
+    @Test
+    fun theScreensStartIsReportedAndIsWhatIsSaved() {
+        ReaderSession.open(book, PAGINATED).use { s ->
+            s.awaitOpened()
+            s.awaitQuiet()
+            s.swipeToNextPage()
+            Device.waitUntil("a turned relocate after the swipe (${s.probe.summary()})", 5_000) { s.probe.turned().isNotEmpty() }
+            s.awaitQuiet()
+            val r = s.probe.relocates.last()
+            Device.log("after a turn: fraction ${r.fraction} startFraction ${r.startFraction} position ${r.position}")
+            val start = r.startFraction
+            assertNotNull("the relocate has no startFraction", start)
+            assertTrue("the screen's start ($start) isn't before its end (${r.fraction})", start!! < r.fraction)
+            assertTrue("the start ($start) is past the opening", start > 0.0)
+            assertEquals(start, r.position, 0.0)
+            Device.waitUntil("a full location", 3_000) { s.probe.locations.isNotEmpty() }
+            val loc = s.probe.locations.last()
+            assertNotNull("the full location has no startFraction", loc.startFraction)
+            assertEquals(start, loc.startFraction!!, 1e-9)
+        }
+    }
+
     @Test
     fun reopeningPartwayIntoAChapterCountsOnlyThePageReadThere() {
         // The phone bug: reopened at a saved place partway into a chapter, the session counted from the

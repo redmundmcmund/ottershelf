@@ -104,4 +104,48 @@
     <string name="bookedit_camera_denied_title">The camera isn\'t allowed</string>
     <string name="bookedit_camera_denied">Allow the camera for Ottershelf in the phone\'s settings, or choose a photo instead.</string>
     <string name="bookedit_open_settings">Open settings</string>
+    <!-- The full editor (Settings > Full metadata editing). -->
+    <string name="bookedit_unlock_field_title">Unlock this field?</string>
+    <string name="bookedit_lock">Lock</string>
+    <string name="bookedit_locking">Locking…</string>
+    <string name="bookedit_field_subtitle">Subtitle</string>
+    <string name="bookedit_field_other_series">Also in these series</string>
+    <!-- %1$s: the series' name. -->
+    <string name="bookedit_remove_series">Remove %1$s</string>
+    <string name="bookedit_add_series">Add another series</string>
+    <string name="bookedit_description">Description</string>
+    <string name="bookedit_field_description">About the book</string>
+    <string name="bookedit_description_hint">Leave a blank line between paragraphs. Formatting from the book\'s file is kept unless you change the text.</string>
+    <string name="bookedit_publication">Publication</string>
+    <string name="bookedit_field_publisher">Publisher</string>
+    <string name="bookedit_field_published">Published</string>
+    <string name="bookedit_published_hint">YYYY-MM-DD</string>
+    <string name="bookedit_published_invalid">Published must be a year (1000–2200) or a date such as 2019-05-21.</string>
+    <string name="bookedit_field_pages">Pages</string>
+    <string name="bookedit_pages_invalid">Pages must be a whole number from 1.</string>
+    <string name="bookedit_field_language">Language</string>
+    <string name="bookedit_language_hint">e.g. en</string>
+    <string name="bookedit_field_isbn13">ISBN-13</string>
+    <string name="bookedit_field_isbn10">ISBN-10</string>
+    <string name="bookedit_isbn_invalid">An ISBN-13 has at most 13 characters and an ISBN-10 at most 10 (spaces and hyphens don\'t count).</string>
+    <string name="bookedit_genres_tags">Genres and tags</string>
+    <string name="bookedit_field_genres">Genres</string>
+    <string name="bookedit_field_tags">Tags</string>
+    <string name="bookedit_add_name_hint">Add…</string>
+    <string name="bookedit_comic">Comic</string>
+    <string name="bookedit_field_issue">Issue</string>
+    <string name="bookedit_field_volume">Volume</string>
+    <string name="bookedit_field_story_arcs">Story arcs</string>
+    <string name="bookedit_field_pencillers">Pencillers</string>
+    <string name="bookedit_field_inkers">Inkers</string>
+    <string name="bookedit_field_colorists">Colorists</string>
+    <string name="bookedit_field_letterers">Letterers</string>
+    <string name="bookedit_field_cover_artists">Cover artists</string>
+    <string name="bookedit_field_characters">Characters</string>
+    <string name="bookedit_field_teams">Teams</string>
+    <string name="bookedit_field_locations">Locations</string>
+    <!-- Settings > Editing. -->
+    <string name="bookedit_settings_group">Editing</string>
+    <string name="bookedit_settings_full">Full metadata editing</string>
+    <string name="bookedit_settings_full_hint">Edit every detail: subtitle, description, publisher, dates, language, pages, ISBNs, genres, tags, more series, comic credits and field locks. Off: title, authors, series and cover only.</string>
 </resources>
