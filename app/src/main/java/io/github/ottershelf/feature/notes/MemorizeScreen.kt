@@ -304,11 +304,6 @@ internal fun MemorizeContent(
                 Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f).padding(start = 6.dp)) {
                         Text(
-                            stringResource(R.string.notes_memorize_tap),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = colors.foreground,
-                        )
-                        Text(
                             pluralStringResource(R.plurals.notes_memorize_session, state.session, state.session) +
                                 (state.count?.let { "  ·  " + pluralStringResource(R.plurals.notes_highlights_count, it, it) } ?: ""),
                             style = MaterialTheme.typography.labelSmall,

@@ -51,11 +51,8 @@
     <string name="library_order_newest">Newest first</string>
     <string name="library_order_oldest">Oldest first</string>
     <string name="library_filter_reading_only">Reading only</string>
-    <string name="library_filter_reading_only_detail">Books you\'re reading or re-reading</string>
     <string name="library_filter_hide_read">Hide read</string>
-    <string name="library_filter_hide_read_detail">Books marked Read</string>
     <string name="library_filter_hide_unread">Hide unread</string>
-    <string name="library_filter_hide_unread_detail">Books marked Unread, or with no status yet</string>
     <!-- The chip for the sort: "Author · Z to A". -->
     <string name="library_chip_sort">%1$s · %2$s</string>
     <string name="library_chip_clear">Clear</string>
@@ -82,7 +79,6 @@
     <string name="library_view_covers_per_row">Covers per row</string>
     <string name="library_view_fewer">Fewer per row, bigger covers</string>
     <string name="library_view_more">More per row, smaller covers</string>
-    <string name="library_view_pinch_hint">Or pinch the grid</string>
 
     <!-- A book as a row of the list view. -->
     <string name="library_row_series">%1$s #%2$s</string>

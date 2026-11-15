@@ -132,14 +132,14 @@ fun SettingsContent(
                         SettingsNavRow(
                             icon = "Target",
                             title = stringResource(R.string.calendar_goals_title),
-                            summary = stringResource(R.string.calendar_settings_goals_summary),
+                            summary = null,
                             onClick = onOpenGoals,
                         )
                         SettingsDivider()
                         SettingsSwitchRow(
                             icon = "Library",
                             title = stringResource(R.string.settings_next_in_series),
-                            summary = stringResource(R.string.settings_next_in_series_hint),
+                            summary = null,
                             checked = state.nextInSeries,
                             onChange = onNextInSeries,
                         )
@@ -152,7 +152,7 @@ fun SettingsContent(
                         SettingsSwitchRow(
                             icon = "Download",
                             title = stringResource(R.string.settings_keep_on_open),
-                            summary = stringResource(R.string.settings_keep_on_open_hint),
+                            summary = null,
                             checked = state.keepOnOpen,
                             onChange = onKeepOnOpen,
                         )
@@ -166,7 +166,7 @@ fun SettingsContent(
                             SettingsSwitchRow(
                                 icon = "Pencil",
                                 title = stringResource(R.string.bookedit_settings_full),
-                                summary = stringResource(R.string.bookedit_settings_full_hint),
+                                summary = null,
                                 checked = state.fullEditing,
                                 onChange = onFullEditing,
                             )
@@ -180,7 +180,7 @@ fun SettingsContent(
                         SettingsNavRow(
                             icon = "Import",
                             title = stringResource(R.string.bookmory_settings_row),
-                            summary = stringResource(R.string.bookmory_settings_row_summary),
+                            summary = null,
                             onClick = onOpenBookmoryImport,
                         )
                     }
@@ -192,7 +192,7 @@ fun SettingsContent(
                         SettingsNavRow(
                             icon = "LogOut",
                             title = stringResource(if (state.signingOut) R.string.settings_signing_out else R.string.settings_sign_out),
-                            summary = stringResource(R.string.settings_sign_out_hint),
+                            summary = null,
                             onClick = onSignOut,
                             danger = true,
                             chevron = false,
@@ -207,7 +207,7 @@ fun SettingsContent(
                         SettingsNavRow(
                             icon = "Info",
                             title = stringResource(R.string.settings_about),
-                            summary = stringResource(R.string.settings_about_summary),
+                            summary = null,
                             onClick = onOpenAbout,
                         )
                     }

@@ -114,7 +114,6 @@ fun ReaderSettingsContent(
                         if (prefs.fixedLayoutSpread == ReaderPrefs.SPREAD_NONE) 1 else 0,
                     ) { onChange(prefs.copy(fixedLayoutSpread = if (it == 1) ReaderPrefs.SPREAD_NONE else ReaderPrefs.SPREAD_AUTO)) }
                 }
-                Hint(stringResource(R.string.reader_page_spreads_hint))
             }
         } else {
             TextSection(prefs, onChange)
@@ -186,8 +185,6 @@ private fun LayoutSection(prefs: ReaderPrefs, onChange: (ReaderPrefs) -> Unit, p
                 onChange(prefs.copy(maxInlineSize = ReaderPrefs.PAGE_WIDTHS[it]))
             }
         }
-        // Narrower than the narrowest page width: every choice fills the screen here.
-        if (pageWidthDp != null && pageWidthDp < ReaderPrefs.PAGE_WIDTHS.first()) Hint(stringResource(R.string.reader_page_width_hint))
     }
 }
 
@@ -302,16 +299,6 @@ private fun SectionLabel(title: String, first: Boolean = false) {
         modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = if (first) 4.dp else 14.dp, bottom = 2.dp),
         style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.05.em),
         color = colors.mutedForeground,
-    )
-}
-
-@Composable
-private fun Hint(text: String) {
-    Text(
-        text,
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 6.dp),
-        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
-        color = OttershelfTheme.colors.mutedForeground,
     )
 }
 

@@ -30,7 +30,9 @@ import androidx.compose.ui.unit.sp
 import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfFonts
 import io.github.ottershelf.ui.theme.OttershelfTheme
+import io.github.ottershelf.ui.theme.PanelKind
 import io.github.ottershelf.ui.theme.atAlpha
+import io.github.ottershelf.ui.theme.panelFill
 
 // The web's settings building blocks (main.css `.settings-*`), drawn with the Nexus card style so
 // Settings and Appearance look like the rest of the app.
@@ -60,7 +62,7 @@ internal fun SettingsCard(modifier: Modifier = Modifier, content: @Composable Co
         modifier = modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(colors.card)
+            .panelFill(colors, PanelKind.Panel, shape)
             .border(1.dp, colors.border, shape),
         content = content,
     )

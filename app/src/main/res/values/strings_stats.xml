@@ -12,9 +12,6 @@
     <string name="stats_load_failed">Couldn\'t load this chart</string>
     <string name="stats_not_enough">Not enough reading yet</string>
     <string name="stats_nothing_here">Nothing to show yet</string>
-    <string name="stats_tap_hint">Tap or drag across the chart for details</string>
-    <string name="stats_tap_point_hint">Tap a dot for details</string>
-    <string name="stats_tap_cell_hint">Tap a day for details</string>
     <string name="stats_other">Other</string>
     <string name="stats_unknown">Unknown</string>
 
@@ -52,7 +49,6 @@
     <!-- The earlier figure, when it is too small for a percentage: "Up from 18 s the 7 days before" -->
     <string name="stats_up_from_seven">Up from %1$s the 7 days before</string>
     <string name="stats_down_from_seven">Down from %1$s the 7 days before</string>
-    <string name="stats_week_strip_hint">Tap a day to see its sessions</string>
     <string name="stats_current_streak">Current streak</string>
     <string name="stats_longest_streak">Longest streak</string>
     <string name="stats_books_this_year">Books this year</string>

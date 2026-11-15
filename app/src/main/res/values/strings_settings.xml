@@ -11,17 +11,13 @@
     <string name="settings_appearance">Appearance</string>
     <string name="settings_appearance_summary">Theme: %1$s • Accent: %2$s • Background: %3$s</string>
     <string name="settings_next_in_series">Suggest the next in a series</string>
-    <string name="settings_next_in_series_hint">When you finish a book: at its end, on its page and after the timer</string>
     <string name="settings_keep_on_open">Keep books on this device</string>
-    <string name="settings_keep_on_open_hint">EPUB, Kobo, MOBI, Kindle and FB2 books download the first time you open them, so they open without a connection. PDFs and comics still open from the server.</string>
     <string name="settings_sign_out">Sign out</string>
-    <string name="settings_sign_out_hint">Cancels downloads and signs this phone out</string>
     <string name="settings_signing_out">Signing out…</string>
     <string name="settings_app_name">Ottershelf</string>
     <string name="settings_version">Version %1$s</string>
     <string name="settings_version_debug">Version %1$s (debug build)</string>
     <string name="settings_about">About Ottershelf</string>
-    <string name="settings_about_summary">Version, licences and the BookOrbit notice</string>
 
     <!-- About (AboutScreen). The notices below are BookOrbit's required wording, word for word
          (ADDITIONAL_TERMS.md sections 1 and 3; AboutNoticeTest checks them against that file):
@@ -43,7 +39,6 @@
     <string name="about_licence_text">The GNU AGPL v3</string>
     <string name="about_terms">BookOrbit\'s additional terms</string>
     <string name="about_group_components">Open-source components</string>
-    <string name="about_components_hint">Ottershelf is built with these. Tap one for its licence.</string>
     <string name="about_link_failed">No app can open this link</string>
 
     <!-- Appearance: the web's Display > Theme settings (en.json settings.appearance.*). -->
@@ -54,9 +49,7 @@
     <string name="settings_storage_active">Active</string>
     <string name="settings_storage_not_available">Not available</string>
     <string name="settings_storage_device_title">This device only</string>
-    <string name="settings_storage_device_description">Preferences stay on this phone. Best if you want a different look on different devices.</string>
     <string name="settings_storage_account_title">My account</string>
-    <string name="settings_storage_account_description">Preferences are saved to your account. Best if you want the same appearance on every device.</string>
     <string name="settings_storage_synced">Preferences will now be synced</string>
     <string name="settings_storage_local">Preferences will stay on this device</string>
     <string name="settings_storage_demo_restricted">Demo-restricted account cannot change theme storage mode</string>
@@ -64,22 +57,25 @@
     <string name="settings_storage_error">An error occurred while updating storage mode</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_color_scheme">Color scheme</string>
-    <string name="settings_color_scheme_hint">Light or dark interface</string>
     <string name="settings_accent">Accent color</string>
-    <string name="settings_accent_hint">Controls highlights and interactive elements</string>
     <string name="settings_radius">Corner radius</string>
-    <string name="settings_radius_hint">Roundness of cards and UI elements</string>
     <string name="settings_surface_opacity">Surface opacity</string>
-    <string name="settings_surface_opacity_hint">How much the toolbar and drawer let the background through</string>
     <string name="settings_brightness">Surface brightness</string>
-    <string name="settings_brightness_hint">Lighten dark mode surfaces</string>
     <string name="settings_brightness_reset">Reset</string>
     <string name="settings_percent">%1$d%%</string>
     <string name="settings_background_title">Library Background</string>
     <string name="settings_background_pattern">Background pattern</string>
-    <string name="settings_background_pattern_hint">Pattern shown behind your lists</string>
     <string name="settings_background_fundamental">Fundamental</string>
     <string name="settings_background_structural">Structural</string>
     <string name="settings_background_ambient">Ambient</string>
     <string name="settings_background_refractive">Refractive</string>
+    <string name="settings_panels">Cards and panels</string>
+    <string name="settings_panels_solid">Solid</string>
+    <string name="settings_panels_glass">Glass</string>
+    <string name="settings_panels_gradient">Gradient</string>
+    <string name="settings_glow">Top glow</string>
+    <string name="settings_pattern_strength">Pattern strength</string>
+    <string name="settings_pattern_strength_subtle">Subtle</string>
+    <string name="settings_pattern_strength_bold">Bold</string>
+    <string name="settings_pattern_strength_vivid">Vivid</string>
 </resources>

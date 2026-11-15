@@ -575,13 +575,6 @@ fun ViewMenuContent(view: ListView, widthDp: Float, onChange: (ListView) -> Unit
                     onChange(view.copy(cellDp = GridColumns.cellFor(widthDp, GridColumns.step(widthDp, columns, 1))))
                 }
             }
-            Text(
-                stringResource(R.string.library_view_pinch_hint),
-                Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 6.dp),
-                style = MaterialTheme.typography.bodySmall,
-                color = colors.mutedForeground,
-                textAlign = TextAlign.Center,
-            )
         }
     }
 }

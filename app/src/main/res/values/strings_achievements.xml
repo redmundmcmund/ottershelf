@@ -45,7 +45,6 @@
     <string name="achievements_rewind_intro_kicker">Your year in books</string>
     <string name="achievements_rewind_intro_line">%1$s of reading across %2$s</string>
     <string name="achievements_rewind_intro_empty">Nothing recorded for this year yet</string>
-    <string name="achievements_rewind_intro_hint">Swipe to see your year</string>
     <string name="achievements_rewind_time_kicker">Time spent reading</string>
     <string name="achievements_rewind_days_read">Days read</string>
     <string name="achievements_rewind_sessions">Sessions</string>
@@ -82,7 +81,6 @@
     <string name="achievements_rewind_badges_stat">Badges</string>
     <string name="achievements_hour">%1$02d:00</string>
     <string name="achievements_hours_short">%1$s h</string>
-    <string name="achievements_tap_hint">Tap or drag across the chart for details</string>
 
     <plurals name="achievements_days">
         <item quantity="one">%d day</item>

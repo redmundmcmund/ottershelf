@@ -25,7 +25,6 @@
 
     <!-- The Book Calendar -->
     <string name="calendar_heading">Book Calendar</string>
-    <string name="calendar_subtitle">How much have you read this month?</string>
     <string name="calendar_save_image">Save as image</string>
     <string name="calendar_saved">Saved to Pictures/Ottershelf</string>
     <string name="calendar_save_failed">Couldn\'t save the image</string>
@@ -129,7 +128,6 @@
     <string name="calendar_picker_search">Title or author</string>
     <string name="calendar_picker_clear">Clear the search</string>
     <string name="calendar_picker_scan">Scan a book</string>
-    <string name="calendar_picker_scan_detail">Find it by the barcode on the back</string>
     <string name="calendar_picker_reading_now">Reading now</string>
     <string name="calendar_picker_results">In your library</string>
     <string name="calendar_picker_nothing_reading">Search your library by title or author.</string>
@@ -143,7 +141,6 @@
     <string name="calendar_dates_loading">Looking at its readings…</string>
     <string name="calendar_dates_load_failed">Couldn\'t load this book\'s readings.</string>
     <string name="calendar_dates_readings">Readings of this book</string>
-    <string name="calendar_dates_readings_hint">Give one of them these dates, or add another reading.</string>
     <string name="calendar_dates_reading_now">Reading now</string>
     <string name="calendar_dates_finished_on">Finished %1$s</string>
     <string name="calendar_dates_gave_up_on">Gave up %1$s</string>
@@ -188,5 +185,4 @@
 
     <!-- The Settings entry -->
     <string name="calendar_settings_group">Reading</string>
-    <string name="calendar_settings_goals_summary">Yearly books and daily minutes</string>
 </resources>

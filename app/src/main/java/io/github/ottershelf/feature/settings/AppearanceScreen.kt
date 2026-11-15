@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
@@ -62,6 +63,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.ottershelf.R
 import io.github.ottershelf.core.theme.Accent
+import io.github.ottershelf.core.theme.PanelStyle
+import io.github.ottershelf.core.theme.PatternStrength
 import io.github.ottershelf.core.theme.Radius
 import io.github.ottershelf.core.theme.ThemeBackground
 import io.github.ottershelf.core.theme.ThemeMode
@@ -72,7 +75,9 @@ import io.github.ottershelf.ui.nav.AppNavigator
 import io.github.ottershelf.ui.nav.appViewModel
 import io.github.ottershelf.ui.theme.OttershelfFonts
 import io.github.ottershelf.ui.theme.OttershelfTheme
+import io.github.ottershelf.ui.theme.PanelKind
 import io.github.ottershelf.ui.theme.PatternBackground
+import io.github.ottershelf.ui.theme.panelFill
 import io.github.ottershelf.ui.theme.atAlpha
 import io.github.ottershelf.ui.theme.backgroundPattern
 import io.github.ottershelf.ui.theme.oklch
@@ -103,6 +108,9 @@ fun AppearanceScreen(navigator: AppNavigator) {
             onBrightness = viewModel::setBrightness,
             onResetBrightness = viewModel::resetBrightness,
             onBackground = viewModel::setBackground,
+            onPanels = viewModel::setPanels,
+            onGlow = viewModel::setGlow,
+            onPatternStrength = viewModel::setPatternStrength,
         ),
     )
 }
@@ -118,6 +126,9 @@ data class AppearanceActions(
     val onBrightness: (Int) -> Unit = {},
     val onResetBrightness: () -> Unit = {},
     val onBackground: (ThemeBackground) -> Unit = {},
+    val onPanels: (PanelStyle) -> Unit = {},
+    val onGlow: (Boolean) -> Unit = {},
+    val onPatternStrength: (PatternStrength) -> Unit = {},
 )
 
 private val AppearanceMessage.text: Int
@@ -167,7 +178,7 @@ fun AppearanceContent(
                 ) {
                     StorageSection(state, actions.onStorageMode)
                     ThemeSection(state.prefs, actions)
-                    BackgroundSection(state.prefs.background, actions.onBackground)
+                    BackgroundSection(state.prefs, actions)
                 }
             }
         }
@@ -184,7 +195,6 @@ private fun StorageSection(state: AppearanceUiState, onStorageMode: (Boolean) ->
             StorageOption(
                 icon = "Monitor",
                 title = stringResource(R.string.settings_storage_device_title),
-                description = stringResource(R.string.settings_storage_device_description),
                 active = !state.sync,
                 enabled = !state.switching,
                 unavailable = false,
@@ -193,7 +203,6 @@ private fun StorageSection(state: AppearanceUiState, onStorageMode: (Boolean) ->
             StorageOption(
                 icon = "Cloud",
                 title = stringResource(R.string.settings_storage_account_title),
-                description = stringResource(R.string.settings_storage_account_description),
                 active = state.sync,
                 enabled = !state.switching,
                 unavailable = state.demoRestricted,
@@ -208,7 +217,6 @@ private fun StorageSection(state: AppearanceUiState, onStorageMode: (Boolean) ->
 private fun StorageOption(
     icon: String,
     title: String,
-    description: String,
     active: Boolean,
     enabled: Boolean,
     unavailable: Boolean,
@@ -227,10 +235,10 @@ private fun StorageOption(
             .selectable(selected = active, enabled = enabled && !unavailable, role = Role.RadioButton, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             Modifier
-                .padding(top = 2.dp)
                 .size(32.dp)
                 .background(if (highlighted) colors.primary.atAlpha(0.15f) else colors.muted, OttershelfTheme.radii.lgShape),
             contentAlignment = Alignment.Center,
@@ -243,12 +251,6 @@ private fun StorageOption(
                 if (highlighted) StateBadge(stringResource(R.string.settings_storage_active), colors.primary.atAlpha(0.15f), colors.primary)
                 if (unavailable) StateBadge(stringResource(R.string.settings_storage_not_available), colors.muted, colors.mutedForeground)
             }
-            Text(
-                description,
-                modifier = Modifier.padding(top = 4.dp),
-                style = TextStyle(fontFamily = OttershelfFonts.Sans, fontSize = 12.sp, lineHeight = 19.sp),
-                color = colors.mutedForeground,
-            )
         }
     }
 }
@@ -277,7 +279,6 @@ private fun ThemeSection(prefs: ThemePrefs, actions: AppearanceActions) {
         SettingsCard {
             Column(SettingsRowPadding) {
                 SettingsLabel(stringResource(R.string.settings_color_scheme))
-                SettingsHint(stringResource(R.string.settings_color_scheme_hint))
                 Spacer(Modifier.height(12.dp))
                 ThemeModePicker(prefs.theme, actions.onTheme)
             }
@@ -285,24 +286,35 @@ private fun ThemeSection(prefs: ThemePrefs, actions: AppearanceActions) {
             Column(Modifier.padding(top = 14.dp, bottom = 8.dp)) {
                 Column(Modifier.padding(horizontal = 16.dp)) {
                     SettingsLabel(stringResource(R.string.settings_accent))
-                    SettingsHint(stringResource(R.string.settings_accent_hint))
                 }
                 AccentPicker(prefs.accent, colors.isDark, actions.onAccent)
             }
             SettingsDivider()
             Column(SettingsRowPadding) {
                 SettingsLabel(stringResource(R.string.settings_radius))
-                SettingsHint(stringResource(R.string.settings_radius_hint))
                 Spacer(Modifier.height(12.dp))
                 RadiusPicker(prefs.radius, actions.onRadius)
             }
+            SettingsDivider()
+            Column(SettingsRowPadding) {
+                SettingsLabel(stringResource(R.string.settings_panels))
+                Spacer(Modifier.height(12.dp))
+                PanelPicker(prefs.panels, prefs.background, actions.onPanels)
+            }
+            SettingsDivider()
+            SettingsSwitchRow(
+                icon = "Sun",
+                title = stringResource(R.string.settings_glow),
+                summary = null,
+                checked = prefs.glow,
+                onChange = actions.onGlow,
+            )
             SettingsDivider()
             Column(SettingsRowPadding) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     SettingsLabel(stringResource(R.string.settings_surface_opacity), modifier = Modifier.weight(1f))
                     SettingsValue(stringResource(R.string.settings_percent, prefs.surfaceOpacity))
                 }
-                SettingsHint(stringResource(R.string.settings_surface_opacity_hint))
                 PercentSlider(
                     value = prefs.surfaceOpacity,
                     min = ThemePrefs.SURFACE_OPACITY_MIN,
@@ -328,7 +340,6 @@ private fun ThemeSection(prefs: ThemePrefs, actions: AppearanceActions) {
                             }
                         }
                     }
-                    SettingsHint(stringResource(R.string.settings_brightness_hint))
                     PercentSlider(
                         value = prefs.brightness,
                         min = ThemePrefs.BRIGHTNESS_MIN,
@@ -466,16 +477,36 @@ private fun swatchColor(accent: Accent, dark: Boolean): Color = when {
 /** The Theme card's radius buttons: each drawn with (roughly) its own corner, the chosen one in the accent. */
 @Composable
 private fun RadiusPicker(selected: Radius, onPick: (Radius) -> Unit) {
-    val colors = OttershelfTheme.colors
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Radius.entries.forEach { radius ->
-            val on = radius == selected
-            val shape = when (radius) {
+    ChoiceButtons(
+        options = Radius.entries,
+        selected = selected,
+        label = { it.label },
+        shape = { radius ->
+            when (radius) {
                 Radius.SHARP -> RoundedCornerShape(2.dp)
                 Radius.DEFAULT -> RoundedCornerShape(6.dp)
                 Radius.ROUNDED -> RoundedCornerShape(14.dp)
                 Radius.PILL -> RoundedCornerShape(percent = 50)
             }
+        },
+        onPick = onPick,
+    )
+}
+
+/** A row of equal outlined buttons, the chosen one in the accent. */
+@Composable
+private fun <T> ChoiceButtons(
+    options: List<T>,
+    selected: T,
+    label: @Composable (T) -> String,
+    shape: @Composable (T) -> Shape,
+    onPick: (T) -> Unit,
+) {
+    val colors = OttershelfTheme.colors
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        options.forEach { option ->
+            val on = option == selected
+            val shape = shape(option)
             Box(
                 Modifier
                     .weight(1f)
@@ -483,11 +514,11 @@ private fun RadiusPicker(selected: Radius, onPick: (Radius) -> Unit) {
                     .clip(shape)
                     .background(if (on) colors.primary.atAlpha(0.08f) else Color.Transparent)
                     .border(2.dp, if (on) colors.primary else colors.border, shape)
-                    .selectable(selected = on, role = Role.RadioButton, onClick = { onPick(radius) }),
+                    .selectable(selected = on, role = Role.RadioButton, onClick = { onPick(option) }),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    radius.label,
+                    label(option),
                     style = TextStyle(fontFamily = OttershelfFonts.Sans, fontWeight = FontWeight.Medium, fontSize = 12.sp),
                     color = if (on) colors.primary else colors.mutedForeground,
                     maxLines = 1,
@@ -541,14 +572,27 @@ private val BackgroundGroups: List<Pair<Int, List<ThemeBackground>>> = listOf(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun BackgroundSection(selected: ThemeBackground, onPick: (ThemeBackground) -> Unit) {
+private fun BackgroundSection(prefs: ThemePrefs, actions: AppearanceActions) {
     val colors = OttershelfTheme.colors
+    val selected = prefs.background
+    val onPick = actions.onBackground
     Column {
         SettingsGroupLabel(stringResource(R.string.settings_background_title))
         SettingsCard {
             Column(SettingsRowPadding) {
+                SettingsLabel(stringResource(R.string.settings_pattern_strength))
+                Spacer(Modifier.height(12.dp))
+                ChoiceButtons(
+                    options = PatternStrength.entries,
+                    selected = prefs.patternStrength,
+                    label = { patternStrengthLabel(it) },
+                    shape = { OttershelfTheme.radii.mdShape },
+                    onPick = actions.onPatternStrength,
+                )
+            }
+            SettingsDivider()
+            Column(SettingsRowPadding) {
                 SettingsLabel(stringResource(R.string.settings_background_pattern))
-                SettingsHint(stringResource(R.string.settings_background_pattern_hint))
                 Spacer(Modifier.height(16.dp))
                 Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
                     BackgroundGroups.forEach { (label, patterns) ->
@@ -614,3 +658,81 @@ private fun PatternTile(pattern: ThemeBackground, selected: Boolean, onClick: ()
 }
 
 private val PATTERN_TILE_WIDTH = 58.dp
+
+@Composable
+private fun patternStrengthLabel(strength: PatternStrength): String = stringResource(
+    when (strength) {
+        PatternStrength.SUBTLE -> R.string.settings_pattern_strength_subtle
+        PatternStrength.BOLD -> R.string.settings_pattern_strength_bold
+        PatternStrength.VIVID -> R.string.settings_pattern_strength_vivid
+    },
+)
+
+@Composable
+private fun panelLabel(style: PanelStyle): String = stringResource(
+    when (style) {
+        PanelStyle.SOLID -> R.string.settings_panels_solid
+        PanelStyle.GLASS -> R.string.settings_panels_glass
+        PanelStyle.GRADIENT -> R.string.settings_panels_gradient
+    },
+)
+
+/**
+ * Solid, Glass and Gradient side by side, each a small window onto the page (the chosen pattern,
+ * drawn bold enough to read at this size) with a card filled in that style over it.
+ */
+@Composable
+private fun PanelPicker(selected: PanelStyle, background: ThemeBackground, onPick: (PanelStyle) -> Unit) {
+    val colors = OttershelfTheme.colors
+    val radii = OttershelfTheme.radii
+    // A pattern under the preview cards even when the page has none, or the styles look alike.
+    val previewPattern = if (background == ThemeBackground.NONE) ThemeBackground.MESH else background
+    val previewColors = colors.copy(patternScale = maxOf(colors.patternScale, 2.5f))
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        PanelStyle.entries.forEach { style ->
+            val on = style == selected
+            val frame = radii.mdShape
+            val cardShape = RoundedCornerShape(radii.lg)
+            Column(
+                Modifier
+                    .weight(1f)
+                    .clip(frame)
+                    .selectable(selected = on, role = Role.RadioButton, onClick = { onPick(style) }),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .clip(frame)
+                        .background(colors.background)
+                        .backgroundPattern(previewPattern, previewColors)
+                        .border(2.dp, if (on) colors.primary else colors.border, frame)
+                        .padding(start = 12.dp, top = 14.dp),
+                ) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .clip(cardShape)
+                            .panelFill(colors.copy(panels = style), PanelKind.Card, cardShape)
+                            .border(1.dp, colors.dashCardBorder, cardShape)
+                            .padding(10.dp),
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                            Box(Modifier.width(36.dp).height(5.dp).background(colors.foreground.atAlpha(0.55f), CircleShape))
+                            Box(Modifier.width(52.dp).height(4.dp).background(colors.mutedForeground.atAlpha(0.45f), CircleShape))
+                            Box(Modifier.width(28.dp).height(4.dp).background(colors.primary.atAlpha(0.7f), CircleShape))
+                        }
+                    }
+                }
+                Text(
+                    panelLabel(style),
+                    modifier = Modifier.padding(top = 4.dp),
+                    style = TextStyle(fontFamily = OttershelfFonts.Sans, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal, fontSize = 12.sp),
+                    color = if (on) colors.primary else colors.mutedForeground,
+                    maxLines = 1,
+                )
+            }
+        }
+    }
+}

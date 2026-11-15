@@ -4,7 +4,7 @@
     <string name="notes_title">Notes</string>
     <string name="notes_book_section">Highlights &amp; notes</string>
     <string name="notes_highlights_title">Highlights &amp; notes</string>
-    <string name="notes_section_empty">No highlights yet. Highlights made in the web reader, KOReader or Kobo show here.</string>
+    <string name="notes_section_empty">No highlights yet.</string>
     <string name="notes_section_failed">Couldn\'t load highlights. Tap to try again.</string>
     <string name="notes_see_all">See all %1$d</string>
     <string name="notes_book_empty">This book has no highlights yet.</string>
@@ -61,8 +61,8 @@
     <string name="notes_filter_liked">Liked</string>
     <string name="notes_all_books">All books</string>
     <string name="notes_all_colours">All colours</string>
-    <string name="notes_empty">No highlights yet. Highlights made in the web reader, KOReader or Kobo show here.</string>
-    <string name="notes_empty_liked">No liked notes yet. Tap the heart on a note to keep it here.</string>
+    <string name="notes_empty">No highlights yet.</string>
+    <string name="notes_empty_liked">No liked notes yet.</string>
     <string name="notes_none_match">Nothing matches these filters.</string>
     <string name="notes_colour_yellow">Yellow</string>
     <string name="notes_colour_green">Green</string>
@@ -79,7 +79,6 @@
     <string name="notes_memorize">Memorize</string>
     <string name="notes_memorize_all">All highlights</string>
     <string name="notes_memorize_liked">Liked notes</string>
-    <string name="notes_memorize_tap">Tap the card for the next one</string>
     <string name="notes_memorize_new">First time</string>
     <plurals name="notes_memorize_session">
         <item quantity="one">%1$d reviewed now</item>

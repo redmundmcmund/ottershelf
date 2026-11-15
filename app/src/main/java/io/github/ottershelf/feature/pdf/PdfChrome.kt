@@ -670,7 +670,7 @@ fun PdfSettingsContent(view: PdfView, customized: Boolean, actions: PdfSettingsA
                 if (view.fit == PdfFit.Width) 0 else 1,
             ) { actions.onFit(if (it == 0) PdfFit.Width else PdfFit.Page) }
         }
-        SettingRow(stringResource(R.string.pdf_night), stringResource(R.string.pdf_night_detail)) {
+        SettingRow(stringResource(R.string.pdf_night)) {
             Switch(checked = view.night, onCheckedChange = actions.onNight)
         }
         HorizontalDivider(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), thickness = 1.dp, color = colors.border)

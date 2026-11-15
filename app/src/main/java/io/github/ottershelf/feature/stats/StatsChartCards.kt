@@ -89,7 +89,6 @@ internal fun DailyCard(state: StatsUiState, onRetry: () -> Unit) {
                 val date = if (data.bucketDays == 1) it.start.format(weekdayDayMonth) else stringResource(R.string.stats_date_range, it.start.format(dayMonth), it.end.format(dayMonth))
                 stringResource(R.string.stats_previous_value, date, res.duration(it.previousSeconds))
             } ?: "",
-            hint = stringResource(R.string.stats_tap_hint),
         )
         val values = remember(data) { data.buckets.map { it.seconds / 60 } }
         val previous = remember(data) { data.buckets.map { it.previousSeconds / 60 } }
@@ -143,7 +142,6 @@ internal fun HeatmapCard(state: StatsUiState, onOpenDay: (LocalDate) -> Unit, on
         Readout(
             value = sel?.let { res.duration(it.seconds).takeIf { _ -> it.seconds > 0 } ?: "0" },
             label = sel?.let { stringResource(R.string.stats_time_sessions, it.date.format(weekdayDayMonth), res.sessions(it.sessions)) } ?: "",
-            hint = stringResource(R.string.stats_tap_cell_hint),
             action = sel?.takeIf { it.seconds > 0 }?.let { d -> @Composable { LinkAction(stringResource(R.string.stats_open_day)) { onOpenDay(d.date) } } },
         )
         Spacer(Modifier.height(4.dp))
@@ -185,12 +183,12 @@ internal fun PeakHoursCard(state: StatsUiState, onRetry: () -> Unit) {
         val events = remember(rows) { IntArray(24).also { a -> rows.forEach { if (it.hour in 0..23) a[it.hour] += it.eventsCount.roundToInt() } } }
         var selected by rememberSaveable(state.days) { mutableIntStateOf(-1) }
         val peak = hours.indices.maxBy { hours[it] }
+        Text(stringResource(R.string.stats_peak_hour, StatsMath.clock(peak.toDouble())), style = MaterialTheme.typography.bodySmall, color = OttershelfTheme.colors.mutedForeground)
         Readout(
             value = if (selected in 0..23) res.duration(hours[selected]) else null,
             label = if (selected in 0..23) stringResource(
                 R.string.stats_hour_span, StatsMath.clock(selected.toDouble()), StatsMath.clock((selected + 1).toDouble()), res.sessions(events[selected]),
             ) else "",
-            hint = stringResource(R.string.stats_peak_hour, StatsMath.clock(peak.toDouble())),
         )
         ColumnChart(
             values = remember(hours) { hours.map { it / 60 } },
@@ -220,12 +218,12 @@ internal fun WeekdaysCard(state: StatsUiState, onRetry: () -> Unit) {
     ) { data ->
         var selected by rememberSaveable(state.days) { mutableIntStateOf(-1) }
         val favourite = data.averageMinutes.indices.maxBy { data.averageMinutes[it] }
+        Text(stringResource(R.string.stats_favourite_day, StatsMath.weekday(favourite).getDisplayName(TextStyle.FULL, locale)), style = MaterialTheme.typography.bodySmall, color = OttershelfTheme.colors.mutedForeground)
         Readout(
             value = if (selected in 0..6) stringResource(R.string.stats_a_day, res.duration(data.averageMinutes[selected] * 60)) else null,
             label = if (selected in 0..6) stringResource(
                 R.string.stats_weekday_readout, StatsMath.weekday(selected).getDisplayName(TextStyle.FULL, locale), res.duration(data.totalSeconds[selected]),
             ) else "",
-            hint = stringResource(R.string.stats_favourite_day, StatsMath.weekday(favourite).getDisplayName(TextStyle.FULL, locale)),
         )
         ColumnChart(
             values = data.averageMinutes,
@@ -258,7 +256,6 @@ internal fun CompletionsCard(state: StatsUiState, onRetry: () -> Unit) {
         Readout(
             value = sel?.let { res.books(it.count.roundToInt()) },
             label = sel?.let { "${Month.of(it.month).getDisplayName(TextStyle.FULL_STANDALONE, locale)} ${it.year}" } ?: "",
-            hint = stringResource(R.string.stats_tap_hint),
         )
         val ink = rememberChartInk()
         LineChart(
@@ -309,7 +306,6 @@ internal fun TrajectoryCard(state: StatsUiState, onRetry: () -> Unit) {
                 val month = "${Month.of(it.month).getDisplayName(TextStyle.SHORT, locale)} ${it.year}"
                 if (t.goalBooks != null) stringResource(R.string.stats_goal_by_then, month, trim(it.targetCumulative)) else month
             } ?: "",
-            hint = stringResource(R.string.stats_tap_hint),
         )
         LineChart(
             series = remember(t, ink) {
@@ -390,7 +386,6 @@ internal fun PaceCard(state: StatsUiState, onRetry: () -> Unit) {
         Readout(
             value = if (selected in points.indices) stringResource(R.string.stats_pace_readout, trim(ys[selected].toDouble())) else null,
             label = if (selected in points.indices) stringResource(R.string.stats_pace_readout_label, res.duration(xs[selected] * 60.0)) else "",
-            hint = stringResource(R.string.stats_tap_point_hint),
         )
         ScatterChart(
             xs = xs,
@@ -446,7 +441,6 @@ internal fun ArchetypesCard(state: StatsUiState, onRetry: () -> Unit) {
             label = sel?.let {
                 stringResource(R.string.stats_day_at, StatsMath.weekday(StatsMath.mondayFirst(it.dayOfWeek)).getDisplayName(TextStyle.FULL, locale), StatsMath.clock(it.hour))
             } ?: "",
-            hint = stringResource(R.string.stats_tap_point_hint),
         )
         ScatterChart(
             xs = xs,
@@ -548,7 +542,6 @@ internal fun LatencyCard(state: StatsUiState, onRetry: () -> Unit) {
                     else -> stringResource(R.string.stats_latency_readout_range, it.minDays, it.maxDays)
                 }
             } ?: "",
-            hint = stringResource(R.string.stats_tap_hint),
         )
         ColumnChart(
             values = remember(l) { l.buckets.map { it.count } },

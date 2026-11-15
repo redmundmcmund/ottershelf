@@ -217,21 +217,18 @@ fun SortSheetContent(sort: ListSort, kind: ListKind, onChange: (ListSort) -> Uni
             EntryCard {
                 ToggleRow(
                     title = R.string.library_filter_reading_only,
-                    detail = R.string.library_filter_reading_only_detail,
                     checked = sort.readingOnly,
                     onChange = { onChange(sort.copy(readingOnly = !sort.readingOnly)) },
                 )
                 HorizontalDivider(color = colors.border)
                 ToggleRow(
                     title = R.string.library_filter_hide_read,
-                    detail = R.string.library_filter_hide_read_detail,
                     checked = sort.hideRead,
                     onChange = { onChange(sort.copy(hideRead = !sort.hideRead)) },
                 )
                 HorizontalDivider(color = colors.border)
                 ToggleRow(
                     title = R.string.library_filter_hide_unread,
-                    detail = R.string.library_filter_hide_unread_detail,
                     checked = sort.hideUnread,
                     onChange = { onChange(sort.copy(hideUnread = !sort.hideUnread)) },
                 )
@@ -329,7 +326,7 @@ private fun OrderTabs(sort: ListSort, onChange: (ListSort) -> Unit) {
 }
 
 @Composable
-private fun ToggleRow(@StringRes title: Int, @StringRes detail: Int, checked: Boolean, onChange: () -> Unit) {
+private fun ToggleRow(@StringRes title: Int, @StringRes detail: Int? = null, checked: Boolean, onChange: () -> Unit) {
     val colors = OttershelfTheme.colors
     Row(
         Modifier
@@ -340,7 +337,7 @@ private fun ToggleRow(@StringRes title: Int, @StringRes detail: Int, checked: Bo
     ) {
         Column(Modifier.weight(1f)) {
             Text(stringResource(title), style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp), color = colors.foreground)
-            Text(stringResource(detail), style = MaterialTheme.typography.bodySmall, color = colors.mutedForeground)
+            if (detail != null) Text(stringResource(detail), style = MaterialTheme.typography.bodySmall, color = colors.mutedForeground)
         }
         Switch(checked = checked, onCheckedChange = { onChange() }, modifier = Modifier.scale(0.8f))
     }

@@ -347,7 +347,6 @@ fun HomeContent(
                 items(entries, key = { it.key }, contentType = { it.contentType }) { item ->
                     when (item) {
                         DashboardItem.Timer -> timerBar?.invoke()
-                        DashboardItem.ArrangeHint -> ArrangeHint()
                         DashboardItem.NoShelves -> NoShelves(onCustomise)
                         is DashboardItem.Arrange -> {
                             val index = arranging.indexOfFirst { it.key == item.card.key }
@@ -410,10 +409,6 @@ private sealed interface DashboardItem {
         override val contentType = "timer"
     }
 
-    data object ArrangeHint : DashboardItem {
-        override val key = "arrange-hint"
-        override val contentType = "hint"
-    }
 
     data object NoShelves : DashboardItem {
         override val key = "no-shelves"
@@ -450,7 +445,6 @@ private fun dashboardItems(
     hasShelves: Boolean,
 ): List<DashboardItem> = buildList {
     if (editing) {
-        add(DashboardItem.ArrangeHint)
         arranging.forEach { add(DashboardItem.Arrange(it)) }
         return@buildList
     }
@@ -514,16 +508,6 @@ private fun WidgetRow(
 }
 
 // --- arranging -------------------------------------------------------------------------------
-
-@Composable
-private fun ArrangeHint() {
-    Text(
-        stringResource(R.string.home_arrange_hint),
-        Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, bottom = 4.dp),
-        style = MaterialTheme.typography.bodySmall,
-        color = OttershelfTheme.colors.mutedForeground,
-    )
-}
 
 /**
  * A card while arranging: its title as on the Dashboard and a drag handle. The handle drags at

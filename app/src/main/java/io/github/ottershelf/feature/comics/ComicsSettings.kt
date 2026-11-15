@@ -115,7 +115,7 @@ fun ComicsSettingsContent(
                 selected = FIT_IDS.indexOf(settings.fitMode).coerceAtLeast(0),
             ) { i -> change { it.copy(fitMode = FIT_IDS[i]) } }
         }
-        Block(stringResource(R.string.comics_scroll_mode), hint = stringResource(R.string.comics_scroll_hint)) {
+        Block(stringResource(R.string.comics_scroll_mode)) {
             Segmented(
                 options = listOf(R.string.comics_scroll_paged, R.string.comics_scroll_infinite, R.string.comics_scroll_no_gaps).map { stringResource(it) },
                 selected = SCROLL_IDS.indexOf(settings.scrollMode).coerceAtLeast(0),
@@ -129,7 +129,7 @@ fun ComicsSettingsContent(
         }
         Block(
             stringResource(R.string.comics_page_view),
-            hint = stringResource(if (paged) R.string.comics_two_page_hint else R.string.comics_two_page_paged_only),
+            hint = if (paged) null else stringResource(R.string.comics_two_page_paged_only),
         ) {
             Segmented(
                 options = listOf(stringResource(R.string.comics_view_single), stringResource(R.string.comics_view_two_page)),
@@ -176,19 +176,13 @@ fun ComicsSettingsContent(
         }
         InlineRow(
             stringResource(R.string.comics_auto_advance),
-            hint = stringResource(if (paged) R.string.comics_auto_advance_hint else R.string.comics_auto_advance_paged_only),
+            hint = if (paged) null else stringResource(R.string.comics_auto_advance_paged_only),
         ) {
             Switch(checked = settings.autoAdvance, onCheckedChange = { v -> change { it.copy(autoAdvance = v) } })
         }
 
         HorizontalDivider(Modifier.padding(horizontal = 20.dp, vertical = 12.dp), thickness = 1.dp, color = colors.border)
         Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-            Text(
-                stringResource(R.string.comics_default_note),
-                style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
-                color = colors.mutedForeground,
-            )
-            Spacer(Modifier.height(8.dp))
             SecondaryButton(text = stringResource(R.string.comics_use_as_default), onClick = actions.onUseAsDefault, icon = "Copy")
         }
     }

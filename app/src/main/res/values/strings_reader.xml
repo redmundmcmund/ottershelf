@@ -76,7 +76,6 @@
     <string name="reader_width_medium">Medium</string>
     <string name="reader_width_wide">Wide</string>
     <string name="reader_width_full">Full</string>
-    <string name="reader_page_width_hint">Every width fills this screen; the difference shows on wider pages, such as in landscape.</string>
     <string name="reader_paragraph_spacing">Paragraph spacing</string>
     <string name="reader_letter_spacing">Letter spacing</string>
     <string name="reader_word_spacing">Word spacing</string>
@@ -88,7 +87,6 @@
     <string name="reader_page_spreads">Page spreads</string>
     <string name="reader_spread_auto">Book default</string>
     <string name="reader_spread_none">Single page</string>
-    <string name="reader_page_spreads_hint">Choose how this image-based book pairs its pages.</string>
 
     <!-- The custom page colour picker -->
     <string name="reader_colour_background_title">Background colour</string>
@@ -157,13 +155,12 @@
     <string name="reader_notes_all">All · %1$d</string>
     <string name="reader_notes_no_chapter">Other</string>
     <string name="reader_notes_waiting">Waiting to sync</string>
-    <string name="reader_notes_no_highlights">No highlights yet. Press and hold on the text to highlight it or add a note.</string>
-    <string name="reader_notes_no_bookmarks">No bookmarks yet. The bookmark button at the top marks the page you\'re on.</string>
-    <string name="reader_notes_bookmarks_hint">Swipe left or press and hold to delete.</string>
+    <string name="reader_notes_no_highlights">No highlights yet.</string>
+    <string name="reader_notes_no_bookmarks">No bookmarks yet.</string>
 
     <string name="reader_search_placeholder">Search in this book</string>
     <string name="reader_search_clear">Clear the search</string>
-    <string name="reader_search_hint">Search the whole book. Matches are marked in the page.</string>
+    <string name="reader_search_hint">Search the whole book.</string>
     <!-- %1$d: percent of the book searched -->
     <string name="reader_search_searching">Searching… %1$d%%</string>
     <string name="reader_search_failed">The search stopped before the end.</string>

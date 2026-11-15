@@ -2,7 +2,7 @@
 <!-- Owned by feature.downloads. -->
 <resources>
     <string name="downloads_count">%1$d books on this device</string>
-    <string name="downloads_empty">No downloaded books yet.\n\nOpen a book and tap Download to keep it on this device for reading without a connection.</string>
+    <string name="downloads_empty">No downloaded books yet.</string>
     <string name="downloads_no_match">No books here</string>
     <string name="downloads_downloading">Downloading…</string>
     <string name="downloads_downloading_percent">Downloading %1$d%%</string>

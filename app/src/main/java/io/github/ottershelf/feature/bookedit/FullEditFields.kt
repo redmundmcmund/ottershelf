@@ -126,7 +126,6 @@ internal fun DescriptionCard(state: BookEditUiState, actions: BookEditActions) {
             shape = RoundedCornerShape(OttershelfTheme.radii.md),
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         )
-        HelperLine(stringResource(R.string.bookedit_description_hint), error = false)
     }
 }
 

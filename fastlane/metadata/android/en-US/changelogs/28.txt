@@ -1,0 +1,4 @@
+- New card styles (Settings > Appearance): Glass, the new default, lets the background pattern show through cards as on the BookOrbit web app; Gradient tints them with your accent; Solid keeps the old look
+- Optional accent glow at the top of the page, and Bold and Vivid strengths for every background pattern
+- A cleaner interface: most hint and explainer text is gone
+- Chart details now float over the chart when you tap it

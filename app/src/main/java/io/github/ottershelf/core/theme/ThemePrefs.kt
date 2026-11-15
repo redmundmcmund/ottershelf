@@ -17,7 +17,19 @@ data class ThemePrefs(
     val brightness: Int = DEFAULT_BRIGHTNESS,
     /** Opacity of the shell surfaces (toolbar, drawer), 80..100 percent. */
     val surfaceOpacity: Int = DEFAULT_SURFACE_OPACITY,
+    // The three below are this app's own, kept on the device only: the server's theme schema is
+    // strict (unknown keys are refused), so they are never sent, and the server's values never
+    // change them.
+    /** How cards and settings panels are filled. */
+    val panels: PanelStyle = PanelStyle.DEFAULT,
+    /** How strongly the background pattern is drawn ([PatternStrength.SUBTLE] is the web's). */
+    val patternStrength: PatternStrength = PatternStrength.DEFAULT,
+    /** The web's accent glow at the top of the page. */
+    val glow: Boolean = true,
 ) {
+    /** Only what the account stores: a change to anything else needs no save to the server. */
+    fun synced(): ThemePrefs = copy(panels = PanelStyle.DEFAULT, patternStrength = PatternStrength.DEFAULT, glow = true)
+
     /** The same preferences with the numbers clamped to what the server accepts. */
     fun clamped(): ThemePrefs = copy(
         brightness = brightness.coerceIn(BRIGHTNESS_MIN, BRIGHTNESS_MAX),
@@ -32,6 +44,40 @@ data class ThemePrefs(
         const val SURFACE_OPACITY_MIN = 80
         const val SURFACE_OPACITY_MAX = 100
         const val DEFAULT_SURFACE_OPACITY = 92
+    }
+}
+
+/**
+ * How cards and settings panels are filled (device only). [GLASS] is the web's BookOrbit style:
+ * dashboard cards at 30% card colour and panels at 60%, so the page pattern shows through.
+ * [GRADIENT] washes them from the accent at the top corner to translucent card colour.
+ */
+enum class PanelStyle(val id: String) {
+    SOLID("solid"),
+    GLASS("glass"),
+    GRADIENT("gradient");
+
+    companion object {
+        val DEFAULT = GLASS
+
+        fun fromId(id: String?): PanelStyle? = entries.firstOrNull { it.id == id }
+    }
+}
+
+/**
+ * How strongly the page pattern is drawn (device only). [scale] raises every pattern's opacity
+ * as `1 - (1 - a)^scale`: about [scale] times for the faint line and dot patterns, while the
+ * stronger ambient glows saturate instead of washing out the page.
+ */
+enum class PatternStrength(val id: String, val scale: Float) {
+    SUBTLE("subtle", 1f),
+    BOLD("bold", 2.5f),
+    VIVID("vivid", 4.5f);
+
+    companion object {
+        val DEFAULT = SUBTLE
+
+        fun fromId(id: String?): PatternStrength? = entries.firstOrNull { it.id == id }
     }
 }
 

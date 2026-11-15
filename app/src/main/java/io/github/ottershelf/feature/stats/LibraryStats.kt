@@ -181,7 +181,6 @@ private fun AddedCard(state: StatsUiState, onRetry: () -> Unit) {
         Readout(
             value = sel?.let { res.books(it.count.roundToInt()) },
             label = sel?.let { "${Month.of(it.month).getDisplayName(TextStyle.FULL_STANDALONE, locale)} ${it.year}" } ?: "",
-            hint = stringResource(R.string.stats_tap_hint),
         )
         ColumnChart(
             values = months.map { it.count },
@@ -216,7 +215,6 @@ private fun DecadesCard(state: StatsUiState, onRetry: () -> Unit) {
         Readout(
             value = sel?.let { res.books(it.count.roundToInt()) },
             label = labels.getOrNull(selected) ?: "",
-            hint = stringResource(R.string.stats_tap_hint),
         )
         ColumnChart(
             values = values,

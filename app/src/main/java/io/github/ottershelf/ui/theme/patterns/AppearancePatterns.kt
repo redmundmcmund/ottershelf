@@ -177,31 +177,31 @@ internal val AppearancePatternPainters: Map<ThemeBackground, BackgroundPainter> 
     },
 
     // Refractive
-    ThemeBackground.PRISM to painter {
+    ThemeBackground.PRISM to painter { colors ->
         // Red, blue and green at 3%: contrast(150%) brightness(110%) leaves pure primaries as they are.
         val brushes = listOf(
-            cssLinear(135f, size, Color(1f, 0f, 0f, 0.03f)),
-            cssLinear(225f, size, Color(0f, 0f, 1f, 0.03f)),
-            cssLinear(45f, size, Color(0f, 1f, 0f, 0.03f)),
+            cssLinear(135f, size, Color(1f, 0f, 0f, boosted(0.03f, colors.patternScale))),
+            cssLinear(225f, size, Color(0f, 0f, 1f, boosted(0.03f, colors.patternScale))),
+            cssLinear(45f, size, Color(0f, 1f, 0f, boosted(0.03f, colors.patternScale))),
         )
         ({ brushes.forEach { drawRect(it) } })
     },
     ThemeBackground.SPECTRUM to painter { colors ->
         val h = colors.tintHue
         val brushes = listOf(
-            cssLinear(135f, size, spectrum(h, 0.08f, contrast = 1.6f)),
-            cssLinear(225f, size, spectrum(h + 120f, 0.08f, contrast = 1.6f)),
-            cssLinear(45f, size, spectrum(h + 240f, 0.08f, contrast = 1.6f)),
+            cssLinear(135f, size, spectrum(h, boosted(0.08f, colors.patternScale), contrast = 1.6f)),
+            cssLinear(225f, size, spectrum(h + 120f, boosted(0.08f, colors.patternScale), contrast = 1.6f)),
+            cssLinear(45f, size, spectrum(h + 240f, boosted(0.08f, colors.patternScale), contrast = 1.6f)),
         )
         ({ brushes.forEach { drawRect(it) } })
     },
     ThemeBackground.SPECTRUM_X to painter { colors ->
         val h = colors.tintHue
         val brushes = listOf(
-            cssLinear(135f, size, spectrum(h, 0.08f, contrast = 1.6f)),
-            cssLinear(225f, size, spectrum(h + 90f, 0.08f, contrast = 1.6f)),
-            cssLinear(315f, size, spectrum(h + 180f, 0.08f, contrast = 1.6f)),
-            cssLinear(45f, size, spectrum(h + 270f, 0.08f, contrast = 1.6f)),
+            cssLinear(135f, size, spectrum(h, boosted(0.08f, colors.patternScale), contrast = 1.6f)),
+            cssLinear(225f, size, spectrum(h + 90f, boosted(0.08f, colors.patternScale), contrast = 1.6f)),
+            cssLinear(315f, size, spectrum(h + 180f, boosted(0.08f, colors.patternScale), contrast = 1.6f)),
+            cssLinear(45f, size, spectrum(h + 270f, boosted(0.08f, colors.patternScale), contrast = 1.6f)),
         )
         ({ brushes.forEach { drawRect(it) } })
     },
@@ -209,10 +209,10 @@ internal val AppearancePatternPainters: Map<ThemeBackground, BackgroundPainter> 
         // "to bottom", "to left", "to top", "to right".
         val h = colors.tintHue
         val brushes = listOf(
-            cssLinear(180f, size, spectrum(h, 0.08f, contrast = 1.6f)),
-            cssLinear(270f, size, spectrum(h + 90f, 0.08f, contrast = 1.6f)),
-            cssLinear(0f, size, spectrum(h + 180f, 0.08f, contrast = 1.6f)),
-            cssLinear(90f, size, spectrum(h + 270f, 0.08f, contrast = 1.6f)),
+            cssLinear(180f, size, spectrum(h, boosted(0.08f, colors.patternScale), contrast = 1.6f)),
+            cssLinear(270f, size, spectrum(h + 90f, boosted(0.08f, colors.patternScale), contrast = 1.6f)),
+            cssLinear(0f, size, spectrum(h + 180f, boosted(0.08f, colors.patternScale), contrast = 1.6f)),
+            cssLinear(90f, size, spectrum(h + 270f, boosted(0.08f, colors.patternScale), contrast = 1.6f)),
         )
         ({ brushes.forEach { drawRect(it) } })
     },
@@ -221,8 +221,8 @@ internal val AppearancePatternPainters: Map<ThemeBackground, BackgroundPainter> 
         val w = size.width
         val h = size.height
         val glows = listOf(
-            Glow(spectrum(hue, 0.12f, contrast = 1.5f), Offset(0f, 0f), rx = w * FARTHEST, ry = h * FARTHEST, end = 0.65f),
-            Glow(spectrum(hue + 180f, 0.12f, contrast = 1.5f), Offset(w, h), rx = w * FARTHEST, ry = h * FARTHEST, end = 0.65f),
+            Glow(spectrum(hue, boosted(0.12f, colors.patternScale), contrast = 1.5f), Offset(0f, 0f), rx = w * FARTHEST, ry = h * FARTHEST, end = 0.65f),
+            Glow(spectrum(hue + 180f, boosted(0.12f, colors.patternScale), contrast = 1.5f), Offset(w, h), rx = w * FARTHEST, ry = h * FARTHEST, end = 0.65f),
         )
         ({ glows.forEach { draw(it) } })
     },
@@ -238,7 +238,15 @@ private fun painter(build: CacheDrawScope.(OttershelfColors) -> (DrawScope.() ->
 }
 
 /** `color-mix(in oklch, var(--primary) [fraction], transparent)`. */
-private fun p(colors: OttershelfColors, fraction: Float): Color = colors.primary.copy(alpha = colors.primary.alpha * fraction)
+private fun p(colors: OttershelfColors, fraction: Float): Color =
+    colors.primary.copy(alpha = boosted(colors.primary.alpha * fraction, colors.patternScale))
+
+/**
+ * An opacity raised for the user's pattern strength ([OttershelfColors.patternScale]): `1 - (1 - a)^scale`,
+ * so faint patterns grow about [scale] times while strong glows saturate rather than flood the page.
+ */
+internal fun boosted(alpha: Float, scale: Float): Float =
+    if (scale == 1f) alpha else (1f - Math.pow((1f - alpha).toDouble(), scale.toDouble()).toFloat()).coerceIn(0f, 1f)
 
 /** The same colour, fully transparent: what CSS's premultiplied gradients fade towards. */
 private fun Color.clear(): Color = copy(alpha = 0f)

@@ -12,7 +12,7 @@
     <string name="requests_go_to">Requests go to</string>
     <string name="requests_server_default">Server default</string>
     <string name="requests_server_default_named">Server default (%1$s)</string>
-    <string name="requests_hint">Search by title and/or author. Results come from your server\'s metadata providers.</string>
+    <string name="requests_hint">Search by title or author.</string>
     <string name="requests_need_input">Enter a title or an author.</string>
     <string name="requests_searching">Searching…</string>
     <string name="requests_searching_found">Searching… %1$d found so far</string>

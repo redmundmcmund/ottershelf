@@ -192,21 +192,6 @@ private fun CustomiseList(state: CustomiseState, valid: Boolean, onEdit: DraftEd
         item(key = "scope", contentType = "scope") {
             Column(Modifier.padding(bottom = 16.dp)) { LibraryScope(draft, state, valid, onEdit, onRetryLibraries) }
         }
-        item(key = "hint:$tab", contentType = "hint") {
-            Column(Modifier.padding(bottom = 14.dp)) {
-                Text(
-                    stringResource(if (tab == CustomiseTab.SHELVES) R.string.home_reorder_shelves else R.string.home_reorder_widgets),
-                    style = labelStyle,
-                    color = colors.mutedForeground,
-                )
-                if (tab == CustomiseTab.SHELVES) {
-                    Spacer(Modifier.height(2.dp))
-                    Text(stringResource(R.string.home_rows_hint), style = labelStyle, color = colors.mutedForeground)
-                }
-                Spacer(Modifier.height(2.dp))
-                Text(stringResource(R.string.home_arrange_tip), style = labelStyle, color = colors.mutedForeground)
-            }
-        }
         items(shown, key = { it }, contentType = { tab }) { key ->
             val index = keys.indexOf(key)
             val entry = reorderable(reorder, key).padding(bottom = 8.dp)
@@ -349,7 +334,6 @@ private fun LibraryScope(draft: CustomiseDraft, state: CustomiseState, valid: Bo
         if (draft.libraryScopeOpen) {
             HorizontalDivider(color = colors.border)
             Column(Modifier.padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 10.dp)) {
-                Text(stringResource(R.string.home_scope_description), style = labelStyle, color = colors.mutedForeground)
                 Spacer(Modifier.height(6.dp))
                 if (libraries == null && state.librariesFailed) {
                     Text(

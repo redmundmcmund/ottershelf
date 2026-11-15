@@ -484,8 +484,6 @@ private fun RhythmBody(data: ReadingRhythmData, initialDay: Int?) {
                     style = small(11),
                     color = colors.mutedForeground,
                 )
-            } else {
-                Text(stringResource(R.string.home_rhythm_hint), style = small(11), color = colors.mutedForeground.copy(alpha = 0.8f), maxLines = 1)
             }
         }
         Spacer(Modifier.height(6.dp))

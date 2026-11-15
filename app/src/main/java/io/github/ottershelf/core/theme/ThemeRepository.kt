@@ -3,6 +3,7 @@ package io.github.ottershelf.core.theme
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -137,7 +138,8 @@ class ThemeRepository(
         changedBeforeLoad = changedBeforeLoad || !_loaded.value
         _prefs.value = next
         persist()
-        if (syncEnabled.value) scheduleSave()
+        // The device-only settings (panels, pattern strength, glow) never reach the server.
+        if (syncEnabled.value && next.synced() != old.synced()) scheduleSave()
     }
 
     /**
@@ -248,6 +250,9 @@ class ThemeRepository(
         private val BACKGROUND = stringPreferencesKey("theme.background")
         private val BRIGHTNESS = intPreferencesKey("theme.brightness")
         private val SURFACE_OPACITY = intPreferencesKey("theme.surfaceOpacity")
+        private val PANELS = stringPreferencesKey("theme.panels")
+        private val PATTERN_STRENGTH = stringPreferencesKey("theme.patternStrength")
+        private val GLOW = booleanPreferencesKey("theme.glow")
 
         /** As the web store reads localStorage, but clamping brightness too (the web forgets to). */
         internal fun Preferences.toThemePrefs() = ThemePrefs(
@@ -258,6 +263,9 @@ class ThemeRepository(
                 ?: ThemeBackground.DEFAULT,
             brightness = this[BRIGHTNESS] ?: ThemePrefs.DEFAULT_BRIGHTNESS,
             surfaceOpacity = this[SURFACE_OPACITY] ?: ThemePrefs.DEFAULT_SURFACE_OPACITY,
+            panels = PanelStyle.fromId(this[PANELS]) ?: PanelStyle.DEFAULT,
+            patternStrength = PatternStrength.fromId(this[PATTERN_STRENGTH]) ?: PatternStrength.DEFAULT,
+            glow = this[GLOW] ?: true,
         ).clamped()
 
         private fun MutablePreferences.write(prefs: ThemePrefs) {
@@ -267,6 +275,9 @@ class ThemeRepository(
             this[BACKGROUND] = prefs.background.id
             this[BRIGHTNESS] = prefs.brightness
             this[SURFACE_OPACITY] = prefs.surfaceOpacity
+            this[PANELS] = prefs.panels.id
+            this[PATTERN_STRENGTH] = prefs.patternStrength.id
+            this[GLOW] = prefs.glow
         }
     }
 }

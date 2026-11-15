@@ -14,7 +14,11 @@ import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import io.github.ottershelf.core.theme.ThemeBackground
 import io.github.ottershelf.ui.theme.patterns.AppearancePatternPainters
@@ -66,12 +70,14 @@ object BackgroundPatterns {
     ): DrawScope.() -> Unit {
         val cell = cellDp.dp.toPx().roundToInt().coerceAtLeast(1)
         val tile = ImageBitmap(cell, cell)
+        // Stronger patterns pull the neutral dots towards the accent and enlarge them a little.
+        val boost = ((colors.patternScale - 1f) / 4.4f).coerceIn(0f, 1f)
         val paint = Paint().apply {
-            color = colors.dotColor
+            color = lerp(colors.dotColor, colors.primary, boost * 0.85f)
             isAntiAlias = true
         }
         val canvas = Canvas(tile)
-        val radius = radiusDp.dp.toPx()
+        val radius = radiusDp.dp.toPx() * (1f + boost * 0.8f)
         offsets.forEach { canvas.drawCircle(Offset(it.x * cell, it.y * cell), radius, paint) }
         val brush = ShaderBrush(ImageShader(tile, TileMode.Repeated, TileMode.Repeated))
         return { drawRect(brush) }
@@ -89,16 +95,40 @@ fun Modifier.backgroundPattern(pattern: ThemeBackground, colors: OttershelfColor
 }
 
 /**
- * The page behind the app's content: the background colour with the user's pattern on it. The
- * shell puts this behind its content area; screens themselves stay transparent (or draw cards).
+ * The web's accent glow at the top of the page (main.css `.shell-glow`, tokens.css `--glow-image`):
+ * an ellipse of the primary, 38% in light mode and 60% in dark, fading out. The web's band is
+ * 10rem under its header; here it is taller, since the toolbar and status bar sit over the page's
+ * top on a phone and would hide most of it.
+ */
+fun Modifier.topGlow(colors: OttershelfColors): Modifier = drawWithCache {
+    val color = colors.primary.copy(alpha = if (colors.isDark) 0.60f else 0.38f)
+    val rx = size.width * 0.75f
+    val ry = GLOW_BAND_DP.dp.toPx()
+    val center = Offset(size.width / 2f, 0f)
+    val brush = Brush.radialGradient(0f to color, 1f to color.copy(alpha = 0f), center = center, radius = rx)
+    onDrawBehind {
+        scale(scaleX = 1f, scaleY = ry / rx, pivot = center) {
+            drawRect(brush, topLeft = center - Offset(rx, rx), size = Size(rx * 2f, rx * 2f))
+        }
+    }
+}
+
+private const val GLOW_BAND_DP = 440f
+
+/**
+ * The page behind the app's content: the background colour with the user's pattern on it, and the
+ * top glow when it is on. The shell puts this behind its content area; screens themselves stay
+ * transparent (or draw cards).
  */
 @Composable
 fun PatternBackground(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
     val colors = OttershelfTheme.colors
+    val prefs = OttershelfTheme.prefs
     Box(
         modifier = modifier
             .background(colors.background)
-            .backgroundPattern(OttershelfTheme.prefs.background, colors),
+            .backgroundPattern(prefs.background, colors)
+            .then(if (prefs.glow) Modifier.topGlow(colors) else Modifier),
         content = content,
     )
 }

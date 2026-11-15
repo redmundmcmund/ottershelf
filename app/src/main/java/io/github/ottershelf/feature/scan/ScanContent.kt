@@ -575,7 +575,6 @@ private fun ManualSheet(entry: ManualEntry, actions: ScanActions) {
     val colors = OttershelfTheme.colors
     Column {
         Text(stringResource(R.string.scan_manual_title), style = MaterialTheme.typography.titleMedium, color = colors.foreground)
-        Text(stringResource(R.string.scan_manual_detail), style = MaterialTheme.typography.bodySmall, color = colors.mutedForeground)
     }
     val focus = remember { FocusRequester() }
     val inPreview = LocalInspectionMode.current

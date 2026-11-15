@@ -278,12 +278,6 @@ private fun MonthCard(
         Row(Modifier.padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 CardTitle(stringResource(R.string.calendar_heading), icon = "CalendarDays")
-                Text(
-                    stringResource(R.string.calendar_subtitle),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.mutedForeground,
-                    modifier = Modifier.padding(start = 24.dp, top = 1.dp),
-                )
             }
             if (state.loading && !state.refreshing) SmallSpinner()
         }

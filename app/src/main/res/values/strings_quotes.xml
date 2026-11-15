@@ -21,11 +21,9 @@
     <string name="quotes_thought_hint">What it made you think (optional)</string>
     <string name="quotes_colour">Colour</string>
     <string name="quotes_keep_photo">Keep the photo on this phone</string>
-    <string name="quotes_keep_photo_detail">It isn\'t uploaded. Off: it is deleted once the quote is saved.</string>
     <string name="quotes_save">Save quote</string>
     <string name="quotes_saving">Saving…</string>
     <string name="quotes_save_failed">Couldn\'t save: %1$s</string>
-    <string name="quotes_where">Saved to BookOrbit as a highlight with no place in the book: it shows in Notes, on the book page and on the web, but the reader can\'t open it.</string>
 
     <!-- Book picker -->
     <string name="quotes_search_books">Search your library</string>

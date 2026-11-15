@@ -29,7 +29,6 @@
 
     <!-- Typing the ISBN -->
     <string name="scan_manual_title">Type the ISBN</string>
-    <string name="scan_manual_detail">10 or 13 digits, from the back cover or the copyright page. Hyphens and spaces are fine.</string>
     <string name="scan_manual_placeholder">978-0-306-40615-7</string>
     <string name="scan_manual_x">X</string>
     <string name="scan_manual_x_description">Type X, the last character of some ISBN-10s</string>

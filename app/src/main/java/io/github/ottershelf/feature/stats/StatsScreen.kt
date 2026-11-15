@@ -376,8 +376,6 @@ private fun WeekCard(o: Overview, today: LocalDate, onOpenDay: (LocalDate) -> Un
                 }
             }
         }
-        Spacer(Modifier.height(8.dp))
-        Text(stringResource(R.string.stats_week_strip_hint), style = MaterialTheme.typography.labelSmall, color = colors.mutedForeground)
     }
 }
 
@@ -437,7 +435,6 @@ private fun GoalCard(o: Overview, today: LocalDate, onOpenGoals: () -> Unit) {
                     val month = java.time.Month.of(p.month).getDisplayName(TextStyle.FULL_STANDALONE, locale)
                     p.targetCumulative?.let { stringResource(R.string.stats_goal_by_then, month, trim(it)) } ?: month
                 } ?: "",
-                hint = stringResource(R.string.stats_tap_hint),
             )
             val ink = rememberChartInk()
             val series = remember(goal, currentMonth, ink) {

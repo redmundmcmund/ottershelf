@@ -40,7 +40,6 @@
     <string name="pdf_fit_width">Fit width</string>
     <string name="pdf_fit_page">Fit page</string>
     <string name="pdf_night">Night mode</string>
-    <string name="pdf_night_detail">Invert the page colours</string>
     <string name="pdf_settings_default">Layout and zoom follow your default for PDFs.</string>
     <string name="pdf_settings_customized">Layout and zoom are set for this book.</string>
     <string name="pdf_settings_reset">Reset</string>

@@ -40,7 +40,7 @@ fun OttershelfTheme(
     darkTheme: Boolean = prefs.theme.isDark(isSystemInDarkTheme()),
     content: @Composable () -> Unit,
 ) {
-    val colors = remember(prefs.accent, prefs.brightness, prefs.surfaceOpacity, darkTheme) {
+    val colors = remember(prefs.accent, prefs.brightness, prefs.surfaceOpacity, prefs.panels, prefs.patternStrength, darkTheme) {
         ottershelfColors(prefs, darkTheme)
     }
     val radii = remember(prefs.radius) { OttershelfRadii.of(prefs.radius) }

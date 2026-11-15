@@ -90,7 +90,6 @@
     <string name="bookedit_search">Search</string>
     <string name="bookedit_search_none">No covers found. Try another source, or fewer words in the title.</string>
     <string name="bookedit_search_failed">Couldn\'t search: %1$s.</string>
-    <string name="bookedit_search_note">Searched by your BookOrbit server, and the previews come through it.</string>
     <string name="bookedit_provider_duckduckgo">DuckDuckGo</string>
     <string name="bookedit_provider_itunes">iTunes</string>
     <string name="bookedit_provider_all">All</string>
@@ -115,7 +114,6 @@
     <string name="bookedit_add_series">Add another series</string>
     <string name="bookedit_description">Description</string>
     <string name="bookedit_field_description">About the book</string>
-    <string name="bookedit_description_hint">Leave a blank line between paragraphs. Formatting from the book\'s file is kept unless you change the text.</string>
     <string name="bookedit_publication">Publication</string>
     <string name="bookedit_field_publisher">Publisher</string>
     <string name="bookedit_field_published">Published</string>
@@ -147,5 +145,4 @@
     <!-- Settings > Editing. -->
     <string name="bookedit_settings_group">Editing</string>
     <string name="bookedit_settings_full">Full metadata editing</string>
-    <string name="bookedit_settings_full_hint">Edit every detail: subtitle, description, publisher, dates, language, pages, ISBNs, genres, tags, more series, comic credits and field locks. Off: title, authors, series and cover only.</string>
 </resources>

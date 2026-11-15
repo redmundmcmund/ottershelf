@@ -304,7 +304,6 @@ private fun MonthsChart(values: List<Double>, valueText: (Double) -> String, int
     Readout(
         value = selected.takeIf { it >= 0 }?.let { valueText(values[it]) },
         label = selected.takeIf { it >= 0 }?.let { monthName(it) }.orEmpty(),
-        hint = stringResource(R.string.achievements_tap_hint),
     )
     ColumnChart(
         values = if (minutes) values.map { it / 60.0 } else values,
@@ -346,7 +345,6 @@ private fun Intro(data: RewindData, onYear: (Int) -> Unit) {
             MiniStat(data.badges.size.toString(), stringResource(R.string.achievements_rewind_badges_stat), Modifier.weight(1f))
         }
         Spacer(Modifier.height(28.dp))
-        Text(stringResource(R.string.achievements_rewind_intro_hint), style = MaterialTheme.typography.labelMedium, color = colors.mutedForeground)
     } else {
         Line(stringResource(R.string.achievements_rewind_intro_empty))
     }
@@ -467,7 +465,6 @@ private fun HoursPage(data: RewindData) {
     Readout(
         value = selected.takeIf { it >= 0 }?.let { res.duration(data.peakHours[it]) },
         label = selected.takeIf { it >= 0 }?.let { stringResource(R.string.achievements_hour, it) }.orEmpty(),
-        hint = stringResource(R.string.achievements_tap_hint),
     )
     ColumnChart(
         values = data.peakHours.map { it / 60.0 },

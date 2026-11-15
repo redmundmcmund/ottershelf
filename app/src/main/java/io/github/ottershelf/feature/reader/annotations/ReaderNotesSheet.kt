@@ -337,12 +337,6 @@ private fun ColumnScope.BookmarksTab(state: ReaderNotesUiState, actions: NotesSh
     }
     val format = remember { DateFormat.getDateInstance(DateFormat.MEDIUM) }
     var confirm by remember { mutableStateOf<Bookmark?>(null) }
-    Text(
-        stringResource(R.string.reader_notes_bookmarks_hint),
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 6.dp),
-        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
-        color = OttershelfTheme.colors.mutedForeground,
-    )
     LazyColumn(Modifier.fillMaxWidth().weight(1f), contentPadding = PaddingValues(bottom = 24.dp)) {
         items(state.bookmarks, key = { it.id }) { b ->
             BookmarkRow(b, format, onClick = { b.cfi?.let(actions.onJump) }, onLongClick = { confirm = b }, onSwiped = { actions.onDeleteBookmark(b.id) })

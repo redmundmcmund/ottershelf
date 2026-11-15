@@ -263,7 +263,6 @@ internal fun AddQuoteContent(state: AddQuoteUiState, actions: AddQuoteActions) {
                     Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(stringResource(R.string.quotes_keep_photo), style = MaterialTheme.typography.bodyMedium, color = colors.foreground)
-                            Text(stringResource(R.string.quotes_keep_photo_detail), style = MaterialTheme.typography.bodySmall, color = colors.mutedForeground)
                         }
                         Spacer(Modifier.width(12.dp))
                         Switch(checked = state.keepPhoto, onCheckedChange = actions.onKeepPhoto)
@@ -317,7 +316,6 @@ internal fun AddQuoteContent(state: AddQuoteUiState, actions: AddQuoteActions) {
                 enabled = state.canSave,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Text(stringResource(R.string.quotes_where), style = MaterialTheme.typography.bodySmall, color = colors.mutedForeground)
         }
     }
 }

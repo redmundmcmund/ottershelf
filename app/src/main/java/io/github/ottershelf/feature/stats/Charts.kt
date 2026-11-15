@@ -1,6 +1,11 @@
 package io.github.ottershelf.feature.stats
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.draw.shadow
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +15,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -547,22 +551,49 @@ internal fun LegendKey(label: String, color: Color, line: Boolean = false, dashe
 }
 
 /**
- * The readout above a plot: the selected value (strong) and what it is (dim), or a dim hint when
- * nothing is selected. Fixed height, so selecting never moves the chart. [action] (optional) sits
- * at the end, such as "Open day".
+ * The selected point's readout, placed just before a plot: the value (strong) and what it is
+ * (dim) on a small card, with [action] (optional, such as "Open day") at its end. Nothing shows
+ * until a point is selected.
+ *
+ * It takes only a fixed 8dp gap: the card floats over the top start corner of the plot below it,
+ * so the plot never moves when a point is picked (a drag across it would otherwise jump to
+ * another point). The start corner, as most plots end with their newest point.
  */
+private val READOUT_GAP = 8.dp
+
 @Composable
-internal fun Readout(value: String?, label: String, hint: String, action: (@Composable () -> Unit)? = null) {
+internal fun Readout(value: String?, label: String, action: (@Composable () -> Unit)? = null) {
     val colors = OttershelfTheme.colors
-    Row(Modifier.fillMaxWidth().heightIn(min = 34.dp), verticalAlignment = Alignment.CenterVertically) {
-        if (value == null) {
-            Text(hint, style = MaterialTheme.typography.bodySmall, color = colors.mutedForeground, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-        } else {
-            Column(Modifier.weight(1f)) {
-                Text(value, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold), color = colors.foreground, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(label, style = MaterialTheme.typography.labelSmall, color = colors.mutedForeground, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    val shape = OttershelfTheme.radii.lgShape
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .zIndex(1f)
+            .layout { measurable, constraints ->
+                val card = measurable.measure(constraints.copy(minHeight = 0))
+                layout(card.width, READOUT_GAP.roundToPx()) { card.place(0, 0) }
+            },
+    ) {
+        if (value != null) {
+            Row(
+                Modifier
+                    .shadow(6.dp, shape)
+                    .background(colors.popover, shape)
+                    .border(1.dp, colors.border, shape)
+                    .padding(start = 12.dp, end = if (action != null) 4.dp else 12.dp, top = 6.dp, bottom = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f, fill = false)) {
+                    Text(value, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold), color = colors.foreground, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (label.isNotEmpty()) {
+                        Text(label, style = MaterialTheme.typography.labelSmall, color = colors.mutedForeground, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+                action?.let {
+                    Spacer(Modifier.width(4.dp))
+                    it()
+                }
             }
-            action?.invoke()
         }
     }
 }

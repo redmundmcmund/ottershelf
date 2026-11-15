@@ -181,7 +181,6 @@ fun AboutContent(version: String, modified: String, onBack: () -> Unit = {}) {
 
                 Column {
                     SettingsGroupLabel(stringResource(R.string.about_group_components))
-                    SettingsHint(stringResource(R.string.about_components_hint), Modifier.padding(start = 2.dp, bottom = 8.dp))
                     SettingsCard {
                         COMPONENTS.forEachIndexed { i, component ->
                             if (i > 0) SettingsDivider()

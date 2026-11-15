@@ -3,7 +3,6 @@
     <!-- Settings row -->
     <string name="bookmory_settings_group">Import</string>
     <string name="bookmory_settings_row">Import from Bookmory</string>
-    <string name="bookmory_settings_row_summary">Readings, statuses and ratings from a Bookmory CSV export</string>
 
     <string name="bookmory_title">Import from Bookmory</string>
 

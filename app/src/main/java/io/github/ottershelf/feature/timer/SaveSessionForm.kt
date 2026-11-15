@@ -161,12 +161,14 @@ internal fun SaveSessionForm(
                             modifier = Modifier.width(128.dp),
                         )
                     }
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        form.startPage?.let { stringResource(R.string.timer_started_page, it) } ?: stringResource(R.string.timer_no_page_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.mutedForeground,
-                    )
+                    form.startPage?.let { start ->
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            stringResource(R.string.timer_started_page, start),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.mutedForeground,
+                        )
+                    }
                 }
                 ProgressUnit.PERCENT -> {
                     OutlinedTextField(
@@ -182,13 +184,14 @@ internal fun SaveSessionForm(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        form.startPercent?.let { stringResource(R.string.timer_started_percent, ProgressInput.percentText(it)) }
-                            ?: stringResource(R.string.timer_no_page_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.mutedForeground,
-                    )
+                    form.startPercent?.let { start ->
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            stringResource(R.string.timer_started_percent, ProgressInput.percentText(start)),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.mutedForeground,
+                        )
+                    }
                 }
             }
 

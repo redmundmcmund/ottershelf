@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Icon
 import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfTheme
+import io.github.ottershelf.ui.theme.PanelKind
+import io.github.ottershelf.ui.theme.panelFill
 
 /**
  * A dashboard card as the web and the Nexus app draw it: the card colour faintly over the page
@@ -52,10 +54,15 @@ fun DashCard(
     contentPadding: PaddingValues = PaddingValues(12.dp),
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val colors = OttershelfTheme.colors
     Column(
         modifier = modifier
             .clip(shape)
-            .background(containerColor)
+            // The default fill follows the Panels setting; a colour of the caller's own is drawn as given.
+            .then(
+                if (containerColor == colors.dashCard) Modifier.panelFill(colors, PanelKind.Card, shape)
+                else Modifier.background(containerColor),
+            )
             .border(1.dp, borderColor, shape)
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(contentPadding),

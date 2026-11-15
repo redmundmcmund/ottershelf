@@ -155,11 +155,6 @@ internal fun CoverSearchContent(
                 items(results) { result -> FoundCover(result, onPick) }
             }
         }
-        Row(Modifier.fillMaxWidth().padding(top = 10.dp), verticalAlignment = Alignment.Top) {
-            LucideIcon("Info", contentDescription = null, tint = colors.mutedForeground, size = 14.dp, modifier = Modifier.padding(top = 1.dp))
-            Spacer(Modifier.width(6.dp))
-            Text(stringResource(R.string.bookedit_search_note), style = MaterialTheme.typography.bodySmall, color = colors.mutedForeground)
-        }
     }
 }
 

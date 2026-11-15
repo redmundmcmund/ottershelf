@@ -21,6 +21,8 @@ import io.github.ottershelf.core.model.AuthUser
 import io.github.ottershelf.core.network.ApiException
 import io.github.ottershelf.core.settings.AppSettings
 import io.github.ottershelf.core.theme.Accent
+import io.github.ottershelf.core.theme.PanelStyle
+import io.github.ottershelf.core.theme.PatternStrength
 import io.github.ottershelf.core.theme.Radius
 import io.github.ottershelf.core.theme.ThemeBackground
 import io.github.ottershelf.core.theme.ThemeMode
@@ -149,6 +151,9 @@ class AppearanceViewModel(private val container: AppContainer) : ViewModel() {
     fun setBackground(background: ThemeBackground) = theme.update { it.copy(background = background) }
     fun setBrightness(value: Int) = theme.update { it.copy(brightness = value) }
     fun setSurfaceOpacity(value: Int) = theme.update { it.copy(surfaceOpacity = value) }
+    fun setPanels(style: PanelStyle) = theme.update { it.copy(panels = style) }
+    fun setGlow(on: Boolean) = theme.update { it.copy(glow = on) }
+    fun setPatternStrength(strength: PatternStrength) = theme.update { it.copy(patternStrength = strength) }
 
     /** The web's Reset: brightness 0 (not the 35 a fresh install starts with). */
     fun resetBrightness() = setBrightness(0)

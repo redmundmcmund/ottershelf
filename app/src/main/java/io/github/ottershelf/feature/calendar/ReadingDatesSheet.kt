@@ -205,7 +205,6 @@ fun BookPickerContent(
             }
             Column(Modifier.weight(1f).padding(start = 12.dp)) {
                 Text(stringResource(R.string.calendar_picker_scan), style = MaterialTheme.typography.bodyLarge, color = colors.foreground)
-                Text(stringResource(R.string.calendar_picker_scan_detail), style = MaterialTheme.typography.bodySmall, color = colors.mutedForeground)
             }
             Chevron(left = false, tint = colors.mutedForeground, size = 18.dp)
         }
@@ -492,7 +491,6 @@ private fun Readings(state: DatesUiState, onTarget: (DatesTarget) -> Unit) {
     val colors = OttershelfTheme.colors
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         FieldLabel(stringResource(R.string.calendar_dates_readings))
-        Text(stringResource(R.string.calendar_dates_readings_hint), style = MaterialTheme.typography.bodySmall, color = colors.mutedForeground)
         Spacer(Modifier.height(2.dp))
         ReadingDates.ordered(state.attempts).forEach { attempt ->
             ChoiceRow(

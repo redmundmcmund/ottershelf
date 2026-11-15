@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import io.github.ottershelf.core.model.ReadStatus
 import io.github.ottershelf.core.theme.Accent
 import io.github.ottershelf.core.theme.AccentTone
+import io.github.ottershelf.core.theme.PanelStyle
 import io.github.ottershelf.core.theme.ThemePrefs
 
 /**
@@ -113,6 +114,11 @@ data class OttershelfColors(
     val flame: Color,
 
     private val pillFormats: Map<String, Color>,
+
+    /** How [DashCard][io.github.ottershelf.ui.components.DashCard]s and settings panels are filled (ui.theme.Panels). */
+    val panels: PanelStyle = PanelStyle.DEFAULT,
+    /** PatternStrength.scale: how much the page patterns' opacity is raised. */
+    val patternScale: Float = 1f,
 ) {
     /** Text colour of a format chip (`--pill-format-*`), tuned per theme. */
     fun formatPill(format: String?): Color = pillFormats[format?.lowercase()] ?: pillFormats.getValue("default")
@@ -203,6 +209,7 @@ fun ottershelfColors(prefs: ThemePrefs, dark: Boolean): OttershelfColors {
     val nearWhite = ok(0.985f, 0f, 0f)
     val nearBlack = ok(0.145f, 0f, 0f)
     val dashCard = card.over(background, 0.30f)
+    val see = prefs.panels != PanelStyle.SOLID
 
     return OttershelfColors(
         isDark = dark,
@@ -267,9 +274,10 @@ fun ottershelfColors(prefs: ThemePrefs, dark: Boolean): OttershelfColors {
 
         dashCard = dashCard,
         dashCardBorder = primary.atAlpha(0.40f),
-        cardRow = muted.over(dashCard, 0.20f),
-        cardRowPressed = muted.over(dashCard, 0.40f),
-        iconBox = muted.over(dashCard, 0.50f),
+        // Over a see-through panel these stay see-through too (the web's bg-muted/20 and /40).
+        cardRow = if (see) muted.atAlpha(0.20f) else muted.over(dashCard, 0.20f),
+        cardRowPressed = if (see) muted.atAlpha(0.40f) else muted.over(dashCard, 0.40f),
+        iconBox = if (see) muted.atAlpha(0.50f) else muted.over(dashCard, 0.50f),
         coverSurface = foreground.over(background, 0.12f),
         overlayPill = Color.Black.atAlpha(0.60f),
         statusDisc = Color(0xE61C1D22),
@@ -278,6 +286,9 @@ fun ottershelfColors(prefs: ThemePrefs, dark: Boolean): OttershelfColors {
         flame = Color(0xFFFF6900),
 
         pillFormats = if (dark) pillFormatsDark else pillFormatsLight,
+
+        panels = prefs.panels,
+        patternScale = prefs.patternStrength.scale,
     )
 }
 

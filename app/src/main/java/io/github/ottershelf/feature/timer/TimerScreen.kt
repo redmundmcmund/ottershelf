@@ -587,13 +587,7 @@ private fun ClockBody(state: TimerUiState, now: Long, phase: Phase, actions: Tim
         when (phase) {
             Phase.Running -> BigButton(icon = "Pause", label = stringResource(R.string.timer_pause), onClick = actions.onToggle)
             Phase.Paused -> BigButton(icon = "Play", label = stringResource(R.string.timer_resume), onClick = actions.onToggle)
-            else -> Text(
-                stringResource(R.string.timer_stopped_hint),
-                style = MaterialTheme.typography.bodyMedium,
-                color = colors.mutedForeground,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.widthIn(max = 280.dp),
-            )
+            else -> Unit
         }
     }
 }
