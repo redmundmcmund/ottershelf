@@ -1,5 +1,6 @@
 package io.github.ottershelf.feature.comics
 
+import kotlin.math.roundToInt
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -64,11 +65,22 @@ data class ComicsJump(val page: Int, val id: Int)
 sealed interface ComicsMessage {
     /** Marked Read/Unread by hand since it was last read: starting from the first page. */
     data class FreshStart(val statusLabel: String) : ComicsMessage
+
+    /** Read on elsewhere while the screen was away: moved there ([percent] of the book). */
+    data class MovedOn(val percent: Int) : ComicsMessage
+
+    /** Back from a pause, the server didn't answer in time: reading goes on unconfirmed. */
+    data object Unchecked : ComicsMessage
+
+    /** Back from a pause, the book had been finished on another device: the reader closes. */
+    data object FinishedElsewhere : ComicsMessage
 }
 
 data class ComicsUiState(
     val title: String,
     val loading: Boolean = true,
+    /** Back from a pause, asking the server where the book is now: the pages take no input. */
+    val resyncing: Boolean = false,
     val error: ComicsError? = null,
     /** The top and bottom bars (a tap in the middle of the page toggles them). */
     val chromeVisible: Boolean = false,
@@ -165,6 +177,14 @@ class ComicsViewModel(
                 if (count > 0) jumpTo(PageProgress.startPage(position, count) - 1)
             }
         }
+        viewModelScope.launch {
+            progress.movedOn.collect { position ->
+                _messages.trySend(ComicsMessage.MovedOn(position.percentage.roundToInt().coerceIn(0, 100)))
+            }
+        }
+        viewModelScope.launch { progress.unchecked.collect { _messages.trySend(ComicsMessage.Unchecked) } }
+        viewModelScope.launch { progress.finishedElsewhere.collect { _messages.trySend(ComicsMessage.FinishedElsewhere) } }
+        viewModelScope.launch { progress.resyncing.collect { on -> _state.update { it.copy(resyncing = on) } } }
         open()
     }
 
@@ -306,6 +326,8 @@ class ComicsViewModel(
     }
 
     fun onResume() {
+        // The server is asked again before anything counts (PageReaderProgress.onResume).
+        progress.onResume()
         // A new session starts with the page the user comes back to.
         val s = _state.value
         if (shownOnce && s.pageCount > 0) progress.onPage(s.lastShownPage + 1, s.pageCount)

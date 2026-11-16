@@ -22,6 +22,14 @@
     <string name="reader_webview_version">Installed WebView: %1$s</string>
     <!-- %1$s: the read status (Read, Unread). -->
     <string name="reader_fresh_start">Marked %1$s, so starting from the beginning</string>
+    <!-- Over a reader's page after coming back to it, while the library is asked where the book is now. Also used by the PDF and comics readers. -->
+    <string name="reader_resync_checking">Checking where you\'re up to…</string>
+    <!-- The library didn't answer in time: reading goes on from the page shown, unconfirmed. Also used by the PDF and comics readers. -->
+    <string name="reader_resync_unchecked">Couldn\'t reach your library to check your place</string>
+    <!-- A toast as a reader closes by itself: back from a pause, the book had been finished (marked Read) on another device meanwhile. Also used by the PDF and comics readers. -->
+    <string name="reader_finished_elsewhere">Finished on another device</string>
+    <!-- After coming back to a reader left open: the book was read on elsewhere meanwhile. Also used by the PDF and comics readers. %1$d: the new place, percent. -->
+    <string name="reader_moved_on">Read on elsewhere: moved to %1$d%%</string>
 
     <!-- Two reading positions (read offline here while the server moved on). -->
     <string name="reader_conflict_title">Two reading positions</string>

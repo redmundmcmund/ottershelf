@@ -1,5 +1,6 @@
 package io.github.ottershelf.feature.reader
 
+import android.widget.Toast
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -81,6 +82,7 @@ fun ReaderScreen(route: Route.Reader, navigator: AppNavigator) {
     val appColors = ReaderAppColors(colors.background, colors.foreground, colors.primary, colors.isDark)
     LaunchedEffect(appColors) { viewModel.setAppColors(appColors) }
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { viewModel.onPause() }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onResume() }
 
     var sheet by rememberSaveable { mutableStateOf<ReaderSheet?>(null) }
     // Look up (feature.reader.lookup): its own ViewModel, so its answers last the reading session.
@@ -97,6 +99,15 @@ fun ReaderScreen(route: Route.Reader, navigator: AppNavigator) {
             when (message) {
                 is ReaderMessage.FreshStart ->
                     snackbars.showSnackbar(resources.getString(R.string.reader_fresh_start, message.statusLabel))
+                is ReaderMessage.MovedOn ->
+                    snackbars.showSnackbar(resources.getString(R.string.reader_moved_on, message.percent))
+                ReaderMessage.Unchecked ->
+                    snackbars.showSnackbar(resources.getString(R.string.reader_resync_unchecked))
+                ReaderMessage.FinishedElsewhere -> {
+                    // A toast: the reader's own snackbar would go with it.
+                    Toast.makeText(context, R.string.reader_finished_elsewhere, Toast.LENGTH_LONG).show()
+                    navigator.back()
+                }
                 is ReaderMessage.NoteRejected ->
                     snackbars.showSnackbar(resources.getString(R.string.reader_note_rejected, message.message))
             }

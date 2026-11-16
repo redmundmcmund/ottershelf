@@ -430,6 +430,225 @@ class PageReaderProgressTest {
         assertEquals(listOf(SaveProgress(cfi = null, percentage = 60.0, pageNumber = 6)), server.saved)
     }
 
+    // --- coming back to a reader left open ---------------------------------------------------
+
+    @Test
+    fun aBookFinishedElsewhereWhileAwayIsJumpedToAndTheOldPageSendsNothing() = runTest {
+        server.position = FileProgress(pageNumber = 5, percentage = 50.0)
+        val store = store()
+        val tracker = tracker(store)
+        tracker.open(hasLocalCopy = false)
+        tracker.onPage(5, 10)
+        now += 60_000
+        tracker.onPage(6, 10)
+        now += 60_000
+        tracker.onPause() // swiped home, phone locked
+        runCurrent()
+        store.syncAll(emptyList())
+        assertEquals(1, server.sessions.size)
+        // Read on and finished on another device.
+        server.position = FileProgress(pageNumber = 10, percentage = 100.0)
+        now += 3 * 3_600_000L
+        val jump = async { tracker.jumps.first() }
+        tracker.onResume()
+        tracker.onPage(6, 10) // the page still showing
+        runCurrent()
+        assertEquals(10, jump.await().pageNumber)
+        assertTrue(tracker.resyncing.value) // input stays off until the reader is there
+        tracker.onPage(10, 10) // landed there
+        assertFalse(tracker.resyncing.value)
+        now += 30_000
+        now += 30_000
+        tracker.onPause()
+        tracker.close()
+        runCurrent()
+        store.syncAll(emptyList())
+        assertEquals(1, server.sessions.size) // nothing from the old page, or from just looking
+        assertEquals(listOf(SaveProgress(cfi = null, percentage = 60.0, pageNumber = 6)), server.saved)
+        assertEquals(100.0, server.position.percentage!!, 1e-9)
+    }
+
+    @Test
+    fun theOldPageTakesNoTurnsWhileTheServerIsAskedAndTheReaderThenMovesOnAndSaysSo() = runTest {
+        server.position = FileProgress(pageNumber = 5, percentage = 50.0)
+        val store = store()
+        val tracker = tracker(store)
+        tracker.open(hasLocalCopy = false)
+        tracker.onPage(5, 10)
+        now += 60_000
+        tracker.onPage(6, 10)
+        tracker.onPause()
+        runCurrent()
+        server.position = FileProgress(pageNumber = 10, percentage = 100.0)
+        val jump = async { tracker.jumps.first() }
+        val said = async { tracker.movedOn.first() }
+        tracker.onResume()
+        assertTrue(tracker.resyncing.value)
+        tracker.onPage(6, 10)
+        now += 30_000
+        tracker.onPage(7, 10) // a turn from the old page (a key, the slider) before the answer: ignored
+        tracker.onGesture()
+        runCurrent()
+        assertTrue(tracker.resyncing.value)
+        assertEquals(10, jump.await().pageNumber)
+        assertEquals(100.0, said.await().percentage, 1e-9)
+        assertNull(tracker.choice.value)
+        tracker.onPage(10, 10)
+        assertFalse(tracker.resyncing.value)
+        now += 30_000
+        tracker.close()
+        runCurrent()
+        advanceTimeBy(3_000)
+        runCurrent()
+        store.syncAll(emptyList())
+        assertEquals(listOf(SaveProgress(cfi = null, percentage = 60.0, pageNumber = 6)), server.saved)
+        assertTrue(server.sessions.none { it.endProgress != null && it.endProgress!! < 100.0 && it.startedAt > server.sessions.first().startedAt })
+        assertEquals(100.0, server.position.percentage!!, 1e-9)
+    }
+
+    @Test
+    fun aServerThatDoesntAnswerLetsTheReaderGoOnButNothingIsSentUnchecked() = runTest {
+        server.position = FileProgress(pageNumber = 5, percentage = 50.0)
+        val store = store()
+        val tracker = tracker(store)
+        tracker.open(hasLocalCopy = false)
+        tracker.onPage(5, 10)
+        tracker.onPage(6, 10)
+        tracker.onPause()
+        runCurrent()
+        server.position = FileProgress(pageNumber = 10, percentage = 100.0)
+        server.unreachable = true
+        val said = async { tracker.unchecked.first() }
+        tracker.onResume()
+        runCurrent()
+        assertFalse(tracker.resyncing.value) // gave up at once: no answer
+        said.await() // and says the place isn't confirmed
+        server.unreachable = false
+        tracker.onPage(6, 10)
+        tracker.onPage(7, 10)
+        advanceTimeBy(3_000)
+        runCurrent()
+        assertEquals(10, tracker.choice.value!!.server.pageNumber) // checked first: asked, not overwritten
+        assertEquals(listOf(6), server.saved.map { it.pageNumber })
+    }
+
+    @Test
+    fun aReaderThatNeverReportsTheServersPageTakesInputAgainAfterAWhile() = runTest {
+        server.position = FileProgress(pageNumber = 5, percentage = 50.0)
+        val store = store()
+        val tracker = tracker(store)
+        tracker.open(hasLocalCopy = false)
+        tracker.onPage(5, 10)
+        tracker.onPause()
+        runCurrent()
+        server.position = FileProgress(pageNumber = 9, percentage = 90.0)
+        tracker.onResume()
+        runCurrent()
+        assertTrue(tracker.resyncing.value)
+        advanceTimeBy(PageReaderProgress.LAND_WAIT_MS + 1)
+        runCurrent()
+        assertFalse(tracker.resyncing.value)
+    }
+
+    @Test
+    fun aBookFinishedOnAnotherDeviceWhileAwayClosesTheReader() = runTest {
+        server.position = FileProgress(pageNumber = 5, percentage = 50.0)
+        server.status = ReadStatusInfo(status = "reading", source = "auto")
+        val store = store()
+        val tracker = tracker(store)
+        tracker.open(hasLocalCopy = false)
+        runCurrent()
+        tracker.onPage(5, 10)
+        now += 60_000
+        tracker.onPage(6, 10)
+        tracker.onPause()
+        runCurrent()
+        store.syncAll(emptyList())
+        val sessionsBefore = server.sessions.size
+        // Finished on the Kindle.
+        server.position = FileProgress(pageNumber = 10, percentage = 100.0)
+        server.status = ReadStatusInfo(status = "read", source = "auto")
+        val closes = async { tracker.finishedElsewhere.first() }
+        tracker.onResume()
+        tracker.onPage(6, 10)
+        tracker.onPage(7, 10) // refused: the cover is up
+        runCurrent()
+        closes.await()
+        assertTrue(tracker.resyncing.value) // stays covered while the screen closes
+        now += 30_000
+        tracker.close()
+        runCurrent()
+        store.syncAll(emptyList())
+        assertEquals(sessionsBefore, server.sessions.size)
+        assertEquals(listOf(6), server.saved.map { it.pageNumber })
+        assertEquals(100.0, server.position.percentage!!, 1e-9)
+    }
+
+    @Test
+    fun aReReadOpenedWhileReadIsMovedOnNotClosed() = runTest {
+        server.position = FileProgress(pageNumber = 2, percentage = 20.0)
+        server.status = ReadStatusInfo(status = "read", source = "auto")
+        val store = store()
+        val tracker = tracker(store)
+        tracker.open(hasLocalCopy = false)
+        runCurrent()
+        tracker.onPage(2, 10)
+        tracker.onPause()
+        runCurrent()
+        server.position = FileProgress(pageNumber = 8, percentage = 80.0)
+        val moved = async { tracker.movedOn.first() }
+        tracker.onResume()
+        runCurrent()
+        assertEquals(8, moved.await().pageNumber)
+        tracker.onPage(8, 10)
+        assertFalse(tracker.resyncing.value)
+    }
+
+    @Test
+    fun finishingOnThisDeviceDoesNotCloseTheReaderOnComingBack() = runTest {
+        server.position = FileProgress(pageNumber = 9, percentage = 90.0)
+        server.status = ReadStatusInfo(status = "reading", source = "auto")
+        val store = store()
+        val tracker = tracker(store)
+        tracker.open(hasLocalCopy = false)
+        runCurrent()
+        tracker.onPage(9, 10)
+        tracker.onPage(10, 10) // the last page: the server marks it Read
+        advanceTimeBy(3_000)
+        runCurrent()
+        server.status = ReadStatusInfo(status = "read", source = "auto")
+        tracker.onPause()
+        runCurrent()
+        var closed = false
+        backgroundScope.launch { tracker.finishedElsewhere.first(); closed = true }
+        tracker.onResume()
+        tracker.onPage(10, 10)
+        runCurrent()
+        assertFalse(closed)
+        assertFalse(tracker.resyncing.value)
+    }
+
+    @Test
+    fun comingBackWhenNothingMovedElsewhereReadsOnAsBefore() = runTest {
+        server.position = FileProgress(pageNumber = 5, percentage = 50.0)
+        val store = store()
+        val tracker = tracker(store)
+        tracker.open(hasLocalCopy = false)
+        tracker.onPage(5, 10)
+        tracker.onPage(6, 10)
+        tracker.onPause()
+        runCurrent()
+        tracker.onResume()
+        tracker.onPage(6, 10)
+        runCurrent()
+        now += 30_000
+        tracker.onPage(7, 10)
+        advanceTimeBy(3_000)
+        runCurrent()
+        assertNull(tracker.choice.value)
+        assertEquals(listOf(6, 7), server.saved.map { it.pageNumber })
+    }
+
     private class FakeServer : ProgressRemote, PageReaderProgress.Remote {
         var position = FileProgress(percentage = 0.0)
         var status: ReadStatusInfo? = null

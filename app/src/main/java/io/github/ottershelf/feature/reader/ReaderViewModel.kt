@@ -67,6 +67,7 @@ import io.github.ottershelf.feature.reader.annotations.SelectionPopupState
 import io.github.ottershelf.feature.reader.annotations.displayHex
 import io.github.ottershelf.feature.reader.annotations.shareText
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /** What the ViewModel needs from the page on screen (the screen's WebView). Main thread. */
@@ -174,6 +175,16 @@ class ReaderViewModel(
     /** A position dialog is showing (sends keep reporting the conflict until it's answered). */
     private var choosing = false
     private var pendingChoice: CompletableDeferred<Boolean>? = null
+
+    /** The screen was paused since it last resumed ([onResume] then checks the server again). */
+    private var stopped = false
+    /** Counts resumes, so an older resume's check that answers late is ignored. */
+    private var resumes = 0
+    /** The book was Read when this reader opened it (a re-read): finishing elsewhere doesn't close it. */
+    private var openedRead = false
+    /** Sent to the server's place after a resume: input stays off until the page gets there. */
+    private var landingOn: Position? = null
+    private val landingTimeout = Runnable { endResync() }
 
     init {
         val downloads = container.downloads
@@ -544,6 +555,7 @@ class ReaderViewModel(
     }
 
     fun seek(fraction: Float) {
+        if (_state.value.resyncing) return
         freshStart = false
         visit.markMoved()
         signs.expect()
@@ -551,6 +563,7 @@ class ReaderViewModel(
     }
 
     fun goTo(href: String) {
+        if (_state.value.resyncing) return
         freshStart = false
         visit.markMoved()
         signs.expect()
@@ -568,9 +581,13 @@ class ReaderViewModel(
         goTo(note.href)
     }
 
-    fun next() = js("readerNext()")
+    fun next() {
+        if (!_state.value.resyncing) js("readerNext()")
+    }
 
-    fun previous() = js("readerPrev()")
+    fun previous() {
+        if (!_state.value.resyncing) js("readerPrev()")
+    }
 
     /**
      * After an error: a new WebView loads the page again, which reopens the book. If where to open
@@ -732,6 +749,7 @@ class ReaderViewModel(
             val wait = if (local != null) SERVER_WAIT_LOCAL_MS else SERVER_WAIT_MS
             val serverProgress = async { withTimeoutOrNull(wait) { runCatching { api.fileProgress(fileId) }.getOrNull() } }
             val status = async { withTimeoutOrNull(wait) { detail.get().await()?.readStatus } }
+            launch { openedRead = status.await()?.status == ReadStatus.READ.value }
             val server = serverProgress.await()
             val pending = record?.pendingPosition
             freshStart = false
@@ -879,6 +897,7 @@ class ReaderViewModel(
 
     private fun onFullLocation(r: Relocate) {
         showFullLocation(r)
+        if (landingOn != null && landed(r)) endResync()
         // Not moved since opening (or a fresh start not turned yet): where it opened stays as saved.
         if (freshStart || !visit.moved) return
         // Relaid out, not moved by the user (rotated, resized): the place the user read to stays saved.
@@ -1017,6 +1036,8 @@ class ReaderViewModel(
      */
     fun onPause() {
         if (closed) return
+        stopped = true
+        endResync() // left before it finished: the next resume asks again
         main.removeCallbacks(saveRunnable)
         if (freshStart || !visit.moved) {
             // Not moved since opening (or opened from the beginning and never turned a page): keep
@@ -1038,6 +1059,113 @@ class ReaderViewModel(
             saveProgress()
         }
         visit.end()
+    }
+
+    /**
+     * The screen is back after a pause. The reader still shows where it was left, but the book may
+     * have been read on elsewhere meanwhile (another device, the web), even finished. So the reader
+     * takes no input ([ReaderUiState.resyncing]) until the server has been asked again, as on
+     * opening: if it moved on, the reader goes there and says so; if this device also has reading
+     * the server hasn't got (read offline), the user picks. Only if the server can't be reached in
+     * time does the reader carry on from where it was, and then nothing is sent unchecked: the
+     * checked push and the session's sync find any difference later (a prompt; sessions lose their
+     * end point).
+     */
+    fun onResume() {
+        if (closed || !stopped) return
+        stopped = false
+        endResync()
+        visit.rest()
+        if (!decided || choosing) return
+        verified = false
+        if (!container.online.value) return
+        val before = progress.get(fileId)
+        val generation = ++resumes
+        setResyncing(true)
+        viewModelScope.launch {
+            var target: Position? = null
+            var finished = false
+            // Asked alongside: a book finished elsewhere meanwhile closes the reader.
+            val status = async { withTimeoutOrNull(RESYNC_WAIT_MS) { runCatching { api.book(bookId).readStatus }.getOrNull() } }
+            try {
+                val server = withTimeoutOrNull(RESYNC_WAIT_MS) { runCatching { api.fileProgress(fileId) }.getOrNull() }
+                if (server == null) {
+                    if (generation == resumes && !closed) _messages.trySend(ReaderMessage.Unchecked)
+                    return@launch
+                }
+                if (closed || generation != resumes || choosing) return@launch
+                when (val decision = progress.decideOnOpen(fileId, bookId, server, before)) {
+                    is ProgressStore.Opening.Start -> {
+                        verified = decision.inStep
+                        if (decision.send) pushPending()
+                        if (decision.atServer && before?.baseline?.sameAs(decision.position) != true) {
+                            // Moved on elsewhere. Finished there too (Read now, not when opened here:
+                            // this device's own finish leaves the server at its own place) closes the reader.
+                            if (!openedRead && status.await()?.status == ReadStatus.READ.value) {
+                                finished = true
+                            } else {
+                                target = decision.position
+                                _messages.trySend(ReaderMessage.MovedOn(decision.position.percentage.roundToInt().coerceIn(0, 100)))
+                            }
+                        }
+                    }
+                    is ProgressStore.Opening.Ask -> {
+                        val chosen = choosePosition(decision.mine, decision.mineAt, decision.server, decision.serverReadAt, online = true)
+                        if (chosen === decision.server) target = decision.server
+                    }
+                }
+            } finally {
+                status.cancel()
+                if (generation == resumes) {
+                    val to = target
+                    when {
+                        // The cover stays (nothing more can be read here) while the screen closes.
+                        finished && !closed -> _messages.trySend(ReaderMessage.FinishedElsewhere)
+                        to != null && !closed -> showServerPosition(to)
+                        else -> endResync()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setResyncing(on: Boolean) {
+        if (_state.value.resyncing != on) _state.update { it.copy(resyncing = on) }
+    }
+
+    /** Taking input again: the place is confirmed (or couldn't be), or the screen left. */
+    private fun endResync() {
+        landingOn = null
+        main.removeCallbacks(landingTimeout)
+        setResyncing(false)
+    }
+
+    /**
+     * Goes to the server's [position] (not the user's move: nothing is saved until they turn a page).
+     * Input stays off until the page reports it is there ([onFullLocation]), or [LAND_WAIT_MS].
+     */
+    private fun showServerPosition(position: Position) {
+        main.removeCallbacks(saveRunnable)
+        latest = null
+        unsaved = false
+        userPlaced = false
+        freshStart = false
+        start = position // a new page (the renderer taken back) opens here
+        landingOn = position
+        main.removeCallbacks(landingTimeout)
+        main.postDelayed(landingTimeout, LAND_WAIT_MS)
+        val cfi = position.cfi
+        if (cfi != null) js("readerGoTo(${ApiJson.encodeToString(String.serializer(), cfi)})")
+        else js("readerGoToFraction(${position.percentage / 100})")
+    }
+
+    /** The page reached [r]: if it was sent to the server's place, has it arrived? */
+    private fun landed(r: Relocate): Boolean {
+        val target = landingOn ?: return false
+        val at = r.cfi
+        if (target.cfi != null && at != null && Cfi.contains(at, target.cfi)) return true
+        // The server's place may be a percentage only (KOReader, Kobo), or a CFI inside another page.
+        return abs(r.position * 100 - target.percentage) < LANDED_WITHIN_PERCENT
     }
 
     /**
@@ -1067,6 +1195,12 @@ class ReaderViewModel(
         /** How long to wait for the server's position before opening a downloaded book without it. */
         const val SERVER_WAIT_LOCAL_MS = 4_000L
         const val SERVER_WAIT_MS = 20_000L
+        /** How long the reader, back from a pause, waits for the server with input off before going on unconfirmed. */
+        const val RESYNC_WAIT_MS = 10_000L
+        /** How long it waits for the page to reach the server's place before taking input again anyway. */
+        const val LAND_WAIT_MS = 5_000L
+        /** A full location this close to the server's percentage is taken as there. */
+        const val LANDED_WITHIN_PERCENT = 1.0
         /** foliate's search needs two characters at least (the web's MIN_SEARCH_QUERY_LENGTH). */
         const val MIN_SEARCH = 2
     }

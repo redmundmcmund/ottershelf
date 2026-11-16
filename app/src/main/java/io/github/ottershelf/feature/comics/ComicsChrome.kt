@@ -81,6 +81,7 @@ import io.github.ottershelf.ui.icons.AppIcons
 import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfTheme
 import kotlin.math.roundToInt
+import io.github.ottershelf.ui.components.ResyncCover
 
 /** What the comics reader's chrome and pages can do. */
 class ComicsActions(
@@ -163,6 +164,7 @@ fun ComicsContent(
         } else if (state.loading) {
             LoadingState(Modifier.align(Alignment.Center))
         }
+        ResyncCover(state.resyncing)
 
         val next = state.nextBook
         // Switched off in Settings, it still shows with auto-advance on: it says what the turn will open.

@@ -263,6 +263,18 @@ sealed interface ReaderMessage {
     /** The book was marked Read/Unread by hand since it was last read: it starts from the beginning. */
     data class FreshStart(val statusLabel: String) : ReaderMessage
 
+    /** Read on elsewhere while the screen was away: moved there ([percent] of the book). */
+    data class MovedOn(val percent: Int) : ReaderMessage
+
+    /** Back from a pause, the server didn't answer in time: reading goes on unconfirmed. */
+    data object Unchecked : ReaderMessage
+
+    /**
+     * Back from a pause, the book had been finished on another device meanwhile (now Read, and it
+     * wasn't when this reader opened it): the reader closes rather than show the old place.
+     */
+    data object FinishedElsewhere : ReaderMessage
+
     /** The server refused a highlight, note or bookmark change ([message] is the server's). */
     data class NoteRejected(val message: String) : ReaderMessage
 }
@@ -271,6 +283,8 @@ data class ReaderUiState(
     val title: String,
     /** Until the book is open on screen. */
     val loading: Boolean = true,
+    /** Back from a pause, asking the server where the book is now: the page takes no input. */
+    val resyncing: Boolean = false,
     val error: ReaderError? = null,
     /** The top and bottom bars (toggled by a tap in the middle of the page). */
     val chromeVisible: Boolean = false,

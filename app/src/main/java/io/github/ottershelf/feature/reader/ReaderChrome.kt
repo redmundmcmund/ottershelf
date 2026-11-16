@@ -85,6 +85,7 @@ import io.github.ottershelf.feature.reader.annotations.BookmarkRibbon
 import io.github.ottershelf.ui.components.EmptyState
 import io.github.ottershelf.ui.components.ErrorState
 import io.github.ottershelf.ui.components.LoadingState
+import io.github.ottershelf.ui.components.ResyncCover
 import io.github.ottershelf.ui.icons.AppIcons
 import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfTheme
@@ -162,6 +163,7 @@ fun ReaderContent(
         } else if (state.loading) {
             LoadingState(Modifier.align(Alignment.Center))
         }
+        ResyncCover(state.resyncing)
 
         AnimatedVisibility(
             visible = state.chromeVisible,

@@ -96,9 +96,41 @@ class PageReaderProgress(
     /** A conflict found while reading was settled for the server's position: the reader goes there. */
     val jumps: Flow<Position> = _jumps.receiveAsFlow()
 
+    private val _movedOn = Channel<Position>(Channel.CONFLATED)
+    /** After a resume the book had been read on elsewhere, and [jumps] went there: the reader says so. */
+    val movedOn: Flow<Position> = _movedOn.receiveAsFlow()
+
+    private val _resyncing = MutableStateFlow(false)
+    /** Back from a pause, asking the server where the book is now: the reader takes no input. */
+    val resyncing: StateFlow<Boolean> = _resyncing.asStateFlow()
+
+    private val _finishedElsewhere = Channel<Unit>(Channel.CONFLATED)
+    /**
+     * After a resume: the book had been finished on another device meanwhile (Read now, and not when
+     * this reader opened it). The reader closes, saying so; the cover ([resyncing]) stays until then.
+     */
+    val finishedElsewhere: Flow<Unit> = _finishedElsewhere.receiveAsFlow()
+
+    /** The book was Read when this reader opened it (a re-read): finishing elsewhere doesn't close it. */
+    private var openedRead = false
+
+    private val _unchecked = Channel<Unit>(Channel.CONFLATED)
+    /** After a resume the server didn't answer in time: the reader goes on unconfirmed, and says so. */
+    val unchecked: Flow<Unit> = _unchecked.receiveAsFlow()
+
     private var closed = false
     private var choosing = false
     private var pendingChoice: CompletableDeferred<Boolean>? = null
+
+    /** [open] has decided where to start. */
+    private var opened = false
+    /** Paused since the last resume ([onResume] then asks the server again). */
+    private var stopped = false
+    /** Counts resumes, so an older resume's check that answers late is ignored. */
+    private var resumes = 0
+    /** Sent to [jumps] after a resume: [resyncing] lasts until the reader reports that page. */
+    private var landing: Position? = null
+    private var landingTimeout: Job? = null
 
     // Progress: debounced like the web reader (2 s after the last page change), flushed on pause/close.
     private var latest: Position? = null
@@ -137,6 +169,7 @@ class PageReaderProgress(
         val record = store.get(fileId)
         val wait = if (hasLocalCopy) SERVER_WAIT_LOCAL_MS else SERVER_WAIT_MS
         val status = uiScope.async { withTimeoutOrNull(wait) { runCatching { remote.readStatus(bookId) }.getOrNull() } }
+        uiScope.launch { openedRead = status.await()?.status == ReadStatus.READ.value }
         val server = withTimeoutOrNull(wait) { runCatching { remote.fileProgress(fileId) }.getOrNull() }
         val pending = record?.pendingPosition
         freshStart = false
@@ -165,6 +198,7 @@ class PageReaderProgress(
         val jump = jumpPage?.let { Position(cfi = null, percentage = position?.percentage ?: 0.0, pageNumber = it) }
         val freshStatus = if (freshStart && jump == null) ReadStatus.of(status.await()?.status) ?: ReadStatus.READ else null
         if (jump != null) freshStart = true
+        opened = true
         return Opening(jump ?: position, freshStatus, withServer = server != null)
     }
 
@@ -177,6 +211,18 @@ class PageReaderProgress(
     fun onPage(pageNumber: Int, pageCount: Int) {
         if (closed || pageCount <= 0) return
         val position = PageProgress.position(pageNumber, pageCount)
+        if (_resyncing.value) {
+            // While the server is asked and the reader sent there (it takes no input) nothing counts.
+            val target = landing
+            if (target != null && position.pageNumber == PageProgress.startPage(target, pageCount)) {
+                // Landed on the server's place: this visit starts here, and reading can go on.
+                firstPage = position.pageNumber
+                endResync()
+            } else if (target == null && firstPage == null) {
+                firstPage = position.pageNumber // the page shown as the screen came back
+            }
+            return
+        }
         if (freshStart) {
             val first = freshStartPage
             if (first == null) freshStartPage = position.pageNumber
@@ -207,7 +253,7 @@ class PageReaderProgress(
 
     /** The user zoomed, or scrolled within a page: a move (the visit counts as reading) and activity. */
     fun onGesture() {
-        if (closed) return
+        if (closed || _resyncing.value) return
         visit.markMoved()
         visit.activity()
     }
@@ -215,9 +261,105 @@ class PageReaderProgress(
     /** The screen stopped (the app left, the phone locked): save now and end the session. */
     fun onPause() {
         if (closed) return
+        stopped = true
+        endResync() // left before it finished: the next resume asks again
         saveJob?.cancel()
         if (!freshStart) save()
         visit.end()
+    }
+
+    /**
+     * The screen is back after a pause (call before reporting the page shown). The book may have
+     * been read on elsewhere meanwhile, even finished. So the reader takes no input ([resyncing])
+     * until the server has been asked again, as on opening: if it moved on, [jumps] takes the reader
+     * there and [movedOn] says so; if this device also has reading the server hasn't got (read
+     * offline), the user picks. Only if the server can't be reached in time does the reader carry on
+     * from where it was, and then nothing is sent unchecked (the checked push and the session's sync
+     * find any difference later: a prompt; sessions lose their end point).
+     */
+    fun onResume() {
+        if (closed || !stopped) return
+        stopped = false
+        endResync()
+        visit.rest()
+        firstPage = null // the page shown now is where this visit starts
+        if (!opened || choosing) return
+        verified = false
+        if (!online()) return
+        val before = store.get(fileId)
+        val generation = ++resumes
+        _resyncing.value = true
+        uiScope.launch {
+            var landingOn: Position? = null
+            var finished = false
+            // Asked alongside: a book finished elsewhere meanwhile closes the reader.
+            val status = async { withTimeoutOrNull(RESYNC_WAIT_MS) { runCatching { remote.readStatus(bookId) }.getOrNull() } }
+            try {
+                val server = withTimeoutOrNull(RESYNC_WAIT_MS) { runCatching { remote.fileProgress(fileId) }.getOrNull() }
+                if (server == null) {
+                    if (generation == resumes && !closed) _unchecked.trySend(Unit)
+                    return@launch
+                }
+                if (closed || generation != resumes || choosing) return@launch
+                when (val decision = store.decideOnOpen(fileId, bookId, server, before)) {
+                    is ProgressStore.Opening.Start -> {
+                        verified = decision.inStep
+                        if (decision.send) pushPending()
+                        if (decision.atServer && before?.baseline?.sameAs(decision.position) != true) {
+                            // Moved on elsewhere. Finished there too (Read now, not when opened here:
+                            // this device's own finish leaves the server at its own place) closes the reader.
+                            if (!openedRead && status.await()?.status == ReadStatus.READ.value) {
+                                finished = true
+                            } else {
+                                landingOn = decision.position
+                                _movedOn.trySend(decision.position)
+                            }
+                        }
+                    }
+                    is ProgressStore.Opening.Ask -> {
+                        val chosen = choosePosition(decision.mine, decision.mineAt, decision.server, decision.serverReadAt, online = true)
+                        if (chosen === decision.server) landingOn = decision.server
+                    }
+                }
+            } finally {
+                status.cancel()
+                if (generation == resumes) {
+                    val target = landingOn
+                    when {
+                        finished && !closed -> _finishedElsewhere.trySend(Unit)
+                        target != null && !closed -> showServerPosition(target)
+                        else -> endResync()
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Sends the reader to the server's [position] (not the user's move: nothing is saved until they
+     * turn a page). Input stays off until the reader reports that page ([onPage]), or [LAND_WAIT_MS].
+     */
+    private fun showServerPosition(position: Position) {
+        saveJob?.cancel()
+        latest = null
+        unsaved = false
+        freshStart = false
+        freshStartPage = null
+        landing = position
+        firstPage = null
+        landingTimeout?.cancel()
+        landingTimeout = uiScope.launch {
+            delay(LAND_WAIT_MS)
+            endResync()
+        }
+        _jumps.trySend(position)
+    }
+
+    private fun endResync() {
+        landing = null
+        landingTimeout?.cancel()
+        landingTimeout = null
+        _resyncing.value = false
     }
 
     /** The reader closed (`onCleared`): the last save and session go out in [sendScope]. */
@@ -345,5 +487,9 @@ class PageReaderProgress(
         /** How long to wait for the server's position before opening a downloaded book without it. */
         const val SERVER_WAIT_LOCAL_MS = 4_000L
         const val SERVER_WAIT_MS = 20_000L
+        /** How long a reader back from a pause waits for the server, input off, before going on unconfirmed. */
+        const val RESYNC_WAIT_MS = 10_000L
+        /** How long it waits for the reader to report the server's page before taking input again anyway. */
+        const val LAND_WAIT_MS = 5_000L
     }
 }

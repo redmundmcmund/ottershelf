@@ -1,5 +1,6 @@
 package io.github.ottershelf.feature.pdf
 
+import android.widget.Toast
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -44,6 +45,7 @@ fun PdfScreen(route: Route.Pdf, navigator: AppNavigator) {
     val viewModel = appViewModel { PdfViewModel(it, route.bookId, route.fileId, route.title, route.page, appContext) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { viewModel.onPause() }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onResume() }
 
     var sheet by rememberSaveable { mutableStateOf<PdfSheet?>(null) }
     PdfImmersiveMode(barsVisible = state.chromeVisible || sheet != null || !state.ready)
@@ -57,6 +59,13 @@ fun PdfScreen(route: Route.Pdf, navigator: AppNavigator) {
         viewModel.messages.collect { message ->
             when (message) {
                 is PdfMessage.FreshStart -> snackbars.showSnackbar(resources.getString(R.string.pdf_fresh_start, message.statusLabel))
+                is PdfMessage.MovedOn -> snackbars.showSnackbar(resources.getString(R.string.reader_moved_on, message.percent))
+                PdfMessage.Unchecked -> snackbars.showSnackbar(resources.getString(R.string.reader_resync_unchecked))
+                PdfMessage.FinishedElsewhere -> {
+                    // A toast: the reader's own snackbar would go with it.
+                    Toast.makeText(context, R.string.reader_finished_elsewhere, Toast.LENGTH_LONG).show()
+                    navigator.back()
+                }
             }
         }
     }

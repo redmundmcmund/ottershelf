@@ -114,6 +114,7 @@ import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfTheme
 import kotlin.math.roundToInt
 import io.github.ottershelf.ui.components.belowStatusBar
+import io.github.ottershelf.ui.components.ResyncCover
 
 /** What the PDF reader's chrome can do. */
 class PdfActions(
@@ -202,6 +203,7 @@ fun PdfContent(
             is PdfPhase.Failed -> PdfErrorCard(phase, actions.onRetry, Modifier.align(Alignment.Center))
             is PdfPhase.Password, PdfPhase.Ready -> {}
         }
+        ResyncCover(state.resyncing)
 
         AnimatedVisibility(
             visible = state.chromeVisible,

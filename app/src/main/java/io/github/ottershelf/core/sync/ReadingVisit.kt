@@ -75,6 +75,16 @@ class ReadingVisit(
         held.clear()
     }
 
+    /**
+     * The screen is back after a stop: until the user moves again, the visit counts as not moved
+     * (what starts now is held, and [close] drops it). While the screen was away the book may have
+     * been read on elsewhere, even finished; the page still showing the old place isn't reading, and
+     * a session ending there would set a Read book back to Re-reading on the server.
+     */
+    fun rest() {
+        moved = false
+    }
+
     /** The screen stopped: the session ends now, or at its last activity if it had gone idle. */
     fun end() {
         val now = clock()

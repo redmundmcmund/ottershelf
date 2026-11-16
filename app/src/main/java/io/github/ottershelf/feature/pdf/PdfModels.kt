@@ -129,6 +129,8 @@ sealed interface PdfPhase {
 
 data class PdfUiState(
     val title: String = "",
+    /** Back from a pause, asking the server where the book is now: the pages take no input. */
+    val resyncing: Boolean = false,
     val phase: PdfPhase = PdfPhase.Loading(),
     val pageCount: Int = 0,
     val sizes: PdfPageSizes = PdfPageSizes.Empty,
@@ -159,6 +161,15 @@ data class PdfJump(val page: Int, val y: Float? = null, val animate: Boolean = f
 
 sealed interface PdfMessage {
     data class FreshStart(val statusLabel: String) : PdfMessage
+
+    /** Read on elsewhere while the screen was away: moved there ([percent] of the book). */
+    data class MovedOn(val percent: Int) : PdfMessage
+
+    /** Back from a pause, the server didn't answer in time: reading goes on unconfirmed. */
+    data object Unchecked : PdfMessage
+
+    /** Back from a pause, the book had been finished on another device: the reader closes. */
+    data object FinishedElsewhere : PdfMessage
 }
 
 /** A line of text around a search match. */

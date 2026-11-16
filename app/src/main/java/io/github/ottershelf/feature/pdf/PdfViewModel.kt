@@ -1,5 +1,6 @@
 package io.github.ottershelf.feature.pdf
 
+import kotlin.math.roundToInt
 import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.res.Configuration
@@ -102,6 +103,14 @@ class PdfViewModel(
                 if (count > 0) _jumps.trySend(PdfJump(PageProgress.startPage(position, count) - 1))
             }
         }
+        viewModelScope.launch {
+            progress.movedOn.collect { position ->
+                _messages.trySend(PdfMessage.MovedOn(position.percentage.roundToInt().coerceIn(0, 100)))
+            }
+        }
+        viewModelScope.launch { progress.unchecked.collect { _messages.trySend(PdfMessage.Unchecked) } }
+        viewModelScope.launch { progress.finishedElsewhere.collect { _messages.trySend(PdfMessage.FinishedElsewhere) } }
+        viewModelScope.launch { progress.resyncing.collect { on -> _state.update { it.copy(resyncing = on) } } }
         load()
     }
 
@@ -258,6 +267,9 @@ class PdfViewModel(
 
     /** The screen stopped: save now, end the session. */
     fun onPause() = progress.onPause()
+
+    /** The screen is back: the server is asked again before anything counts (PageReaderProgress.onResume). */
+    fun onResume() = progress.onResume()
 
     /** Go to [page] (1-based). */
     fun goToPage(page: Int, animate: Boolean = false) {

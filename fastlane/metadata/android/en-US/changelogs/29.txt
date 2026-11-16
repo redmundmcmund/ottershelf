@@ -1,0 +1,3 @@
+- Coming back to a book left open now checks your library first: if you read on elsewhere, it moves to that place and says so
+- A book finished on another device while the reader was open now closes instead of starting a re-read
+- Page turns wait until your place is confirmed, so an old page can't overwrite newer progress

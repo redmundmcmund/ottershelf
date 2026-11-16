@@ -133,4 +133,21 @@ class ReadingVisitTest {
         visit.close()
         assertTrue(sent.isEmpty())
     }
+
+    @Test
+    fun comingBackToAReaderLeftOpenSendsNothingUntilTheUserMovesAgain() {
+        // Read, put down (the session went out), then finished on another device. Back on the phone
+        // the old page still shows: a session ending there would turn Read into Re-reading.
+        visit.activity(40.0)
+        visit.markMoved()
+        now += 60_000
+        visit.activity(41.0)
+        visit.end()
+        assertEquals(1, sent.size)
+        visit.rest()
+        visit.activity(41.0) // the old page, shown again
+        now += 60_000
+        visit.close()
+        assertEquals(1, sent.size)
+    }
 }

@@ -1,5 +1,6 @@
 package io.github.ottershelf.feature.comics
 
+import android.widget.Toast
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,11 +47,21 @@ fun ComicsScreen(route: Route.Comics, navigator: AppNavigator) {
 
     val snackbars = remember { SnackbarHostState() }
     val resources = LocalResources.current
+    val context = LocalContext.current
     LaunchedEffect(viewModel) {
         viewModel.messages.collect { message ->
             when (message) {
                 is ComicsMessage.FreshStart ->
                     snackbars.showSnackbar(resources.getString(R.string.comics_fresh_start, message.statusLabel))
+                is ComicsMessage.MovedOn ->
+                    snackbars.showSnackbar(resources.getString(R.string.reader_moved_on, message.percent))
+                ComicsMessage.Unchecked ->
+                    snackbars.showSnackbar(resources.getString(R.string.reader_resync_unchecked))
+                ComicsMessage.FinishedElsewhere -> {
+                    // A toast: the reader's own snackbar would go with it.
+                    Toast.makeText(context, R.string.reader_finished_elsewhere, Toast.LENGTH_LONG).show()
+                    navigator.back()
+                }
             }
         }
     }
