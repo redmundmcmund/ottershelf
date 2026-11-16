@@ -279,6 +279,12 @@ class Api(
         )
         val request = Request.Builder().url("${server.trimEnd('/')}/api/v1/auth/login").post(encode(body)).build()
         val creds = call(loginClient, request, NativeCredentials.serializer())
+        if (creds.user?.username.isNullOrBlank()) {
+            // Who signed in decides where the account's data lives on the device (its storage key),
+            // so an answer that doesn't say isn't kept: the previous account's would be used instead.
+            runCatching { revokeAt(server, creds.refreshToken) }
+            throw IOException("The server didn't say who signed in")
+        }
         try {
             session.store(creds, server = server)
         } catch (e: IOException) {

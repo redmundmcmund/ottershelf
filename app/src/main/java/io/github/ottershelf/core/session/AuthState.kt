@@ -40,8 +40,14 @@ class AuthState(private val session: Session) {
         _status.value = current()
     }
 
-    /** Any thread: the credentials are gone (signed out here, or the refresh token was rejected). */
+    /**
+     * Any thread: the credentials are gone (signed out here, or the refresh token was rejected).
+     * Who was signed in goes too ([Session.forgetUser]), so the next sign-in starts with no one's
+     * permissions or storage key.
+     */
     fun setSignedOut() {
+        session.forgetUser()
+        _user.value = null
         _status.value = Status.SignedOut
     }
 

@@ -1,10 +1,7 @@
 package io.github.ottershelf.feature.pdf
 
 import android.widget.Toast
-import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import io.github.ottershelf.feature.book.openDescriptionLink
 import io.github.ottershelf.ui.components.KeepScreenOnWhileReading
 import io.github.ottershelf.R
 import io.github.ottershelf.feature.reader.PositionChoiceDialog
@@ -142,17 +140,12 @@ fun PdfScreen(route: Route.Pdf, navigator: AppNavigator) {
     ReaderTimerNotice(route.bookId)
 }
 
-/** Opens a web or mail link from the document in another app; false if it isn't one or nothing can. */
-private fun openLink(context: Context, uri: String): Boolean {
-    val parsed = Uri.parse(uri)
-    if (parsed.scheme?.lowercase() !in setOf("http", "https", "mailto")) return false
-    return try {
-        context.startActivity(Intent(Intent.ACTION_VIEW, parsed))
-        true
-    } catch (e: ActivityNotFoundException) {
-        false
-    }
-}
+/**
+ * Opens a web or mail link from the document in another app; false if it isn't one or nothing can.
+ * The book description's rule (http, https and mailto only, as a browser link: BROWSABLE, and an
+ * app that guards its screen is skipped rather than crash the reader).
+ */
+private fun openLink(context: Context, uri: String): Boolean = openDescriptionLink(context, uri)
 
 /**
  * Hides the status and navigation bars while [barsVisible] is false (a swipe from an edge shows

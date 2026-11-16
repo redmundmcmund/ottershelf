@@ -48,7 +48,7 @@ class LoginViewModel(private val container: AppContainer) : ViewModel() {
     private val _state = MutableStateFlow(
         LoginUiState(
             server = container.session.serverUrl.orEmpty(),
-            username = container.session.username.orEmpty(),
+            username = container.session.lastLoginName.orEmpty(),
         ),
     )
     val state: StateFlow<LoginUiState> = _state.asStateFlow()

@@ -47,21 +47,33 @@ internal object TextApps {
         return process + translate
     }
 
-    /** The intent that hands [text] to [app]; the app's own activity, explicitly. */
-    fun intent(app: TextApp, text: String): Intent = when (app.kind) {
-        TextApp.Kind.ProcessText -> processTextIntent()
-            .putExtra(Intent.EXTRA_PROCESS_TEXT, text)
-            .putExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, true)
-        TextApp.Kind.Translate -> Intent(Intent.ACTION_TRANSLATE)
-            .apply { if (app.typed) type = TEXT }
-            .putExtra(Intent.EXTRA_TEXT, text)
-    }.setClassName(app.packageName, app.className)
+    /**
+     * The intent that hands [text] to [app]; the app's own activity, explicitly. At most
+     * [MAX_TEXT] characters: a selection can run over most of a long chapter, and an intent past
+     * Android's limit for what passes between apps (about 1 MB) isn't delivered at all.
+     */
+    fun intent(app: TextApp, text: String): Intent {
+        val handed = text.take(MAX_TEXT)
+        return when (app.kind) {
+            TextApp.Kind.ProcessText -> processTextIntent()
+                .putExtra(Intent.EXTRA_PROCESS_TEXT, handed)
+                .putExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, true)
+            TextApp.Kind.Translate -> Intent(Intent.ACTION_TRANSLATE)
+                .apply { if (app.typed) type = TEXT }
+                .putExtra(Intent.EXTRA_TEXT, handed)
+        }.setClassName(app.packageName, app.className)
+    }
+
+    /** Characters handed to another app: far more than a translator or dictionary takes. */
+    const val MAX_TEXT = 10_000
 
     fun launch(context: Context, app: TextApp, text: String) {
         try {
             context.startActivity(intent(app, text).fromAnyContext(context))
         } catch (_: ActivityNotFoundException) {
         } catch (_: SecurityException) {
+        } catch (_: RuntimeException) {
+            // The system refused to deliver it (too large after all, or the app went away meanwhile).
         }
     }
 

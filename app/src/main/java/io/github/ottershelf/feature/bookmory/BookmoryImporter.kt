@@ -1,5 +1,8 @@
 package io.github.ottershelf.feature.bookmory
 
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.CompletableDeferred
 import io.github.ottershelf.core.network.ApiException
 import io.github.ottershelf.core.network.isAppAttestRefusal
 import io.github.ottershelf.core.tracking.Patch
@@ -183,7 +186,7 @@ class BookmoryImporter(
     /** The row's book: its match, or its placeholder (uploaded now, or found under its key); null when there is none. */
     private suspend fun bookFor(item: ImportItem, tally: Tally): Long? = when (val target = item.target) {
         is ImportTarget.Book -> target.bookId
-        is ImportTarget.Stub -> when (val result = uploadStub(target)) {
+        is ImportTarget.Stub -> when (val result = stubOnce(target)) {
             is StubResult.Made -> {
                 if (result.new) tally.created += target.stub.title else tally.found++
                 result.bookId
@@ -277,6 +280,36 @@ class BookmoryImporter(
         data class Problem(val kind: ImportProblem.Kind, val detail: String? = null) : StubResult
     }
 
+    /** This run's placeholders by key, so two rows for the same book (two editions, say) make one. */
+    private val stubs = HashMap<String, CompletableDeferred<StubResult>>()
+    private val stubsLock = Mutex()
+
+    /**
+     * [target]'s placeholder, made once per run: a row whose key was already uploaded this run (or is
+     * being uploaded by another of the parallel rows) gets that book. That matters most once sessions
+     * are refused, since a whole upload has no key of its own and makes a new book every time.
+     */
+    private suspend fun stubOnce(target: ImportTarget.Stub): StubResult {
+        val key = target.stub.idempotencyKey
+        val (mine, deferred) = stubsLock.withLock {
+            stubs[key]?.let { false to it } ?: (true to CompletableDeferred<StubResult>().also { stubs[key] = it })
+        }
+        if (!mine) {
+            return when (val earlier = deferred.await()) {
+                is StubResult.Made -> earlier.copy(new = false)
+                is StubResult.Problem -> earlier
+            }
+        }
+        return try {
+            uploadStub(target).also { deferred.complete(it) }
+        } catch (e: Throwable) {
+            // Not made (the run stops, or was cancelled): a later run may try again.
+            stubsLock.withLock { stubs.remove(key) }
+            deferred.completeExceptionally(e)
+            throw e
+        }
+    }
+
     /** The server keeps upload sessions for its own apps (BookOrbit 3.7+, App Attest): placeholders go whole. */
     @Volatile
     private var sessionsRefused = false
@@ -310,9 +343,18 @@ class BookmoryImporter(
         }
         val new = session.status == RECEIVING && session.receivedBytes == 0L
         var polls = 0
+        var lastReceived = -1L
+        var stalls = 0
         while (true) {
             when (session.status) {
                 RECEIVING -> {
+                    // A server that keeps answering "receiving" without taking more isn't asked forever.
+                    if (session.receivedBytes <= lastReceived) {
+                        if (++stalls > MAX_STALLS) return StubResult.Problem(ImportProblem.Kind.UPLOAD_FAILED, session.errorMessage)
+                    } else {
+                        stalls = 0
+                    }
+                    lastReceived = session.receivedBytes
                     val received = session.receivedBytes.toInt().coerceIn(0, bytes.size)
                     session = if (received < bytes.size) {
                         remote.uploadChunk(session.id, received.toLong(), bytes.copyOfRange(received, bytes.size))
@@ -350,6 +392,8 @@ class BookmoryImporter(
         private const val MAX_READING_PAGES = 50
         private const val POLL_MS = 1_000L
         private const val MAX_POLLS = 90
+        /** Rounds in a row the server may stay at the same received size (one is the completion call). */
+        private const val MAX_STALLS = 3
         private const val PARALLEL = 6
     }
 }

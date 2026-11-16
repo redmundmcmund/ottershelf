@@ -5,6 +5,7 @@ import android.os.Looper
 import io.github.ottershelf.core.model.NativeCredentials
 import io.github.ottershelf.core.util.IsoTime
 import java.io.IOException
+import java.security.MessageDigest
 
 /**
  * Server URL and native-session credentials, persisted in private prefs. The access and refresh
@@ -46,6 +47,15 @@ class Session(context: Context, private val cipher: TokenCipher) {
 
     private val access = Token(ACCESS)
     private val refresh = Token(REFRESH)
+
+    init {
+        // Installs from before account keys had owners: the account whose name is still stored (older
+        // versions kept it after a sign-out) owns the key its data is under, so a later account that
+        // happens to share it gets its own.
+        val server = serverUrl
+        val user = username
+        if (server != null && user != null) claimKey(server, user)
+    }
 
     /**
      * The server the stored tokens belong to. No setter: only [store] writes it, together with the
@@ -110,6 +120,9 @@ class Session(context: Context, private val cipher: TokenCipher) {
                 .putString(REFRESH, encryptedRefresh)
             creds.user?.let { editor.putString("user", it.username) }
             server?.let { editor.putString(SERVER, it.trimEnd('/')) }
+            val keyServer = server?.trimEnd('/') ?: serverUrl
+            val keyUser = creds.user?.username ?: username
+            if (keyServer != null && keyUser != null) claimKey(keyServer, keyUser, editor)
             // commit, not apply: a rotated refresh token must never be lost if the process dies.
             editor.commit()
             access.set(creds.accessToken)
@@ -148,17 +161,64 @@ class Session(context: Context, private val cipher: TokenCipher) {
 
     private fun requestLibraryKey() = "requestLibrary:${serverUrl.orEmpty()}:${username.orEmpty()}"
 
-    /** File-name-safe id for the signed-in account (server + user), for per-account storage. */
-    fun accountKey(): String =
-        "${serverUrl.orEmpty().substringAfter("://")}_${username.orEmpty()}".replace(UNSAFE, "_")
+    /**
+     * File-name-safe id for the signed-in account (server + user), for per-account storage
+     * (downloads, queued progress and notes, settings, caches).
+     *
+     * The readable form turns every character outside `[A-Za-z0-9._-]` into `_`, so two accounts
+     * can share it (`anna@x` and `anna_x`, a name with a space and one with `_`). The first account
+     * signed in under it owns it ([claimKey], recorded with the account's exact server and name);
+     * any other account sharing it gets it with a hash of its exact server and name added, so one
+     * account's downloads and queued writes never become another's. Owned keys keep their form, so
+     * no data moves.
+     */
+    fun accountKey(): String = keyFor(serverUrl.orEmpty(), username.orEmpty())
+
+    private fun keyFor(server: String, user: String): String {
+        val exact = exactId(server, user)
+        val readable = readableKey(server, user)
+        val owner = prefs.getString(OWNER + readable, null)
+        return if (owner == null || owner == exact) readable else "$readable-${shortHash(exact)}"
+    }
+
+    /** Records [server] and [user] as the owner of their readable key, if nobody owns it yet. */
+    private fun claimKey(server: String, user: String, editor: android.content.SharedPreferences.Editor? = null) {
+        val readable = readableKey(server, user)
+        if (prefs.contains(OWNER + readable)) return
+        if (editor != null) editor.putString(OWNER + readable, exactId(server, user))
+        else prefs.edit().putString(OWNER + readable, exactId(server, user)).commit()
+    }
 
     /** The signed-in user (`AuthUser` JSON) as last fetched. */
     var userJson: String?
         get() = prefs.getString("me", null)
         set(value) = prefs.edit().putString("me", value).apply()
 
+    /**
+     * Forgets who was signed in (name and cached profile), after [clearCredentials] at a sign-out,
+     * so nothing of theirs (permissions shown, storage key) carries over to the next sign-in. Their
+     * key's owner record stays: their data is still on the device for their next sign-in.
+     */
+    fun forgetUser() {
+        val name = username
+        prefs.edit().remove("user").remove("me").apply { if (name != null) putString(LAST_LOGIN, name) }.commit()
+    }
+
+    /** The name last signed in with, only to fill in the sign-in form (never a storage key). */
+    val lastLoginName: String? get() = username ?: prefs.getString(LAST_LOGIN, null)
+
     companion object {
         private val UNSAFE = Regex("[^A-Za-z0-9._-]")
+        private const val OWNER = "keyOwner:"
+        private const val LAST_LOGIN = "lastLogin"
+
+        private fun readableKey(server: String, user: String) = "${server.substringAfter("://")}_$user".replace(UNSAFE, "_")
+
+        /** The account exactly, unambiguous (a server can't contain a line break). */
+        private fun exactId(server: String, user: String) = "${server.substringAfter("://")}\n$user"
+
+        private fun shortHash(text: String): String =
+            MessageDigest.getInstance("SHA-256").digest(text.toByteArray()).take(6).joinToString("") { "%02x".format(it) }
         private const val SERVER = "server"
         private const val ACCESS = "access.enc"
         private const val REFRESH = "refresh.enc"

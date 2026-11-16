@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 import java.text.Normalizer
@@ -78,6 +76,11 @@ internal class PageCounts(
                     var event: String? = null
                     while (true) {
                         ensureActive()
+                        // No candidate line comes near MAX_LINE_BYTES (Api.searchMetadata's bound);
+                        // a server sending one (broken, or a huge field) ends the search here rather
+                        // than filling memory, and so does an endless run of candidates.
+                        if (source.indexOf('\n'.code.toByte(), 0, MAX_LINE_BYTES) == -1L && source.buffer.size >= MAX_LINE_BYTES) break
+                        if (candidates.size >= MAX_CANDIDATES) break
                         val line = source.readUtf8Line() ?: break
                         when {
                             line.isEmpty() -> event = null
@@ -97,14 +100,13 @@ internal class PageCounts(
         pick(candidates, book)
     }
 
-    /** Writes [count] to the book's metadata (`library_edit_metadata`); throws when refused. */
-    suspend fun save(bookId: Long, count: Int) {
-        api.send("PATCH", "books/$bookId/metadata", buildJsonObject { put("pageCount", count) }) { }
-    }
-
     companion object {
         private const val MAX_TRIED = 2000
         private const val SEARCH_TIMEOUT_MS = 25_000L
+        /** One candidate line at most (as Api.MAX_EVENT_BYTES for the edit screen's search). */
+        private const val MAX_LINE_BYTES = 1_048_576L
+        /** Providers send a few dozen at most. */
+        private const val MAX_CANDIDATES = 200
 
         /** Fewer, or more, than this many pages is no printed book's count. */
         private val PLAUSIBLE = 10..5000

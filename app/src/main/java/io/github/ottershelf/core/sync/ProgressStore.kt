@@ -479,6 +479,7 @@ class ProgressStore(
 
     /** [syncAll] under the mutex. */
     private suspend fun syncAllLocked(downloadedFiles: Collection<Pair<Long, Long>>): Pass {
+        val signedIn = stillSignedInAs(accountKey())
         var finished = true
         try {
             batching = true
@@ -500,6 +501,8 @@ class ProgressStore(
                 // Sessions before positions, so a Reading/Read change is dated by the session's end.
                 if (!flushSessionsLocked()) return Pass.STOPPED
                 for (fileId in clean) {
+                    // As the sessions: not past a sign-out (and maybe another account's sign-in).
+                    if (!signedIn()) return Pass.STOPPED
                     when (pushLocked(fileId, checked = false)) {
                         Push.FAILED -> return Pass.STOPPED
                         Push.REJECTED -> finished = false

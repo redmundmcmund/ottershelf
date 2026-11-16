@@ -41,6 +41,8 @@ class FakeBookOrbit(private val today: LocalDate = LocalDate.of(2024, 6, 1)) : B
     var canUpload = true
     /** A BookOrbit 3.7+ server: upload sessions are kept for its own apps (App Attest); whole uploads still work. */
     var sessionsNeedAppAttest = false
+    /** A broken server: takes no chunk, and keeps answering "receiving". */
+    var stallChunks = false
     var wholeUploads = 0
     var mayRate = true
 
@@ -218,6 +220,7 @@ class FakeBookOrbit(private val today: LocalDate = LocalDate.of(2024, 6, 1)) : B
 
     override suspend fun uploadChunk(sessionId: String, offset: Long, bytes: ByteArray): UploadSessionInfo = write {
         val s = session(sessionId)
+        if (stallChunks) return@write info(s)
         if (s.status != "receiving") throw ApiException(409, "Upload session is ${s.status}")
         if (offset != s.data.size().toLong()) throw ApiException(409, "Expected upload offset ${s.data.size()}, received $offset")
         if (s.data.size() + bytes.size > s.size) throw ApiException(413, "Chunk exceeds the remaining upload size")

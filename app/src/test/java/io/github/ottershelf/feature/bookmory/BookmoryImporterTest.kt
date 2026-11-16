@@ -330,4 +330,24 @@ class BookmoryImporterTest {
         assertEquals(RatingRule.Allowed, RatingAccess().rule(9))
         assertEquals(RatingRule.NoPermission, RatingAccess(permitted = false).rule(1))
     }
+
+    @Test
+    fun twoRowsForTheSamePlaceholderMakeOneBookEvenWhenUploadedWhole() = runBlocking {
+        val server = server().apply { sessionsNeedAppAttest = true }
+        val importer = BookmoryImporter(server, pause = {})
+        val preview = ImportPreviews.preview(analyse(file, server, importer), ImportChoices(libraryId = 1))
+        val twice = preview.items.first { it.target is ImportTarget.Stub } // two editions in the export, say
+        val summary = importer.run(preview.items + twice)
+        assertEquals(13, server.wholeUploads) // a whole upload has no key: without the run's own record, 14
+        assertEquals(13, summary.stubsCreated.size)
+    }
+
+    @Test
+    fun aServerThatTakesNoChunksEndsThatUploadRatherThanLooping() = runBlocking {
+        val server = server().apply { stallChunks = true }
+        val booksBefore = server.books.size
+        val (_, summary) = importOnce(server)
+        assertEquals(13, summary.problems.count { it.kind == ImportProblem.Kind.UPLOAD_FAILED })
+        assertEquals(booksBefore, server.books.size)
+    }
 }

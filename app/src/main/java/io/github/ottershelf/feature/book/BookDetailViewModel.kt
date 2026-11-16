@@ -367,10 +367,13 @@ class BookDetailViewModel(private val container: AppContainer, private val bookI
 
     /**
      * An ebook whose metadata has no page count, and no total the user set: looked up once from
-     * BookOrbit's metadata providers ([PageCounts]) and saved to its metadata when the account may
-     * edit it (then it shows everywhere, the web too), else as the user's own page total
-     * (AppSettings.pageTotals, kept on the account). PDFs and comics are left alone: their pages
-     * are the file's own. In the app scope: the lookup can take a few seconds.
+     * BookOrbit's metadata providers ([PageCounts]) and kept as the user's own page total
+     * (AppSettings.pageTotals, kept on the account). Never written to the book's metadata: the
+     * count is a guess (an ISBN match, or the median of same-title candidates), and the metadata is
+     * the whole library's, so only an editor's own edit (feature.bookedit, Pages) puts it there.
+     * PDFs and comics are left alone: their pages are the file's own. In the app scope: the lookup
+     * can take a few seconds; what it finds is kept only while the account that asked is still
+     * signed in.
      */
     private fun findPageCount(book: BookDetail) {
         if (book.pageCount?.let { it > 0 } == true) return
@@ -378,18 +381,13 @@ class BookDetailViewModel(private val container: AppContainer, private val bookI
         if (container.appSettings.settings.value.pageTotals[book.id]?.let { it > 0 } == true) return
         if (book.files.none { BookFormats.readerFor(it.format) == ReaderKind.Foliate }) return
         container.appScope.launch {
+            val signedIn = container.stillSignedInAs(account)
             val lookup = PageCounts(container.api, container.settings, account)
             if (!lookup.firstTry(book.id)) return@launch
             val count = lookup.find(book) ?: return@launch
-            val onServer = "pageCount" !in book.lockedFields &&
-                container.libraryRoles.canEditMetadata(container.auth.user.value, book.libraryId) &&
-                runCatching { lookup.save(book.id, count) }.isSuccess
-            if (onServer) {
-                _state.update { s -> s.copy(book = s.book?.let { if (it.id == book.id) it.copy(pageCount = count) else it }) }
-                container.tracking.changedElsewhere(book.id)
-            } else {
-                container.appSettings.update { s -> s.copy(pageTotals = s.pageTotals + (book.id to count)) }
-            }
+            // Signed out (and maybe another account in) during the search: not that account's total.
+            if (!signedIn()) return@launch
+            container.appSettings.update { s -> s.copy(pageTotals = s.pageTotals + (book.id to count)) }
         }
     }
 

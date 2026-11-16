@@ -1,0 +1,5 @@
+- Security fixes from a full review
+- Page counts found online are kept as your own and no longer change the book's details for everyone
+- Accounts with similar names on one device can no longer see each other's downloads
+- Signing out now forgets more about the account
+- Links in PDFs, long text sent to translators, and Bookmory imports are handled more safely
