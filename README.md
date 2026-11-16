@@ -1,5 +1,17 @@
 # Ottershelf
 
+<p align="center">
+  <strong>Read, track and annotate the books on your own BookOrbit server. Open source.</strong>
+</p>
+
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=io.github.ottershelf"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80"></a>
+</p>
+
+<p align="center">
+  Or download the signed APK from <a href="https://github.com/redmundmcmund/ottershelf/releases/latest">GitHub Releases</a> (same signing key, so the two update each other).
+</p>
+
 Ottershelf is an open-source Android app for reading, tracking and annotating the books on a
 self-hosted [BookOrbit](https://github.com/bookorbit/bookorbit) server. It opens EPUB and the other
 ebook formats, PDFs and comics from your server, keeps books on the phone for offline reading,
