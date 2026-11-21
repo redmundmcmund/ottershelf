@@ -465,7 +465,7 @@
 
     <issue
         id="AndroidGradlePluginVersion"
-        message="A newer version of com.android.application than 9.4.1 is available: 9.5.1"
+        message="A newer version of com.android.application than 9.4.1 is available: 9.5.2"
         errorLine1="agp = &quot;9.4.1&quot;"
         errorLine2="      ~~~~~~~">
         <location
@@ -1275,17 +1275,6 @@
             file="src/main/java/io/github/ottershelf/feature/library/LibraryScreens.kt"
             line="105"
             column="40"/>
-    </issue>
-
-    <issue
-        id="StateFlowValueCalledInComposition"
-        message="StateFlow.value should not be called within composition"
-        errorLine1="    val navigator = rememberAppNavigatorState(start = if (container.online.value) Route.Home else Route.Downloads())"
-        errorLine2="                                                                           ~~~~~">
-        <location
-            file="src/main/java/io/github/ottershelf/ui/nav/AppScaffold.kt"
-            line="83"
-            column="76"/>
     </issue>
 
     <issue
