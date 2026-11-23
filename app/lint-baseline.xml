@@ -750,28 +750,6 @@
     </issue>
 
     <issue
-        id="RestrictedApi"
-        message="Builder.setAutoRotationEnabled can only be called from within the same library group (referenced groupId=`androidx.camera` from groupId=`ottershelf`)"
-        errorLine1="                val session = SessionConfig.Builder(preview, capture).setAutoRotationEnabled(true).build()"
-        errorLine2="                                                                      ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/github/ottershelf/feature/bookedit/CoverCamera.kt"
-            line="132"
-            column="71"/>
-    </issue>
-
-    <issue
-        id="RestrictedApi"
-        message="Builder.setAutoRotationEnabled can only be called from within the same library group (referenced groupId=`androidx.camera` from groupId=`ottershelf`)"
-        errorLine1="                val session = SessionConfig.Builder(preview, capture).setAutoRotationEnabled(true).build()"
-        errorLine2="                                                                      ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/github/ottershelf/feature/quotes/ScanContent.kt"
-            line="167"
-            column="71"/>
-    </issue>
-
-    <issue
         id="VisibleForTests"
         message="This method should only be accessed from tests or within private scope"
         errorLine1="    private val saved: SavedStateHandle = SavedStateHandle(),"
@@ -855,7 +833,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/io/github/ottershelf/feature/quotes/ScanContent.kt"
-            line="231"
+            line="233"
             column="55"/>
     </issue>
 

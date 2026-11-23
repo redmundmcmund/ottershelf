@@ -67,6 +67,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.awaitCancellation
 import io.github.ottershelf.R
+import io.github.ottershelf.ui.components.CaptureFollowsDeviceRotation
 import io.github.ottershelf.ui.components.AccentButton
 import io.github.ottershelf.ui.components.DetailTopBar
 import io.github.ottershelf.ui.components.LoadingState
@@ -149,6 +150,10 @@ private fun CameraStep(onClose: () -> Unit, onTaken: (File) -> Unit, onFailed: (
     val capture = remember { ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY).build() }
     val failed by rememberUpdatedState(onFailed)
     if (!inPreview) {
+        // The capture follows how the phone is held (the activity handles rotation itself, and
+        // with auto-rotate off the display never turns), so a page shot in landscape isn't read
+        // sideways.
+        CaptureFollowsDeviceRotation(capture)
         LaunchedEffect(lifecycle) {
             val preview = Preview.Builder().build().apply { setSurfaceProvider { surface = it } }
             val provider = try {
@@ -161,10 +166,7 @@ private fun CameraStep(onClose: () -> Unit, onTaken: (File) -> Unit, onFailed: (
             }
             try {
                 provider.unbindAll()
-                // Auto rotation: the capture follows how the phone is held (the activity handles
-                // rotation itself, and with auto-rotate off the display never turns), so a page
-                // shot in landscape isn't read sideways.
-                val session = SessionConfig.Builder(preview, capture).setAutoRotationEnabled(true).build()
+                val session = SessionConfig.Builder(preview, capture).build()
                 provider.bindToLifecycle(lifecycle, CameraSelector.DEFAULT_BACK_CAMERA, session)
             } catch (e: Exception) {
                 failed(e.message)
