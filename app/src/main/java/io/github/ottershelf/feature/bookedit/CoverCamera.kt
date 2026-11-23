@@ -67,6 +67,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.awaitCancellation
 import io.github.ottershelf.R
+import io.github.ottershelf.ui.components.CaptureFollowsDeviceRotation
 import io.github.ottershelf.ui.icons.LucideIcon
 import io.github.ottershelf.ui.theme.OttershelfTheme
 import java.io.File
@@ -116,6 +117,8 @@ internal fun CoverCameraContent(
         onDispose { if (before != null) controller.isAppearanceLightStatusBars = before }
     }
     if (!inPreview) {
+        // The shot follows how the phone is held, as the quote scanner.
+        CaptureFollowsDeviceRotation(capture)
         LaunchedEffect(lifecycle) {
             val preview = Preview.Builder().build().apply { setSurfaceProvider { surface = it } }
             val provider = try {
@@ -128,8 +131,7 @@ internal fun CoverCameraContent(
             }
             try {
                 provider.unbindAll()
-                // Auto rotation, as the quote scanner: the shot follows how the phone is held.
-                val session = SessionConfig.Builder(preview, capture).setAutoRotationEnabled(true).build()
+                val session = SessionConfig.Builder(preview, capture).build()
                 provider.bindToLifecycle(lifecycle, CameraSelector.DEFAULT_BACK_CAMERA, session)
             } catch (e: Exception) {
                 failed()

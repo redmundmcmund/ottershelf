@@ -80,7 +80,9 @@ private fun ViewModelScope(content: @Composable () -> Unit) {
  */
 @Composable
 private fun AppScaffold(container: AppContainer) {
-    val navigator = rememberAppNavigatorState(start = if (container.online.value) Route.Home else Route.Downloads())
+    // Online or not when the shell first appears; going on or offline later doesn't move the user.
+    val startOnline = remember { container.online.value }
+    val navigator = rememberAppNavigatorState(start = if (startOnline) Route.Home else Route.Downloads())
     val shell = appViewModel { ShellViewModel(it) }
     val drawer by shell.state.collectAsStateWithLifecycle()
     LaunchedEffect(drawer.failed) { navigator.drawerLoadFailed(drawer.failed) }

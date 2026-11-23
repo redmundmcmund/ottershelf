@@ -1,0 +1,48 @@
+# Builds the app and runs the JVM tests and Android lint on every push to main and every pull
+# request. Not run here: the device tests (app/src/androidTest, which need a phone), the screenshot
+# recordings (recordRoborazziDebug; a plain testDebugUnitTest skips the captures) and the reader's
+# browser checks (tools/reader-js-test). Lint fails only on issues missing from app/lint-baseline.xml.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          # Only main writes the cache; pull requests read it.
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Unit tests, lint and debug build
+        run: ./gradlew --console=plain testDebugUnitTest lintDebug assembleDebug
+
+      - name: Upload test and lint reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            app/build/reports/tests/
+            app/build/reports/lint-results-debug.*
+          retention-days: 14

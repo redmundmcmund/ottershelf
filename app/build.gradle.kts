@@ -119,6 +119,13 @@ android {
         buildConfig = true
     }
 
+    // CI (.github/workflows/ci.yml) runs lintDebug. The baseline records the issues that were
+    // already there when CI started, so only new ones fail the build. Fix an old one and run
+    // `./gradlew updateLintBaseline` to drop it from the file.
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     testOptions {
         unitTests {
             // Robolectric and Roborazzi need the merged resources and manifest.
